@@ -1,0 +1,10 @@
+// Colors
+$darkBlue: #020111;
+$lightGray: #eee;
+
+// Mobile breakpoints
+@mixin mobile {
+  @media screen and (max-width: 640px) {
+    @content;
+  }
+}

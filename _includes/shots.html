@@ -1,0 +1,20 @@
+{% if site.dribbble-token %}
+  <script>
+    $.jribbble.setToken('{{ site.dribbble-token }}');
+    $.jribbble.users('{{ site.dribbble }}').shots({per_page: 62}).then(function(shots) {
+      var html = [];
+
+      shots.forEach(function(shot) {
+        html.push(
+          '<div class="shotsItem col-lg-3 col-md-4 col-sm-6">' +
+            '<a href="' + shot.html_url + '" target="_blank">' +
+              '<img src="' + shot.images.normal + '">' +
+            '</a>' +
+          '</div>'
+        );
+      });
+
+      $('.shots').html(html.join(''));
+    });
+  </script>
+{% endif %}

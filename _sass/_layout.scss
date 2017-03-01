@@ -1,0 +1,132 @@
+.wrapper-masthead {
+  margin-bottom: 40px;
+}
+
+.masthead {
+  padding: 40px;
+  border-bottom: 1px solid rgba($darkBlue, .1);
+  text-align: center;
+}
+
+.site-avatar {
+  .avatar-img {
+    max-height: 140px;
+  }
+}
+
+.site-info {
+  max-width: 600px;
+  margin: auto;
+}
+
+.site-name {
+  margin: 0;
+  color: $darkBlue;
+  cursor: pointer;
+  font-weight: 700;
+  transition: .2s;
+
+  a {
+    color: $darkBlue;
+
+    &:hover {
+      color: rgba($darkBlue, .8);
+    }
+  }
+}
+
+.site-description {
+  margin: 5px 0 0;
+  color: rgba($darkBlue, .65);
+  font-size: 16px;
+}
+
+nav {
+  margin-top: 20px;
+  font-family: $proxima;
+  font-size: 18px;
+  transition: .2s;
+
+  a {
+    margin: 0 10px;
+    color: $darkBlue;
+
+    &:hover {
+      color: rgba($darkBlue, .8);
+    }
+  }
+}
+
+//
+// .main
+//
+
+.posts > .post {
+  padding-bottom: 2em;
+  border-bottom: 1px solid $lightGray;
+}
+
+.posts > .post:last-child {
+  padding-bottom: 1em;
+  border-bottom: none;
+}
+
+.post {
+  blockquote {
+    margin: 1.8em .8em;
+    border-left: 2px solid gray;
+    padding: 0.1em 1em;
+    color: gray;
+    font-size: 22px;
+    font-style: italic;
+  }
+
+  .comments {
+    margin-top: 10px;
+  }
+
+  .read-more {
+    text-transform: uppercase;
+    font-size: 15px;
+  }
+}
+
+.wrapper-footer {
+  margin-top: 50px;
+  border-top: 1px solid rgba($darkBlue, .1);
+  background-color: rgba($darkBlue, .05);
+}
+
+footer {
+  padding: 20px;
+  text-align: center;
+
+  a {
+    margin: 0 2px;
+  }
+}
+
+//
+//  New
+//
+
+.shots {
+  padding: 0 10px;
+}
+
+.shotsItem {
+  margin-bottom: 10px;
+
+  a img {
+    box-shadow: 0 16px 60px 0 rgba(black, .1);
+  }
+}
+
+.row {
+  margin: 0;
+}
+
+.page, .post {
+  max-width: 960px;
+  padding: 0 30px;
+}
