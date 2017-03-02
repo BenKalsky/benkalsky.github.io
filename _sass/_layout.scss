@@ -1,11 +1,21 @@
 .wrapper-masthead {
   margin-bottom: 40px;
+  position: relative;
 }
 
 .masthead {
-  padding: 40px;
-  border-bottom: 1px solid rgba($darkBlue, .1);
+  padding: 40px 30px;
   text-align: center;
+  max-width: 740px;
+
+  &:after {
+    content: '';
+    border-bottom: 1px solid rgba($darkBlue, .1);
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
 }
 
 .site-avatar {
@@ -15,7 +25,6 @@
 }
 
 .site-info {
-  max-width: 600px;
   margin: auto;
 }
 
@@ -127,6 +136,7 @@ footer {
 }
 
 .page, .post {
-  max-width: 960px;
+  max-width: 740px;
   padding: 0 30px;
+  text-align: left;
 }
