@@ -33,15 +33,6 @@
   color: $darkBlue;
   cursor: pointer;
   font-weight: 700;
-  transition: .2s;
-
-  a {
-    color: $darkBlue;
-
-    &:hover {
-      color: rgba($darkBlue, .8);
-    }
-  }
 }
 
 .site-description {
@@ -115,10 +106,6 @@ footer {
   }
 }
 
-//
-//  New
-//
-
 .shots {
   padding: 0 10px;
 }
@@ -140,4 +127,13 @@ footer {
   padding: 0 30px;
   text-align: left;
   @include flex-basis(740px);
+}
+
+a {
+  transition: .2s;
+  color: $darkBlue;
+
+  &:hover {
+    color: rgba($darkBlue, .8);
+  }
 }
