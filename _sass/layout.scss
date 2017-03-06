@@ -45,21 +45,11 @@ nav {
   margin-top: 20px;
   font-family: $proxima;
   font-size: 18px;
-  transition: .2s;
-
+  
   a {
     margin: 0 10px;
-    color: $darkBlue;
-
-    &:hover {
-      color: rgba($darkBlue, .8);
-    }
   }
 }
-
-//
-// .main
-//
 
 .posts > .post {
   padding-bottom: 2em;
