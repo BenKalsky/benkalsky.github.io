@@ -43,8 +43,9 @@ google_analytics: UA-38858139-16
 url: http://benkalsky.net
 
 # Your Dribbble Client Access Token
-dribbble: benkalsky
-dribbble-token: 0ddba12d9980140ec6a091c6bd01c1ec8ca28ba54eb0b42e0f06fe439ba3a9c8
+dribbble:
+  username: benkalsky
+  token: 0ddba12d9980140ec6a091c6bd01c1ec8ca28ba54eb0b42e0f06fe439ba3a9c8
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
