@@ -45,7 +45,7 @@ nav {
   margin-top: 20px;
   font-family: $proxima;
   font-size: 18px;
-  
+
   a {
     margin: 0 10px;
   }
@@ -116,13 +116,4 @@ footer {
   padding: 0 30px;
   text-align: left;
   @include flex-basis(740px);
-}
-
-a {
-  transition: .2s;
-  color: $darkBlue;
-
-  &:hover {
-    color: rgba($darkBlue, .8);
-  }
 }
