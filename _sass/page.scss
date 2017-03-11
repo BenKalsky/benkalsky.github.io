@@ -22,3 +22,19 @@
     }
   }
 }
+
+nav {
+  a {
+    &:hover {
+      @if $breaking-underlines {
+        text-shadow: (-1px) -1px 0 $background-color, 1px -1px 0 $background-color, -1px 1px 0 $background-color, 1px 1px 0 $background-color;
+      }
+
+      @include underline($link-color-nav);
+
+      @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+        @include underline($link-color-nav, 0.5);
+      }
+    }
+  }
+}
