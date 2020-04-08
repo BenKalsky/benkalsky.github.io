@@ -3,7 +3,7 @@
   <script>
     // Get a list of your shots and display them in the DOM.
     jribbble.shots({token: "{{ site.dribbble.token }}"}, function(shotsArray) {
-      document.querySelector(".dribbble-shots").innerHTML = shotsArray.reduce(function(html, shot) {
+      document.querySelector(".shotsItem").innerHTML = shotsArray.reduce(function(html, shot) {
         return html + '<li><a href="'+  shot.html_url + '" target="_blank"><img src="' + shot.images.normal + '"></a></li>';
       }, "");
     });
@@ -15,7 +15,7 @@
     
     // Get the second page of your shots at 12 per page and display them in the DOM.
     jribbble.shots({token: "{{ site.dribbble.token }}", page: 2, per_page: 12}, function(shotsArray) {
-      document.querySelector(".dribbble-shots").innerHTML = shotsArray.reduce(function(html, shot) {
+      document.querySelector(".shotsItem").innerHTML = shotsArray.reduce(function(html, shot) {
         return html + '<li><a href="'+  shot.html_url + '" target="_blank"><img src="' + shot.images.normal + '"></a></li>';
       }, "");
     });
