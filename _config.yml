@@ -45,7 +45,8 @@ url: http://benkalsky.net
 # Your Dribbble Client Access Token
 dribbble:
   username: benkalsky
-  token: 0ddba12d9980140ec6a091c6bd01c1ec8ca28ba54eb0b42e0f06fe439ba3a9c8
+  token: f140cb51294409f05f244cb9a63ee06f23068b57655aff618fac3c9f0df73602
+#  token: 0ddba12d9980140ec6a091c6bd01c1ec8ca28ba54eb0b42e0f06fe439ba3a9c8
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
