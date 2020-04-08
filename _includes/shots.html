@@ -2,28 +2,28 @@
   {% include jribbble.html %}
   <script>
     
-    jribbble.shots({token: "f140cb51294409f05f244cb9a63ee06f23068b57655aff618fac3c9f0df73602"}, function(shots) {
-  document.querySelector(".dribbble-shots-list").innerHTML = shots.reduce(function(html, shot) {
-    return html + '<li><a href="'+  shot.html_url + '" target="_blank"><img src="' + shot.images.normal + '"></a></li>';
-  }, "");
-});
+//     jribbble.shots({token: ""}, function(shots) {
+//   document.querySelector(".dribbble-shots-list").innerHTML = shots.reduce(function(html, shot) {
+//     return html + '<li><a href="'+  shot.html_url + '" target="_blank"><img src="' + shot.images.normal + '"></a></li>';
+//   }, "");
+// });
     
-//     $.jribbble.setToken('{{ site.dribbble.token }}');
-//     $.jribbble.users('{{ site.dribbble.username }}').shots({per_page: 62}).then(function(shots) {
-//       var html = [];
+    $.jribbble.setToken('{{ site.dribbble.token }}');
+    $.jribbble.users('{{ site.dribbble.username }}').shots({per_page: 62}).then(function(shots) {
+      var html = [];
 
-//       shots.forEach(function(shot) {
-//         html.push(
-//           '<div class="shotsItem col-lg-3 col-md-4 col-sm-6">' +
-//             '<a href="' + shot.html_url + '" target="_blank">' +
-//               '<img src="' + shot.images.normal + '">' +
-//             '</a>' +
-//           '</div>'
-//         );
-//       });
+      shots.forEach(function(shot) {
+        html.push(
+          '<div class="shotsItem col-lg-3 col-md-4 col-sm-6">' +
+            '<a href="' + shot.html_url + '" target="_blank">' +
+              '<img src="' + shot.images.normal + '">' +
+            '</a>' +
+          '</div>'
+        );
+      });
 
-//       $('.shots').html(html.join(''));
-//     });
+      $('.shots').html(html.join(''));
+    });
     
   </script>
 {% endif %}
