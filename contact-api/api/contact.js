@@ -7,6 +7,9 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 const TO_ADDRESS = 'benkalsky@gmail.com';
+// TODO: verify benkalsky.co.il in Resend and switch the sender to
+// forms@benkalsky.co.il — quoty.co.il is used only because it is
+// currently the sole verified sending domain in the account.
 const FROM_ADDRESS = 'Ben Kalsky Site <forms@quoty.co.il>';
 
 // Best-effort throttling. State is per warm lambda instance, so these are
