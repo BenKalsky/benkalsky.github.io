@@ -20,27 +20,28 @@ const ipBuckets = new Map();
 let dailyCount = 0;
 let dailyResetAt = 0;
 
-function rateLimited(req) {
+function dailyQuotaExhausted() {
   const now = Date.now();
-
   if (now > dailyResetAt) {
     dailyResetAt = now + 24 * 60 * 60 * 1000;
     dailyCount = 0;
   }
-  if (dailyCount >= DAILY_CAP) return true;
+  return dailyCount >= DAILY_CAP;
+}
 
+function rateLimited(req) {
+  if (dailyQuotaExhausted()) return true;
+
+  const now = Date.now();
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   const bucket = ipBuckets.get(ip);
   if (!bucket || now > bucket.resetAt) {
     if (ipBuckets.size > 5000) ipBuckets.clear();
     ipBuckets.set(ip, { count: 1, resetAt: now + IP_WINDOW_MS });
-  } else {
-    bucket.count += 1;
-    if (bucket.count > IP_LIMIT) return true;
+    return false;
   }
-
-  dailyCount += 1;
-  return false;
+  bucket.count += 1;
+  return bucket.count > IP_LIMIT;
 }
 
 function setCors(req, res) {
@@ -119,6 +120,14 @@ export default async function handler(req, res) {
     <hr>
     <p style="color:#666;font-size:12px">נשלח עם הסכמה למדיניות הפרטיות (תיקון 13).</p>
   `;
+
+  // The daily quota counts only requests that passed validation and the
+  // honeypot — i.e. actual send attempts — so junk traffic cannot exhaust it.
+  if (dailyQuotaExhausted()) {
+    res.status(429).json({ error: 'too many requests' });
+    return;
+  }
+  dailyCount += 1;
 
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
