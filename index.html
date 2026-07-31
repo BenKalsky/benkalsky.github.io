@@ -1,5 +1,545 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בן קלסקי — יישום בינה מלאכותית בעסק | Claude, סוכני AI ואוטומציות</title>
+<meta name="description" content="מומחה ליישום בינה מלאכותית בעסקים: Claude, MCP, סוכני AI, תהליכים אג'נטיים, אוטומציות ו-Vibe Coding. שותף-מייסד ו-CTO בדיגיטייזר. 15+ שנות ניסיון, 100+ פרויקטים.">
+<meta property="og:locale" content="he_IL">
+<meta property="og:type" content="website">
+<meta property="og:title" content="בן קלסקי — יישום בינה מלאכותית בעסק">
+<meta property="og:description" content="Claude, MCP, סוכני AI, תהליכים אג'נטיים, אוטומציות ו-Vibe Coding. שותף-מייסד ו-CTO בדיגיטייזר.">
+<meta property="og:url" content="https://benkalsky.net/">
+<link rel="canonical" href="https://benkalsky.net/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23201743'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23AF8FE2' font-family='Georgia,serif' font-weight='bold'%3Eב%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=IBM+Plex+Sans+Hebrew:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  :root {
+    --ink: #201743;
+    --ink-soft: #4A4165;
+    --paper: #F6F4FA;
+    --paper-raised: #FFFFFF;
+    --lavender: #AF8FE2;
+    --violet: #6C4BC8;
+    --amber: #E8A33D;
+    --line: #DDD7EC;
+    --radius: 14px;
+    --font-display: 'Suez One', serif;
+    --font-body: 'IBM Plex Sans Hebrew', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
 
-<div class="row center-xs shots"></div>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  a { color: var(--violet); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--violet);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  .bridge :focus-visible, footer :focus-visible {
+    outline-color: var(--lavender);
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    direction: ltr;
+    unicode-bidi: embed;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    padding: 96px 0 72px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: var(--violet);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .eyebrow::after {
+    content: '';
+    flex: 0 0 56px;
+    height: 1px;
+    background: var(--lavender);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 6vw, 3.9rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    max-width: 16ch;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--violet);
+  }
+
+  .hero-sub {
+    margin-top: 26px;
+    max-width: 56ch;
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+  }
+  .hero-sub strong { color: var(--ink); font-weight: 600; }
+
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+    list-style: none;
+  }
+  .keywords li {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    color: var(--ink-soft);
+  }
+  .keywords li.hot {
+    border-color: var(--lavender);
+    color: var(--violet);
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 40px;
+    margin-top: 44px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .stats b {
+    font-family: var(--font-mono);
+    font-size: 1.55rem;
+    font-weight: 500;
+    color: var(--ink);
+    display: block;
+    line-height: 1.2;
+  }
+  .stats span {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 36px;
+    list-style: none;
+  }
+  .social a {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 9px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper-raised);
+    color: var(--ink);
+    transition: border-color 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+  .social a:hover {
+    text-decoration: none;
+    border-color: var(--violet);
+    transform: translateY(-2px);
+  }
+
+  /* ---------- sections ---------- */
+  section { padding: 64px 0; }
+
+  .sec-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+    margin-bottom: 10px;
+  }
+  .sec-lead {
+    color: var(--ink-soft);
+    max-width: 54ch;
+    margin-bottom: 40px;
+  }
+
+  /* what I do */
+  .craft {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    list-style: none;
+  }
+  @media (max-width: 680px) {
+    .craft { grid-template-columns: 1fr; }
+  }
+  .craft li {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 24px;
+  }
+  .craft h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .craft h3::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--lavender);
+    margin-bottom: 14px;
+  }
+  .craft li:nth-child(2) h3::before { background: var(--violet); }
+  .craft li:nth-child(3) h3::before { background: var(--amber); }
+  .craft li:nth-child(4) h3::before { background: var(--ink-soft); }
+  .craft p { font-size: 0.95rem; color: var(--ink-soft); }
+  .craft .mono { font-size: 0.85em; }
+
+  /* products */
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 18px;
+    list-style: none;
+  }
+  .products li {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    background: var(--paper-raised);
+    transition: border-color 0.2s;
+  }
+  .products li:hover { border-color: var(--lavender); }
+  .products .name {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .products .name a { color: var(--ink); }
+  .products p { font-size: 0.9rem; color: var(--ink-soft); }
+  .products .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--violet);
+    display: inline-block;
+    margin-top: 12px;
+  }
+
+  /* clients */
+  .clients {
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .clients li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 20px;
+    padding: 18px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .clients .who {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .clients .what {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+  .clients .what b {
+    color: var(--violet);
+    font-weight: 500;
+  }
+
+  /* ---------- digitizer bridge ---------- */
+  .bridge {
+    margin-top: 40px;
+    background: var(--ink);
+    color: #EFEAFB;
+    border-radius: 28px 28px 0 0;
+    position: relative;
+    overflow: hidden;
+    padding: 88px 0 96px;
+  }
+  .bridge::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -120px;
+    top: -160px;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(175,143,226,0.28), transparent 70%);
+    pointer-events: none;
+  }
+  .bridge .eyebrow { color: var(--lavender); }
+  .bridge .eyebrow::after { background: var(--violet); }
+  .bridge h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 4.6vw, 3rem);
+    line-height: 1.3;
+    max-width: 20ch;
+  }
+  .bridge p {
+    margin-top: 22px;
+    max-width: 54ch;
+    color: #C9C0E4;
+  }
+  .bridge .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 40px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-2px); }
+  .btn-primary {
+    background: var(--lavender);
+    color: var(--ink);
+  }
+  .btn-primary:hover { background: #C3A9EE; }
+  .btn-ghost {
+    border: 1px solid #8F85AD;
+    color: #EFEAFB;
+  }
+  .btn-ghost:hover { border-color: var(--lavender); }
+
+  /* ---------- footer ---------- */
+  footer {
+    background: var(--ink);
+    color: #8F85AD;
+    padding: 8px 0 40px;
+    font-size: 0.85rem;
+  }
+  footer .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 24px;
+    border-top: 1px solid #372E58;
+    padding-top: 24px;
+  }
+  footer a { color: var(--lavender); }
+  footer .quote {
+    font-style: italic;
+    color: #9A90B8;
+  }
+
+  /* ---------- motion (hidden state only when JS is running) ---------- */
+  .js .hero .fade {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .js .hero .fade.in {
+    opacity: 1;
+    transform: none;
+  }
+  .hero .fade:nth-child(1) { transition-delay: 0.05s; }
+  .hero .fade:nth-child(2) { transition-delay: 0.15s; }
+  .hero .fade:nth-child(3) { transition-delay: 0.28s; }
+  .hero .fade:nth-child(4) { transition-delay: 0.38s; }
+  .hero .fade:nth-child(5) { transition-delay: 0.48s; }
+  .hero .fade:nth-child(6) { transition-delay: 0.58s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js .hero .fade { opacity: 1; transform: none; transition: none; }
+    .social a, .btn { transition: none; }
+  }
+
+  @media (max-width: 560px) {
+    .hero { padding: 64px 0 48px; }
+    section { padding: 44px 0; }
+    .stats { gap: 14px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow fade"><span dir="ltr">BEN KALSKY</span> · בן קלסקי</p>
+    <h1 class="fade">בינה מלאכותית <em>שעובדת בשביל העסק שלך.</em></h1>
+    <p class="hero-sub fade">אני מטמיע AI בעסקים — מסוכנים אוטונומיים ועד אוטומציות מקצה לקצה. שותף-מייסד ו-CTO ב<strong><a href="https://www.digitizer.co.il">דיגיטייזר</a></strong>, עם 15+ שנים של בניית מערכות שמחזיקות בפרודקשן.</p>
+    <ul class="keywords fade" aria-label="תחומי התמחות">
+      <li class="hot">Claude</li>
+      <li class="hot">MCP</li>
+      <li class="hot" lang="he">סוכני AI</li>
+      <li lang="he">תהליכים אג'נטיים</li>
+      <li lang="he">אוטומציות</li>
+      <li>Vibe Coding</li>
+    </ul>
+    <ul class="stats fade">
+      <li><b>15+</b><span>שנות בנייה לרשת</span></li>
+      <li><b>100+</b><span>פרויקטים שנמסרו</span></li>
+      <li><b>4</b><span>מוצרים חיים</span></li>
+    </ul>
+    <ul class="social fade">
+      <li><a href="https://github.com/BenKalsky" rel="me">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/benkalsky" rel="me">LinkedIn</a></li>
+      <li><a href="https://stackoverflow.com/users/1491580/ben-kalsky" rel="me">Stack Overflow</a></li>
+      <li><a href="https://profiles.wordpress.org/benkalsky" rel="me">WordPress.org</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <section aria-labelledby="craft-title">
+    <div class="wrap">
+      <h2 class="sec-title fade" id="craft-title">מה אני עושה</h2>
+      <p class="sec-lead fade">לא הרצאות על AI — יישום. מערכות שרצות אצלך בעסק ומחזירות את ההשקעה.</p>
+      <ul class="craft">
+        <li class="fade">
+          <h3>סוכני AI ותהליכים אג'נטיים</h3>
+          <p>סוכנים אוטונומיים על בסיס <span class="mono">Claude</span> ו-<span class="mono">MCP</span> — מחיבור מקורות המידע של העסק ועד תהליכי עבודה שרצים לבד.</p>
+        </li>
+        <li class="fade">
+          <h3>אוטומציות עסקיות</h3>
+          <p>חיבור בין המערכות שכבר יש לך — CRM, אתר, מייל, דוחות — לתהליך אחד שזורם בלי ידיים.</p>
+        </li>
+        <li class="fade">
+          <h3>Vibe Coding</h3>
+          <p>מרעיון למוצר עובד בשבועות, לא בחודשים — פיתוח מונחה AI עם הקפדה של מהנדס.</p>
+        </li>
+        <li class="fade">
+          <h3>תשתיות ווב</h3>
+          <p>הבסיס שהכול יושב עליו: וורדפרס, WooCommerce, ביצועים ואבטחה — 15+ שנים בתחום.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="products-title">
+    <div class="wrap">
+      <h2 class="sec-title fade" id="products-title">הוכחה, לא הבטחה</h2>
+      <p class="sec-lead fade">מוצרים חיים שבניתי בתהליך אג'נטי — אותה גישה שאני מביא לעסק שלך.</p>
+      <ul class="products">
+        <li class="fade">
+          <span class="name"><a href="https://deep-claw.com">DeepClaw</a></span>
+          <p>SaaS לניטור שערי AI — רואים מה הסוכנים והמודלים שלכם באמת עושים.</p>
+          <span class="tag">AI · SaaS · live</span>
+        </li>
+        <li class="fade">
+          <span class="name"><a href="https://wordpress.org/plugins/digitizer-site-worker/">SiteAgent</a></span>
+          <p>סוכן ניהול וורדפרס עבור <a href="https://my-aura.app" class="mono">Aura</a> — תחזוקת אתרים בלי ידיים.</p>
+          <span class="tag">Agent · WordPress.org</span>
+        </li>
+        <li class="fade">
+          <span class="name">AutoMate</span>
+          <p>ניהול מלאי רכב לסוכנות מכוניות — מהמגרש ועד הליד.</p>
+          <span class="tag">in production</span>
+        </li>
+        <li class="fade">
+          <span class="name">Pulse</span>
+          <p>דשבורד אנליטיקס לסוכנויות — כל הלקוחות במסך אחד.</p>
+          <span class="tag">in production</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="clients-title">
+    <div class="wrap">
+      <h2 class="sec-title fade" id="clients-title">חברות שסמכו עלינו</h2>
+      <p class="sec-lead fade">חלק מהחברות שבנינו עבורן — ולאן הן הגיעו.</p>
+      <ul class="clients">
+        <li class="fade">
+          <span class="who">Reposify</span>
+          <span class="what">נרכשה על ידי <b>CrowdStrike</b></span>
+        </li>
+        <li class="fade">
+          <span class="who">Deci</span>
+          <span class="what">נרכשה על ידי <b>NVIDIA</b></span>
+        </li>
+        <li class="fade">
+          <span class="who">Balance</span>
+          <span class="what">תשתית תשלומים B2B</span>
+        </li>
+        <li class="fade">
+          <span class="who">PractiTest</span>
+          <span class="what">פלטפורמת ניהול בדיקות</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="bridge" aria-labelledby="bridge-title">
+    <div class="wrap">
+      <p class="eyebrow fade">DIGITIZER · דיגיטייזר</p>
+      <h2 class="fade" id="bridge-title">רוצים בינה מלאכותית בעסק? בואו נדבר.</h2>
+      <p class="fade">היישום קורה בדיגיטייזר — שותף טכנולוגי לחברות טכנולוגיה, SaaS ואיקומרס. מאפיון ועד מערכת חיה, עם צוות שמלווה אתכם גם אחרי ההשקה.</p>
+      <div class="cta-row fade">
+        <a class="btn btn-primary" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/benkalsky">דברו איתי ב-LinkedIn</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span class="mono" id="year">2026</span> בן קלסקי · <a href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a></span>
+    <span class="quote">"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.querySelectorAll('.hero .fade').forEach(function (el) {
+        el.classList.add('in');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
