@@ -6,8 +6,16 @@
 <title>404 — הדף לא נמצא</title>
 <meta name="robots" content="noindex">
 <style>
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/GreycliffHebrewCF-Bold.woff2') format('woff2'),
+         url('fonts/GreycliffHebrewCF-Bold.woff') format('woff');
+  }
   body {
-    font-family: 'IBM Plex Sans Hebrew', -apple-system, sans-serif;
+    font-family: 'GreycliffHebrewCF', -apple-system, sans-serif;
     background: #F6F4FA;
     color: #201743;
     min-height: 100vh;
@@ -16,7 +24,7 @@
     margin: 0;
     text-align: center;
   }
-  b { font-size: 4rem; display: block; color: #6C4BC8; font-family: monospace; }
+  b { font-size: 4rem; display: block; color: #6C4BC8; }
   a { color: #6C4BC8; }
 </style>
 </head>
