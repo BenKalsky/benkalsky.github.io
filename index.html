@@ -14,9 +14,36 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23201743'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23AF8FE2' font-family='Georgia,serif' font-weight='bold'%3Eב%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=IBM+Plex+Sans+Hebrew:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/GreycliffHebrewCF-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <script>document.documentElement.classList.add('js');</script>
 <style>
+
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('fonts/GreycliffHebrewCF-Light.woff2') format('woff2'),
+         url('fonts/GreycliffHebrewCF-Light.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('fonts/GreycliffHebrewCF-Medium.woff2') format('woff2'),
+         url('fonts/GreycliffHebrewCF-Medium.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/GreycliffHebrewCF-Bold.woff2') format('woff2'),
+         url('fonts/GreycliffHebrewCF-Bold.woff') format('woff');
+  }
+
   :root {
     --ink: #201743;
     --ink-soft: #4A4165;
@@ -27,8 +54,8 @@
     --amber: #E8A33D;
     --line: #DDD7EC;
     --radius: 14px;
-    --font-display: 'Suez One', serif;
-    --font-body: 'IBM Plex Sans Hebrew', sans-serif;
+    --font-display: 'GreycliffHebrewCF', sans-serif;
+    --font-body: 'GreycliffHebrewCF', sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
   }
 
@@ -38,6 +65,7 @@
 
   body {
     font-family: var(--font-body);
+    font-weight: 300;
     background: var(--paper);
     color: var(--ink);
     line-height: 1.7;
@@ -92,7 +120,7 @@
 
   h1 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 700;
     font-size: clamp(2.2rem, 6vw, 3.9rem);
     line-height: 1.25;
     letter-spacing: -0.01em;
@@ -109,7 +137,7 @@
     font-size: 1.1rem;
     color: var(--ink-soft);
   }
-  .hero-sub strong { color: var(--ink); font-weight: 600; }
+  .hero-sub strong { color: var(--ink); font-weight: 700; }
 
   .keywords {
     display: flex;
@@ -183,7 +211,7 @@
 
   .sec-title {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 700;
     font-size: clamp(1.5rem, 3.4vw, 2.1rem);
     margin-bottom: 10px;
   }
@@ -211,7 +239,7 @@
   }
   .craft h3 {
     font-size: 1.05rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 8px;
   }
   .craft h3::before {
@@ -276,7 +304,7 @@
     border-bottom: 1px solid var(--line);
   }
   .clients .who {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.1rem;
   }
   .clients .what {
@@ -313,7 +341,7 @@
   .bridge .eyebrow::after { background: var(--violet); }
   .bridge h2 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 700;
     font-size: clamp(1.9rem, 4.6vw, 3rem);
     line-height: 1.3;
     max-width: 20ch;
@@ -333,7 +361,7 @@
     display: inline-block;
     padding: 14px 28px;
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
     transition: transform 0.2s, background 0.2s;
   }
