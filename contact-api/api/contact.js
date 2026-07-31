@@ -9,6 +9,40 @@ const ALLOWED_ORIGINS = new Set([
 const TO_ADDRESS = 'benkalsky@gmail.com';
 const FROM_ADDRESS = 'Ben Kalsky Site <forms@quoty.co.il>';
 
+// Best-effort throttling. State is per warm lambda instance, so these are
+// soft caps, not guarantees — good enough to stop naive scripted abuse and
+// protect the Resend quota. A hard guarantee would need shared storage
+// (e.g. Upstash Redis), which is an owner decision.
+const IP_LIMIT = 5;
+const IP_WINDOW_MS = 60 * 60 * 1000;
+const DAILY_CAP = 100;
+const ipBuckets = new Map();
+let dailyCount = 0;
+let dailyResetAt = 0;
+
+function rateLimited(req) {
+  const now = Date.now();
+
+  if (now > dailyResetAt) {
+    dailyResetAt = now + 24 * 60 * 60 * 1000;
+    dailyCount = 0;
+  }
+  if (dailyCount >= DAILY_CAP) return true;
+
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const bucket = ipBuckets.get(ip);
+  if (!bucket || now > bucket.resetAt) {
+    if (ipBuckets.size > 5000) ipBuckets.clear();
+    ipBuckets.set(ip, { count: 1, resetAt: now + IP_WINDOW_MS });
+  } else {
+    bucket.count += 1;
+    if (bucket.count > IP_LIMIT) return true;
+  }
+
+  dailyCount += 1;
+  return false;
+}
+
 function setCors(req, res) {
   const origin = req.headers.origin;
   if (origin && ALLOWED_ORIGINS.has(origin)) {
@@ -39,6 +73,10 @@ export default async function handler(req, res) {
   }
   if (!originAllowed) {
     res.status(403).json({ error: 'origin not allowed' });
+    return;
+  }
+  if (rateLimited(req)) {
+    res.status(429).json({ error: 'too many requests' });
     return;
   }
 
