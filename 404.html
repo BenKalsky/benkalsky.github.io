@@ -9,13 +9,22 @@
   @font-face {
     font-family: 'GreycliffHebrewCF';
     font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('/fonts/GreycliffHebrewCF-Light.woff2') format('woff2'),
+         url('/fonts/GreycliffHebrewCF-Light.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('fonts/GreycliffHebrewCF-Bold.woff2') format('woff2'),
-         url('fonts/GreycliffHebrewCF-Bold.woff') format('woff');
+    src: url('/fonts/GreycliffHebrewCF-Bold.woff2') format('woff2'),
+         url('/fonts/GreycliffHebrewCF-Bold.woff') format('woff');
   }
   body {
     font-family: 'GreycliffHebrewCF', -apple-system, sans-serif;
+    font-weight: 300;
     background: #F6F4FA;
     color: #201743;
     min-height: 100vh;
