@@ -349,6 +349,87 @@
   }
   .btn-ghost:hover { border-color: var(--lavender); }
 
+  /* ---------- contact form ---------- */
+  .contact-form { margin-top: 40px; max-width: 640px; }
+  .contact-form label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #C9C0E4;
+    margin-bottom: 16px;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0 14px;
+  }
+  @media (max-width: 680px) {
+    .field-row { grid-template-columns: 1fr; }
+  }
+  .contact-form input[type="text"],
+  .contact-form input[type="email"],
+  .contact-form input[type="tel"],
+  .contact-form textarea {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 11px 14px;
+    font: inherit;
+    font-size: 0.95rem;
+    color: #EFEAFB;
+    background: #2B2153;
+    border: 1px solid #8F85AD;
+    border-radius: 10px;
+  }
+  .contact-form textarea { resize: vertical; }
+  .contact-form input:focus, .contact-form textarea:focus {
+    outline: 3px solid var(--lavender);
+    outline-offset: 1px;
+    border-color: var(--lavender);
+  }
+  .hp-field {
+    position: absolute;
+    inset-inline-start: -9999px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .privacy {
+    margin: 4px 0 16px;
+    font-size: 0.85rem;
+    color: #C9C0E4;
+    border: 1px solid #4A4165;
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  .privacy summary {
+    cursor: pointer;
+    color: var(--lavender);
+    font-weight: 500;
+  }
+  .privacy p { margin-top: 10px; color: #C9C0E4; }
+  .privacy a { color: var(--lavender); }
+  .consent {
+    display: flex !important;
+    gap: 10px;
+    align-items: flex-start;
+    font-weight: 400 !important;
+  }
+  .consent input {
+    margin-top: 5px;
+    width: 17px;
+    height: 17px;
+    accent-color: var(--lavender);
+    flex: 0 0 auto;
+  }
+  .btn-primary:disabled { opacity: 0.6; cursor: wait; transform: none; }
+  .form-status {
+    margin-top: 14px;
+    font-size: 0.95rem;
+    min-height: 1.6em;
+  }
+  .form-status.ok { color: #B8E6C1; }
+  .form-status.err { color: #F2B8C6; }
+
   /* ---------- footer ---------- */
   footer {
     background: var(--ink);
@@ -514,10 +595,42 @@
       <p class="eyebrow fade">DIGITIZER · דיגיטייזר</p>
       <h2 class="fade" id="bridge-title">רוצים בינה מלאכותית בעסק? בואו נדבר.</h2>
       <p class="fade">היישום קורה בדיגיטייזר — שותף טכנולוגי לחברות טכנולוגיה, SaaS ואיקומרס. מאפיון ועד מערכת חיה, עם צוות שמלווה אתכם גם אחרי ההשקה.</p>
-      <div class="cta-row fade">
-        <a class="btn btn-primary" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
-        <a class="btn btn-ghost" href="https://www.linkedin.com/in/benkalsky">דברו איתי ב-LinkedIn</a>
-      </div>
+
+      <form id="contact-form" class="contact-form" novalidate>
+        <div class="field-row">
+          <label>שם מלא *
+            <input type="text" name="name" required maxlength="200" autocomplete="name">
+          </label>
+          <label>אימייל *
+            <input type="email" name="email" required maxlength="320" autocomplete="email" dir="ltr">
+          </label>
+          <label>טלפון
+            <input type="tel" name="phone" maxlength="50" autocomplete="tel" dir="ltr">
+          </label>
+        </div>
+        <label>איך אפשר לעזור? *
+          <textarea name="message" required maxlength="5000" rows="4"></textarea>
+        </label>
+        <p class="hp-field" aria-hidden="true">
+          <label>אתר
+            <input type="text" name="website" tabindex="-1" autocomplete="off">
+          </label>
+        </p>
+        <details class="privacy">
+          <summary>מדיניות פרטיות — חובת יידוע לפי תיקון 13 לחוק הגנת הפרטיות</summary>
+          <p>מסירת הפרטים אינה חובה על פי חוק והיא תלויה ברצונך בלבד. הפרטים שתמסרו כאן — שם, אימייל, טלפון ותוכן הפנייה — ייאספו על ידי בן קלסקי, בעל האתר, וישמשו למטרה אחת: מתן מענה לפנייתכם. המידע לא יועבר לצדדים שלישיים ולא ישמש לדיוור פרסומי, למעט ספקי התשתית המשמשים להעברת ההודעה — Vercel (עיבוד הבקשה), Resend (שליחת המייל) ו-Google (Gmail — תיבת הדואר שבה מתקבלת הפנייה) — הפועלים כמעבדי מידע לצורך זה בלבד. עומדת לכם זכות לעיין במידע, לתקנו או לבקש את מחיקתו בכל עת — בפנייה דרך טופס זה או דרך <a href="https://www.linkedin.com/in/benkalsky">LinkedIn</a>.</p>
+        </details>
+        <label class="consent">
+          <input type="checkbox" name="consent" required>
+          קראתי את הודעת הפרטיות ואני מסכימ/ה למסירת הפרטים למטרה שצוינה. *
+        </label>
+        <div class="cta-row">
+          <button type="submit" class="btn btn-primary" id="submit-btn">שליחה</button>
+          <a class="btn btn-ghost" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/benkalsky">LinkedIn</a>
+        </div>
+        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 </main>
@@ -537,6 +650,45 @@
       document.querySelectorAll('.hero .fade').forEach(function (el) {
         el.classList.add('in');
       });
+    });
+  });
+
+  var form = document.getElementById('contact-form');
+  var statusEl = document.getElementById('form-status');
+  var submitBtn = document.getElementById('submit-btn');
+  var API_URL = 'https://benkalsky-contact.vercel.app/api/contact';
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (!form.reportValidity()) return;
+
+    statusEl.textContent = '';
+    statusEl.className = 'form-status';
+    submitBtn.disabled = true;
+
+    var data = {
+      name: form.elements.name.value.trim(),
+      email: form.elements.email.value.trim(),
+      phone: form.elements.phone.value.trim() || null,
+      message: form.elements.message.value.trim(),
+      consent: form.elements.consent.checked,
+      website: form.elements.website.value
+    };
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('http ' + r.status);
+      form.reset();
+      statusEl.textContent = 'ההודעה נשלחה. אחזור אליך בהקדם.';
+      statusEl.className = 'form-status ok';
+    }).catch(function () {
+      statusEl.textContent = 'השליחה נכשלה. נסו שוב, או כתבו לי ישירות ב-LinkedIn.';
+      statusEl.className = 'form-status err';
+    }).finally(function () {
+      submitBtn.disabled = false;
     });
   });
 </script>
