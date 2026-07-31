@@ -3,19 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>בן קלסקי — יישום בינה מלאכותית בעסק | Claude, סוכני AI ואוטומציות</title>
-<meta name="description" content="מומחה ליישום בינה מלאכותית בעסקים: Claude, MCP, סוכני AI, תהליכים אג'נטיים, אוטומציות ו-Vibe Coding. שותף-מייסד ו-CTO בדיגיטייזר. 15+ שנות ניסיון, 100+ פרויקטים.">
+<title>יישום בינה מלאכותית לעסקים | בן קלסקי — סוכני AI ואוטומציות</title>
+<meta name="description" content="מטמיע AI בעסקים: סוכנים אוטונומיים עם Claude ו-MCP, אוטומציות מקצה לקצה ופיתוח מהיר של מוצרים. 15+ שנות פרודקשן, מוצרים חיים ולקוחות שהגיעו לאקזיט. פגישת אבחון חינם.">
 <meta property="og:locale" content="he_IL">
 <meta property="og:type" content="website">
-<meta property="og:title" content="בן קלסקי — יישום בינה מלאכותית בעסק">
-<meta property="og:description" content="Claude, MCP, סוכני AI, תהליכים אג'נטיים, אוטומציות ו-Vibe Coding. שותף-מייסד ו-CTO בדיגיטייזר.">
+<meta property="og:title" content="בן קלסקי — יישום בינה מלאכותית לעסקים">
+<meta property="og:description" content="בינה מלאכותית שרצה בפרודקשן. לא במצגת. סוכני AI, אוטומציות ופיתוח מהיר — עם פגישת אבחון חינם.">
 <meta property="og:url" content="https://benkalsky.net/">
 <link rel="canonical" href="https://benkalsky.net/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23201743'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23AF8FE2' font-family='Georgia,serif' font-weight='bold'%3Eב%3C/text%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/GreycliffHebrewCF-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <script>document.documentElement.classList.add('js');</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://benkalsky.net/#ben",
+      "name": "Ben Kalsky",
+      "alternateName": "בן קלסקי",
+      "jobTitle": "Co-founder & CTO",
+      "url": "https://benkalsky.net/",
+      "worksFor": { "@id": "https://benkalsky.net/#digitizer" },
+      "knowsAbout": ["AI implementation", "AI agents", "Claude", "MCP", "Business automation", "WordPress"],
+      "sameAs": [
+        "https://github.com/BenKalsky",
+        "https://www.linkedin.com/in/benkalsky",
+        "https://stackoverflow.com/users/1491580/ben-kalsky",
+        "https://profiles.wordpress.org/benkalsky"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://benkalsky.net/#digitizer",
+      "name": "Digitizer",
+      "url": "https://www.digitizer.co.il"
+    }
+  ]
+}
+</script>
 <style>
-
   @font-face {
     font-family: 'GreycliffHebrewCF';
     font-style: normal;
@@ -53,7 +81,6 @@
     --radius: 14px;
     --font-display: 'GreycliffHebrewCF', sans-serif;
     --font-body: 'GreycliffHebrewCF', sans-serif;
-    --font-mono: 'GreycliffHebrewCF', sans-serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,7 +105,7 @@
 
   a { color: var(--violet); text-decoration: none; }
   a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  a:focus-visible, button:focus-visible {
+  a:focus-visible, button:focus-visible, summary:focus-visible {
     outline: 3px solid var(--violet);
     outline-offset: 3px;
     border-radius: 4px;
@@ -87,19 +114,10 @@
     outline-color: var(--lavender);
   }
 
-  .mono {
-    font-family: var(--font-mono);
-    direction: ltr;
-    unicode-bidi: embed;
-  }
-
   /* ---------- hero ---------- */
-  .hero {
-    padding: 96px 0 72px;
-  }
+  .hero { padding: 88px 0 56px; }
 
   .eyebrow {
-    font-family: var(--font-mono);
     font-weight: 500;
     font-size: 13px;
     letter-spacing: 0.12em;
@@ -122,7 +140,7 @@
     font-size: clamp(2.2rem, 6vw, 3.9rem);
     line-height: 1.25;
     letter-spacing: -0.01em;
-    max-width: 16ch;
+    max-width: 17ch;
   }
   h1 em {
     font-style: normal;
@@ -131,47 +149,63 @@
 
   .hero-sub {
     margin-top: 26px;
-    max-width: 56ch;
+    max-width: 58ch;
     font-size: 1.1rem;
     color: var(--ink-soft);
   }
   .hero-sub strong { color: var(--ink); font-weight: 700; }
 
-  .keywords {
+  .hero-cta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 28px;
-    list-style: none;
-  }
-  .keywords li {
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: 12.5px;
-    padding: 6px 13px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: var(--paper-raised);
-    color: var(--ink-soft);
-  }
-  .keywords li.hot {
-    border-color: var(--lavender);
-    color: var(--violet);
+    gap: 14px;
+    margin-top: 34px;
   }
 
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-2px); }
+  .btn-solid {
+    background: var(--violet);
+    color: #fff;
+  }
+  .btn-solid:hover { background: #5A3BB0; }
+  .btn-outline {
+    border: 1px solid var(--violet);
+    color: var(--violet);
+  }
+  .btn-primary {
+    background: var(--lavender);
+    color: var(--ink);
+  }
+  .btn-primary:hover { background: #C3A9EE; }
+  .btn-ghost {
+    border: 1px solid #8F85AD;
+    color: #EFEAFB;
+  }
+  .btn-ghost:hover { border-color: var(--lavender); }
+
+  /* trust strip */
+  .trust {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
   .stats {
     display: flex;
     flex-wrap: wrap;
     gap: 14px 40px;
-    margin-top: 44px;
-    padding-top: 28px;
-    border-top: 1px solid var(--line);
     list-style: none;
   }
   .stats b {
-    font-family: var(--font-mono);
+    font-weight: 700;
     font-size: 1.55rem;
-    font-weight: 500;
     color: var(--ink);
     display: block;
     line-height: 1.2;
@@ -180,16 +214,21 @@
     font-size: 0.85rem;
     color: var(--ink-soft);
   }
+  .trust-clients {
+    margin-top: 18px;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .trust-clients b { font-weight: 500; color: var(--ink); }
 
   .social {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 36px;
+    margin-top: 24px;
     list-style: none;
   }
   .social a {
-    font-family: var(--font-mono);
     font-weight: 500;
     font-size: 13px;
     padding: 9px 16px;
@@ -207,7 +246,7 @@
   }
 
   /* ---------- sections ---------- */
-  section { padding: 64px 0; }
+  section { padding: 56px 0; }
 
   .sec-title {
     font-family: var(--font-display);
@@ -217,18 +256,27 @@
   }
   .sec-lead {
     color: var(--ink-soft);
-    max-width: 54ch;
-    margin-bottom: 40px;
+    max-width: 56ch;
+    margin-bottom: 36px;
   }
 
-  /* what I do */
+  /* pain */
+  .pain p {
+    max-width: 60ch;
+    margin-bottom: 16px;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+  }
+  .pain p strong { color: var(--ink); font-weight: 700; }
+
+  /* craft cards */
   .craft {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 18px;
     list-style: none;
   }
-  @media (max-width: 680px) {
+  @media (max-width: 780px) {
     .craft { grid-template-columns: 1fr; }
   }
   .craft li {
@@ -253,16 +301,74 @@
   }
   .craft li:nth-child(2) h3::before { background: var(--violet); }
   .craft li:nth-child(3) h3::before { background: var(--amber); }
-  .craft li:nth-child(4) h3::before { background: var(--ink-soft); }
   .craft p { font-size: 0.95rem; color: var(--ink-soft); }
-  .craft .mono { font-size: 0.85em; }
+
+  /* use cases */
+  .usecases {
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .usecases li {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 8px 24px;
+    padding: 18px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 640px) {
+    .usecases li { grid-template-columns: 1fr; }
+  }
+  .usecases .area {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .usecases p { font-size: 0.95rem; color: var(--ink-soft); }
+
+  /* process */
+  .process {
+    list-style: none;
+    counter-reset: step;
+    display: grid;
+    gap: 14px;
+    max-width: 720px;
+  }
+  .process li {
+    counter-increment: step;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 4px 18px;
+  }
+  .process li::before {
+    content: counter(step);
+    grid-row: span 2;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--lavender);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .process h3 { font-size: 1rem; font-weight: 700; }
+  .process h3 span { color: var(--violet); font-weight: 500; font-size: 0.88rem; }
+  .process p { font-size: 0.93rem; color: var(--ink-soft); }
 
   /* products */
   .products {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 18px;
     list-style: none;
+  }
+  @media (max-width: 680px) {
+    .products { grid-template-columns: 1fr; }
   }
   .products li {
     border: 1px solid var(--line);
@@ -273,51 +379,116 @@
   }
   .products li:hover { border-color: var(--lavender); }
   .products .name {
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    font-weight: 500;
+    font-weight: 700;
+    font-size: 1.05rem;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .products .name a { color: var(--ink); }
-  .products p { font-size: 0.9rem; color: var(--ink-soft); }
+  .products p { font-size: 0.92rem; color: var(--ink-soft); margin-bottom: 6px; }
+  .products p b { color: var(--ink); font-weight: 500; }
   .products .tag {
-    font-family: var(--font-mono);
     font-weight: 500;
-    font-size: 11px;
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
     color: var(--violet);
     display: inline-block;
-    margin-top: 12px;
+    margin-top: 8px;
   }
 
-  /* clients */
-  .clients {
+  /* why me */
+  .why {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
     list-style: none;
-    border-top: 1px solid var(--line);
   }
-  .clients li {
+  @media (max-width: 680px) {
+    .why { grid-template-columns: 1fr; }
+  }
+  .why li {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .why h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .why p { font-size: 0.93rem; color: var(--ink-soft); }
+  .keywords {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 4px 20px;
-    padding: 18px 4px;
-    border-bottom: 1px solid var(--line);
+    gap: 8px;
+    margin-top: 24px;
+    list-style: none;
   }
-  .clients .who {
-    font-weight: 700;
-    font-size: 1.1rem;
-  }
-  .clients .what {
-    font-size: 0.9rem;
+  .keywords li {
+    font-weight: 500;
+    font-size: 12.5px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
     color: var(--ink-soft);
   }
-  .clients .what b {
+  .keywords li.hot {
+    border-color: var(--lavender);
     color: var(--violet);
-    font-weight: 500;
   }
 
-  /* ---------- digitizer bridge ---------- */
+  /* fit */
+  .fit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 680px) {
+    .fit-grid { grid-template-columns: 1fr; }
+  }
+  .fit-col {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper-raised);
+    padding: 22px;
+  }
+  .fit-col h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
+  .fit-col.yes h3 { color: var(--violet); }
+  .fit-col.no h3 { color: var(--ink-soft); }
+  .fit-col ul { list-style: none; display: grid; gap: 8px; }
+  .fit-col li {
+    font-size: 0.93rem;
+    color: var(--ink-soft);
+    padding-inline-start: 22px;
+    position: relative;
+  }
+  .fit-col li::before {
+    position: absolute;
+    inset-inline-start: 0;
+    font-weight: 700;
+  }
+  .fit-col.yes li::before { content: '✓'; color: var(--violet); }
+  .fit-col.no li::before { content: '✕'; color: #B0A8C8; }
+
+  /* faq */
+  .faq { max-width: 760px; display: grid; gap: 10px; }
+  .faq details {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+  }
+  .faq summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .faq details[open] summary { color: var(--violet); }
+  .faq details p {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- digitizer bridge / contact ---------- */
   .bridge {
     margin-top: 40px;
     background: var(--ink);
@@ -325,7 +496,7 @@
     border-radius: 28px 28px 0 0;
     position: relative;
     overflow: hidden;
-    padding: 88px 0 96px;
+    padding: 80px 0 96px;
   }
   .bridge::before {
     content: '';
@@ -347,39 +518,26 @@
     line-height: 1.3;
     max-width: 20ch;
   }
-  .bridge p {
+  .bridge .bridge-lead {
     margin-top: 22px;
     max-width: 54ch;
     color: #C9C0E4;
   }
-  .bridge .cta-row {
+  .cta-row {
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
-    margin-top: 40px;
+    margin-top: 32px;
   }
-  .btn {
-    display: inline-block;
-    padding: 14px 28px;
-    border-radius: 999px;
+
+  /* contact form */
+  .contact-form { margin-top: 48px; max-width: 640px; }
+  .contact-form .form-title {
     font-weight: 700;
-    font-size: 1rem;
-    transition: transform 0.2s, background 0.2s;
-  }
-  .btn:hover { text-decoration: none; transform: translateY(-2px); }
-  .btn-primary {
-    background: var(--lavender);
-    color: var(--ink);
-  }
-  .btn-primary:hover { background: #C3A9EE; }
-  .btn-ghost {
-    border: 1px solid #8F85AD;
+    font-size: 1.15rem;
+    margin-bottom: 18px;
     color: #EFEAFB;
   }
-  .btn-ghost:hover { border-color: var(--lavender); }
-
-  /* ---------- contact form ---------- */
-  .contact-form { margin-top: 40px; max-width: 640px; }
   .contact-form label {
     display: block;
     font-size: 0.9rem;
@@ -441,7 +599,7 @@
     display: flex !important;
     gap: 10px;
     align-items: flex-start;
-    font-weight: 400 !important;
+    font-weight: 300 !important;
   }
   .consent input {
     margin-top: 5px;
@@ -458,6 +616,25 @@
   }
   .form-status.ok { color: #B8E6C1; }
   .form-status.err { color: #F2B8C6; }
+
+  /* ---------- whatsapp float ---------- */
+  .wa-float {
+    position: fixed;
+    bottom: 22px;
+    inset-inline-end: 22px;
+    z-index: 50;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(32, 23, 67, 0.25);
+    transition: transform 0.2s;
+  }
+  .wa-float:hover { transform: scale(1.08); text-decoration: none; }
+  .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 
   /* ---------- footer ---------- */
   footer {
@@ -495,17 +672,16 @@
   .hero .fade:nth-child(3) { transition-delay: 0.28s; }
   .hero .fade:nth-child(4) { transition-delay: 0.38s; }
   .hero .fade:nth-child(5) { transition-delay: 0.48s; }
-  .hero .fade:nth-child(6) { transition-delay: 0.58s; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .js .hero .fade { opacity: 1; transform: none; transition: none; }
-    .social a, .btn { transition: none; }
+    .social a, .btn, .wa-float { transition: none; }
   }
 
   @media (max-width: 560px) {
-    .hero { padding: 64px 0 48px; }
-    section { padding: 44px 0; }
+    .hero { padding: 60px 0 44px; }
+    section { padding: 40px 0; }
     .stats { gap: 14px 28px; }
   }
 </style>
@@ -515,117 +691,247 @@
 <header class="hero">
   <div class="wrap">
     <p class="eyebrow fade"><span dir="ltr">BEN KALSKY</span> · בן קלסקי</p>
-    <h1 class="fade">בינה מלאכותית <em>שעובדת בשביל העסק שלך.</em></h1>
-    <p class="hero-sub fade">אני מטמיע AI בעסקים — מסוכנים אוטונומיים ועד אוטומציות מקצה לקצה. שותף-מייסד ו-CTO ב<strong><a href="https://www.digitizer.co.il">דיגיטייזר</a></strong>, עם 15+ שנים של בניית מערכות שמחזיקות בפרודקשן.</p>
-    <ul class="keywords fade" aria-label="תחומי התמחות">
-      <li class="hot">Claude</li>
-      <li class="hot">MCP</li>
-      <li class="hot" lang="he">סוכני AI</li>
-      <li lang="he">תהליכים אג'נטיים</li>
-      <li lang="he">אוטומציות</li>
-      <li>Vibe Coding</li>
-    </ul>
-    <ul class="stats fade">
-      <li><b>15+</b><span>שנות בנייה לרשת</span></li>
-      <li><b>100+</b><span>פרויקטים שנמסרו</span></li>
-      <li><b>4</b><span>מוצרים חיים</span></li>
-    </ul>
-    <ul class="social fade">
-      <li><a href="https://github.com/BenKalsky" rel="me">GitHub</a></li>
-      <li><a href="https://www.linkedin.com/in/benkalsky" rel="me">LinkedIn</a></li>
-      <li><a href="https://stackoverflow.com/users/1491580/ben-kalsky" rel="me">Stack Overflow</a></li>
-      <li><a href="https://profiles.wordpress.org/benkalsky" rel="me">WordPress.org</a></li>
-    </ul>
+    <h1 class="fade">בינה מלאכותית שרצה בפרודקשן. <em>לא במצגת.</em></h1>
+    <p class="hero-sub fade">אני בן קלסקי, שותף-מייסד ו-CTO ב<strong><a href="https://www.digitizer.co.il">דיגיטייזר</a></strong>. אחרי 15+ שנים של בניית מערכות שמחזיקות בפרודקשן, היום אני עוזר לחברות טכנולוגיה, SaaS, איקומרס ועסקים בצמיחה להטמיע AI שבאמת עובד: סוכנים אוטונומיים, אוטומציות מקצה לקצה ומוצרים שנבנים מהר.</p>
+    <div class="hero-cta fade">
+      <a class="btn btn-solid" href="https://digitizer.li/schedule">קביעת פגישת אבחון AI — חינם</a>
+      <a class="btn btn-outline" href="https://wa.me/972528816959">דברו איתי בוואטסאפ</a>
+    </div>
+    <div class="trust fade">
+      <ul class="stats">
+        <li><b>15+</b><span>שנות בנייה לרשת</span></li>
+        <li><b>100+</b><span>פרויקטים שנמסרו</span></li>
+        <li><b>4</b><span>מוצרים חיים</span></li>
+      </ul>
+      <p class="trust-clients">בין החברות שבנינו עבורן: <b>Reposify</b> (נרכשה ע"י CrowdStrike) · <b>Deci</b> (נרכשה ע"י NVIDIA) · <b>Balance</b> · <b>PractiTest</b></p>
+      <ul class="social">
+        <li><a href="https://github.com/BenKalsky" rel="me">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/benkalsky" rel="me">LinkedIn</a></li>
+        <li><a href="https://stackoverflow.com/users/1491580/ben-kalsky" rel="me">Stack Overflow</a></li>
+        <li><a href="https://profiles.wordpress.org/benkalsky" rel="me">WordPress.org</a></li>
+      </ul>
+    </div>
   </div>
 </header>
 
 <main>
+  <section class="pain" aria-labelledby="pain-title">
+    <div class="wrap">
+      <h2 class="sec-title" id="pain-title">רוב פרויקטי ה-AI נתקעים בין הדמו לפרודקשן</h2>
+      <p>ניסיתם כלים. אולי אפילו הרצתם פיילוט מרשים. ואז זה נעצר: הידע לא מחובר למערכות האמיתיות, אין הרשאות ובקרה, וההתלהבות פוגשת את היומיום — העתק-הדבק ידני, מידע מפוזר בין מערכות, ותהליכים שממשיכים לרוץ בדיוק כמו קודם.</p>
+      <p><strong>הפער הוא לא בכלים. הוא בחיבור.</strong> מי שמחבר את ה-AI ל-CRM, לאתר, למייל ולנתונים של העסק, מגדיר לו גבולות ברורים, ומוסר מערכת שרצה כל יום — סוגר את הפער הזה. זה בדיוק מה שאני עושה.</p>
+    </div>
+  </section>
+
   <section aria-labelledby="craft-title">
     <div class="wrap">
-      <h2 class="sec-title fade" id="craft-title">מה אני עושה</h2>
-      <p class="sec-lead fade">לא הרצאות על AI — יישום. מערכות שרצות אצלך בעסק ומחזירות את ההשקעה.</p>
+      <h2 class="sec-title" id="craft-title">מה אני עושה</h2>
+      <p class="sec-lead">לא הרצאות על AI — מערכות שרצות אצלך בעסק ומחזירות את ההשקעה.</p>
       <ul class="craft">
-        <li class="fade">
+        <li>
           <h3>סוכני AI ותהליכים אג'נטיים</h3>
-          <p>סוכנים אוטונומיים על בסיס <span class="mono">Claude</span> ו-<span class="mono">MCP</span> — מחיבור מקורות המידע של העסק ועד תהליכי עבודה שרצים לבד.</p>
+          <p>סוכנים שמבצעים משימות אמיתיות: מחוברים למקורות המידע של העסק, עם הרשאות מוגדרות, יומני פעולה ובקרה אנושית. לא צ'אטבוט — עובד דיגיטלי.</p>
         </li>
-        <li class="fade">
+        <li>
           <h3>אוטומציות עסקיות</h3>
-          <p>חיבור בין המערכות שכבר יש לך — CRM, אתר, מייל, דוחות — לתהליך אחד שזורם בלי ידיים.</p>
+          <p>ה-CRM, האתר, המייל והדוחות מדברים ביניהם בלי ידיים. פחות העתק-הדבק, פחות טעויות אנוש, יותר זמן לעבודה שמייצרת כסף.</p>
         </li>
-        <li class="fade">
-          <h3>Vibe Coding</h3>
-          <p>מרעיון למוצר עובד בשבועות, לא בחודשים — פיתוח מונחה AI עם הקפדה של מהנדס.</p>
-        </li>
-        <li class="fade">
-          <h3>תשתיות ווב</h3>
-          <p>הבסיס שהכול יושב עליו: וורדפרס, WooCommerce, ביצועים ואבטחה — 15+ שנים בתחום.</p>
+        <li>
+          <h3>פיתוח מהיר של מוצרים ומערכות AI</h3>
+          <p>מרעיון למוצר עובד בשבועות, לא בחודשים — פיתוח מונחה AI עם הקפדה של מהנדס: בדיקות, אבטחה וקוד שאפשר לתחזק.</p>
         </li>
       </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="usecases-title">
+    <div class="wrap">
+      <h2 class="sec-title" id="usecases-title">איפה זה פוגש את העסק שלך</h2>
+      <p class="sec-lead">דוגמאות לתהליכים שסוכנים ואוטומציות מרימים בפועל.</p>
+      <ul class="usecases">
+        <li>
+          <span class="area">מכירות ושיווק</span>
+          <p>העשרת לידים אוטומטית, תקציר חכם לפני כל שיחה, מעקב הצעות מחיר ותזכורות שלא נופלות בין הכיסאות.</p>
+        </li>
+        <li>
+          <span class="area">שירות לקוחות</span>
+          <p>טיוטות מענה מבוססות על הידע הארגוני שלך, ניתוב פניות אוטומטי, וזיהוי פניות דחופות בזמן.</p>
+        </li>
+        <li>
+          <span class="area">תפעול</span>
+          <p>סנכרון נתונים בין מערכות, דוחות שנכתבים לבד, ועדכוני סטטוס שמגיעים אליך במקום שתרדוף אחריהם.</p>
+        </li>
+        <li>
+          <span class="area">ניהול ידע</span>
+          <p>שכבת חיפוש חכמה מעל המסמכים, המיילים והמערכות — תשובה מבוססת מקורות במקום חצי שעה של חיפוש.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="process-title">
+    <div class="wrap">
+      <h2 class="sec-title" id="process-title">איך נראה תהליך העבודה</h2>
+      <p class="sec-lead">מתחילים בקטן, מוכיחים ערך, ורק אז מרחיבים.</p>
+      <ol class="process">
+        <li>
+          <h3>פגישת אבחון <span>· 30 דקות, חינם</span></h3>
+          <p>ממפים יחד את התהליכים בעסק ומזהים 2–3 הזדמנויות הטמעה עם החזר מהיר. יוצאים עם תמונה ברורה גם אם לא נעבוד יחד.</p>
+        </li>
+        <li>
+          <h3>Quick Win ראשון</h3>
+          <p>בוחרים את ההזדמנות הקטנה עם הערך הברור ביותר ובונים אותה תוך שבועות ספורים — הוכחת ערך לפני התחייבות גדולה.</p>
+        </li>
+        <li>
+          <h3>פיילוט בסביבה אמיתית</h3>
+          <p>המערכת עובדת על נתונים אמיתיים מול מדד שהוגדר מראש. רואים תוצאות, לא מצגות.</p>
+        </li>
+        <li>
+          <h3>הטמעה לפרודקשן</h3>
+          <p>חיבור מלא למערכות, הגדרות אבטחה והרשאות, ניטור וגבולות פעולה ברורים. המערכת עוברת מ"עובדת אצלי" ל"עובדת אצלכם".</p>
+        </li>
+        <li>
+          <h3>ליווי וצמיחה</h3>
+          <p>המערכת מתוחזקת, משתפרת ומתרחבת לתהליכים נוספים — עם הצוות של <a href="https://www.digitizer.co.il">דיגיטייזר</a> שמלווה אתכם גם אחרי ההשקה.</p>
+        </li>
+      </ol>
     </div>
   </section>
 
   <section aria-labelledby="products-title">
     <div class="wrap">
-      <h2 class="sec-title fade" id="products-title">הוכחה, לא הבטחה</h2>
-      <p class="sec-lead fade">מוצרים חיים שבניתי בתהליך אג'נטי — אותה גישה שאני מביא לעסק שלך.</p>
+      <h2 class="sec-title" id="products-title">הוכחה, לא הבטחה</h2>
+      <p class="sec-lead">מוצרים חיים שבניתי בתהליך אג'נטי — אותה גישה שאני מביא לעסק שלך.</p>
       <ul class="products">
-        <li class="fade">
+        <li>
           <span class="name"><a href="https://deep-claw.com">DeepClaw</a></span>
-          <p>SaaS לניטור שערי AI — רואים מה הסוכנים והמודלים שלכם באמת עושים.</p>
+          <p><b>הבעיה:</b> ארגונים לא רואים מה סוכני ה-AI שלהם באמת עושים.</p>
+          <p><b>בניתי:</b> SaaS לניטור שערי AI — כל קריאה, כל סוכן, בשקיפות מלאה.</p>
           <span class="tag">AI · SaaS · live</span>
         </li>
-        <li class="fade">
+        <li>
           <span class="name"><a href="https://wordpress.org/plugins/digitizer-site-worker/">SiteAgent</a></span>
-          <p>סוכן ניהול וורדפרס עבור <a href="https://my-aura.app" class="mono">Aura</a> — תחזוקת אתרים בלי ידיים.</p>
+          <p><b>הבעיה:</b> תחזוקת אתרים גוזלת שעות של עבודה ידנית.</p>
+          <p><b>בניתי:</b> סוכן וורדפרס שמבצע פעולות אמיתיות מרחוק, עבור <a href="https://my-aura.app">Aura</a>. חי ב-WordPress.org.</p>
           <span class="tag">Agent · WordPress.org</span>
         </li>
-        <li class="fade">
+        <li>
           <span class="name">AutoMate</span>
-          <p>ניהול מלאי רכב לסוכנות מכוניות — מהמגרש ועד הליד.</p>
+          <p><b>הבעיה:</b> מלאי רכב שמנוהל באקסל ובוואטסאפ.</p>
+          <p><b>בניתי:</b> מערכת ניהול מלאי לסוכנות מכוניות — מהמגרש ועד הליד.</p>
           <span class="tag">in production</span>
         </li>
-        <li class="fade">
+        <li>
           <span class="name">Pulse</span>
-          <p>דשבורד אנליטיקס לסוכנויות — כל הלקוחות במסך אחד.</p>
+          <p><b>הבעיה:</b> נתוני לקוחות מפוזרים בין עשרות דשבורדים.</p>
+          <p><b>בניתי:</b> אנליטיקס אחוד לסוכנויות — כל הלקוחות במסך אחד.</p>
           <span class="tag">in production</span>
         </li>
       </ul>
     </div>
   </section>
 
-  <section aria-labelledby="clients-title">
+  <section aria-labelledby="why-title">
     <div class="wrap">
-      <h2 class="sec-title fade" id="clients-title">חברות שסמכו עלינו</h2>
-      <p class="sec-lead fade">חלק מהחברות שבנינו עבורן — ולאן הן הגיעו.</p>
-      <ul class="clients">
-        <li class="fade">
-          <span class="who">Reposify</span>
-          <span class="what">נרכשה על ידי <b>CrowdStrike</b></span>
+      <h2 class="sec-title" id="why-title">למה אני, ולא יועץ AI</h2>
+      <ul class="why">
+        <li>
+          <h3>אני בונה, לא רק ממליץ</h3>
+          <p>אתם לא מקבלים מסמך המלצות שמחפש ספק שיממש אותו. אני מלווה מהרעיון ועד מערכת עובדת.</p>
         </li>
-        <li class="fade">
-          <span class="who">Deci</span>
-          <span class="what">נרכשה על ידי <b>NVIDIA</b></span>
+        <li>
+          <h3>מהממשק ועד התשתית</h3>
+          <p>15+ שנות תשתיות ווב, מערכות ופרודקשן. מערכת AI צריכה להיות פשוטה לצוות — ויציבה מתחת למכסה.</p>
         </li>
-        <li class="fade">
-          <span class="who">Balance</span>
-          <span class="what">תשתית תשלומים B2B</span>
+        <li>
+          <h3>לא נעול על כלי מסוים</h3>
+          <p>Claude, OpenAI, Gemini, מודלים מקומיים, MCP, n8n, Make — הבחירה נעשית לפי הצורך והתקציב שלכם, לא לפי מה שנוח לי.</p>
         </li>
-        <li class="fade">
-          <span class="who">PractiTest</span>
-          <span class="what">פלטפורמת ניהול בדיקות</span>
+        <li>
+          <h3>מוסר מערכת שעובדת</h3>
+          <p>עם ניטור, תיעוד והדרכה — כך שהמערכת ממשיכה לרוץ גם כשאני לא בחדר.</p>
         </li>
       </ul>
+      <ul class="keywords" aria-label="תחומי התמחות">
+        <li class="hot">Claude</li>
+        <li class="hot">MCP</li>
+        <li class="hot">סוכני AI</li>
+        <li>תהליכים אג'נטיים</li>
+        <li>אוטומציות</li>
+        <li>Vibe Coding</li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="fit-title">
+    <div class="wrap">
+      <h2 class="sec-title" id="fit-title">למי זה מתאים</h2>
+      <div class="fit-grid">
+        <div class="fit-col yes">
+          <h3>נעבוד מצוין יחד אם</h3>
+          <ul>
+            <li>יש בעסק תהליכים חוזרים שגוזלים שעות כל שבוע</li>
+            <li>המידע מפוזר בין מערכות שלא מדברות ביניהן</li>
+            <li>יש רעיון למוצר או יכולת AI שצריך להפוך למשהו חי</li>
+            <li>רוצים צעד ראשון קטן ומדיד, לא פרויקט ענק</li>
+          </ul>
+        </div>
+        <div class="fit-col no">
+          <h3>כנראה לא בשבילכם אם</h3>
+          <ul>
+            <li>מחפשים הרצאת השראה על AI</li>
+            <li>רוצים צ'אטבוט גנרי "כדי שיהיה"</li>
+            <li>מחפשים AI בשביל הכותרת, בלי תוצאה עסקית מוגדרת</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="faq-title">
+    <div class="wrap">
+      <h2 class="sec-title" id="faq-title">שאלות נפוצות</h2>
+      <div class="faq">
+        <details>
+          <summary>כמה עולה פרויקט הטמעת AI?</summary>
+          <p>תלוי בהיקף. בגלל זה התהליך מתחיל ב-Quick Win קטן שמוכיח ערך לפני כל התחייבות גדולה — ובפגישת האבחון (שהיא חינם) תקבלו הערכה כנה, כולל אם המסקנה היא שזה לא משתלם לכם עכשיו.</p>
+        </details>
+        <details>
+          <summary>מה עם אבטחת המידע שלנו?</summary>
+          <p>כל מערכת נבנית עם הרשאות מינימליות, והמידע נשאר במערכות שלכם. אפשר לעבוד עם ספקים שעומדים בדרישות הפרטיות שלכם, ובמקרים רגישים — עם מודלים בסביבה הפרטית שלכם.</p>
+        </details>
+        <details>
+          <summary>הסוכן יכול "להשתולל"? מה הגבולות?</summary>
+          <p>כל סוכן מקבל הרשאות מוגדרות, יומן פעולות מלא וגבולות ברורים. פעולות רגישות — שליחה החוצה, מחיקה, תשלום — דורשות אישור אנושי. אוטונומיה היא הגדרה מפורשת, לא ברירת מחדל.</p>
+        </details>
+        <details>
+          <summary>כמה זמן עד שרואים תוצאות?</summary>
+          <p>ה-Quick Win הראשון עולה תוך שבועות ספורים, עם מדד שהוגדר מראש. פיילוט והטמעה מלאה — לפי היקף, ותמיד בשלבים שאפשר לעצור אחרי כל אחד מהם.</p>
+        </details>
+        <details>
+          <summary>צריך להחליף את המערכות הקיימות?</summary>
+          <p>לא. הגישה היא להתחבר למה שכבר עובד אצלכם — CRM, אתר, מייל, גיליונות — בלי לכפות מעבר מערכת. רק אם מערכת קיימת באמת חוסמת, נדבר על זה בכנות.</p>
+        </details>
+        <details>
+          <summary>איך מודדים שזה באמת עובד?</summary>
+          <p>מגדירים מדד לפני שבונים: שעות שנחסכו, זמן תגובה, מספר פניות שטופלו, לידים שלא נפלו. מודדים לפני ואחרי — ואם המספרים לא זזים, אומרים את זה.</p>
+        </details>
+      </div>
     </div>
   </section>
 
   <section class="bridge" aria-labelledby="bridge-title">
     <div class="wrap">
-      <p class="eyebrow fade">DIGITIZER · דיגיטייזר</p>
-      <h2 class="fade" id="bridge-title">רוצים בינה מלאכותית בעסק? בואו נדבר.</h2>
-      <p class="fade">היישום קורה בדיגיטייזר — שותף טכנולוגי לחברות טכנולוגיה, SaaS ואיקומרס. מאפיון ועד מערכת חיה, עם צוות שמלווה אתכם גם אחרי ההשקה.</p>
+      <p class="eyebrow">DIGITIZER · דיגיטייזר</p>
+      <h2 id="bridge-title">מוכנים לצעד ראשון שאפשר למדוד?</h2>
+      <p class="bridge-lead">פגישת אבחון של 30 דקות, בלי עלות ובלי התחייבות. יוצאים עם 2–3 הזדמנויות AI קונקרטיות לעסק שלכם — והיישום, כשתהיו מוכנים, קורה עם הצוות של דיגיטייזר.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://digitizer.li/schedule">קביעת פגישת אבחון AI</a>
+        <a class="btn btn-ghost" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
+      </div>
 
       <form id="contact-form" class="contact-form" novalidate>
+        <p class="form-title">או השאירו פרטים ואחזור אליכם</p>
         <div class="field-row">
           <label>שם מלא *
             <input type="text" name="name" required maxlength="200" autocomplete="name">
@@ -637,7 +943,7 @@
             <input type="tel" name="phone" maxlength="50" autocomplete="tel" dir="ltr">
           </label>
         </div>
-        <label>איך אפשר לעזור? *
+        <label>איזה תהליך הייתם רוצים לשפר? *
           <textarea name="message" required maxlength="5000" rows="4"></textarea>
         </label>
         <p class="hp-field" aria-hidden="true">
@@ -655,8 +961,6 @@
         </label>
         <div class="cta-row">
           <button type="submit" class="btn btn-primary" id="submit-btn">שליחה</button>
-          <a class="btn btn-ghost" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
-          <a class="btn btn-ghost" href="https://www.linkedin.com/in/benkalsky">LinkedIn</a>
         </div>
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
       </form>
@@ -664,9 +968,13 @@
   </section>
 </main>
 
+<a class="wa-float" href="https://wa.me/972528816959" aria-label="דברו איתי בוואטסאפ">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16.004 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.26.59 4.46 1.71 6.4L3.2 28.8l6.58-1.68a12.74 12.74 0 0 0 6.22 1.61h.01c7.06 0 12.79-5.74 12.79-12.8 0-3.42-1.33-6.63-3.75-9.05a12.72 12.72 0 0 0-9.05-3.68zm0 23.36h-.01a10.6 10.6 0 0 1-5.4-1.48l-.39-.23-4.02 1.03 1.07-3.92-.25-.4a10.55 10.55 0 0 1-1.63-5.66c0-5.87 4.78-10.64 10.65-10.64 2.84 0 5.51 1.11 7.52 3.12a10.57 10.57 0 0 1 3.11 7.53c0 5.87-4.78 10.65-10.65 10.65zm5.84-7.97c-.32-.16-1.89-.93-2.19-1.04-.29-.11-.5-.16-.72.16-.21.32-.82 1.04-1.01 1.25-.18.21-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.59-.95-.85-1.59-1.9-1.78-2.22-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.73-.98-2.37-.26-.62-.52-.54-.72-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.12 1.09-1.12 2.66s1.15 3.09 1.31 3.3c.16.21 2.26 3.45 5.47 4.84.76.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.89-.77 2.16-1.52.27-.75.27-1.39.19-1.52-.08-.13-.29-.21-.61-.37z"/></svg>
+</a>
+
 <footer>
   <div class="wrap">
-    <span>© <span class="mono" id="year">2026</span> בן קלסקי · <a href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a></span>
+    <span>© <span id="year">2026</span> בן קלסקי · <a href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a></span>
     <span class="quote">"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</span>
   </div>
 </footer>
@@ -714,7 +1022,7 @@
       statusEl.textContent = 'ההודעה נשלחה. אחזור אליך בהקדם.';
       statusEl.className = 'form-status ok';
     }).catch(function () {
-      statusEl.textContent = 'השליחה נכשלה. נסו שוב, או כתבו לי ישירות ב-LinkedIn.';
+      statusEl.textContent = 'השליחה נכשלה. נסו שוב, או כתבו לי בוואטסאפ.';
       statusEl.className = 'form-status err';
     }).finally(function () {
       submitBtn.disabled = false;
