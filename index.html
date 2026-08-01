@@ -24,9 +24,11 @@
     analytics_storage: 'denied',
     wait_for_update: 500
   });
-  if (localStorage.getItem('bk-consent') === 'granted') {
-    gtag('consent', 'update', { analytics_storage: 'granted' });
-  }
+  try {
+    if (localStorage.getItem('bk-consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) { /* storage blocked — stay denied */ }
 </script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -1049,9 +1051,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   (function () {
     var banner = document.getElementById('consent-banner');
-    if (!localStorage.getItem('bk-consent')) banner.classList.add('show');
+    function readConsent() {
+      try { return localStorage.getItem('bk-consent'); } catch (e) { return null; }
+    }
+    if (!readConsent()) banner.classList.add('show');
     function decide(state) {
-      localStorage.setItem('bk-consent', state);
+      try { localStorage.setItem('bk-consent', state); } catch (e) { /* session-only choice */ }
       banner.classList.remove('show');
       if (state === 'granted') {
         gtag('consent', 'update', { analytics_storage: 'granted' });
