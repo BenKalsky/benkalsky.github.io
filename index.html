@@ -508,6 +508,60 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   .sec-dark h2 .hl { color: var(--acid); }
 
+  .oss-head {
+    margin-top: 56px;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+  .oss-head h3 { font-size: 22px; font-weight: 700; }
+  .oss-head p { font-size: 15px; color: #b3b4ab; margin: 0; }
+  .oss-grid {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+    gap: 1px;
+    background: #33342d;
+    border: 1px solid #33342d;
+    list-style: none;
+  }
+  .oss-grid li { background: var(--ink); }
+  .oss-item {
+    display: block;
+    padding: 14px 16px;
+    height: 100%;
+    transition: background .15s;
+  }
+  .oss-item:hover { background: #1c1d17; }
+  .oss-item .oss-name {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--paper);
+    display: block;
+  }
+  .oss-item:hover .oss-name { color: var(--acid); }
+  .oss-item .oss-desc {
+    font-size: 13px;
+    color: #9a9b93;
+    display: block;
+    margin-top: 3px;
+    line-height: 1.45;
+  }
+  .net-row {
+    margin-top: 26px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #9a9b93;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    align-items: baseline;
+  }
+  .net-row a { color: var(--paper); border-bottom: 1px solid #55564d; }
+  .net-row a:hover { color: var(--acid); border-bottom-color: var(--acid); }
+
   /* ---------- why me ---------- */
   .why-cards { margin-bottom: 28px; }
   .why-card { background: #fff; border: 1px solid var(--ink); padding: 28px; }
@@ -793,7 +847,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <ul class="stats">
     <li><b>15+</b><span>שנות בנייה לרשת</span></li>
     <li><b>100+</b><span>פרויקטים שנמסרו</span></li>
-    <li><b>4</b><span>מוצרים חיים</span></li>
+    <li><b>5</b><span>מוצרים חיים</span></li>
   </ul>
 
   <div class="marquee" id="marquee" dir="ltr">
@@ -905,32 +959,71 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <li>
         <a class="product" href="https://deep-claw.com">
           <span class="name">DeepClaw ↗</span>
-          <p><b>הבעיה:</b> ארגונים לא רואים מה סוכני ה-AI שלהם באמת עושים.</p>
-          <p><b>בניתי:</b> SaaS לניטור שערי AI — כל קריאה, כל סוכן, בשקיפות מלאה.</p>
+          <p><b>הבעיה:</b> ארגונים מריצים סוכני AI בלי לראות מה הם עושים ומה זה עולה.</p>
+          <p><b>בניתי:</b> דשבורד תפעול ל-<span class="lite">OpenClaw</span> — עלויות, סשנים, התראות ואבטחה, בלי לחשוף את השער החוצה.</p>
           <span class="tag">AI · SAAS · LIVE</span>
         </a>
       </li>
       <li>
-        <a class="product" href="https://wordpress.org/plugins/digitizer-site-worker/">
-          <span class="name">SiteAgent ↗</span>
-          <p><b>הבעיה:</b> תחזוקת אתרים גוזלת שעות של עבודה ידנית.</p>
-          <p><b>בניתי:</b> סוכן וורדפרס שמבצע פעולות אמיתיות מרחוק, עבור <span class="lite">Aura</span>. חי ב-WordPress.org.</p>
-          <span class="tag">AGENT · WORDPRESS.ORG</span>
+        <a class="product" href="https://my-aura.app">
+          <span class="name">Aura ↗</span>
+          <p><b>הבעיה:</b> סוכנויות וורדפרס מנהלות עשרות אתרים בעשרות מסכים.</p>
+          <p><b>בניתי:</b> מערכת הפעלה לסוכנויות — כל האתרים, התשתית ופעולות AI מאושרות ומתועדות, בחדר בקרה אחד.</p>
+          <span class="tag">AI · SAAS · LIVE</span>
         </a>
       </li>
-      <li class="product">
-        <span class="name">AutoMate</span>
-        <p><b>הבעיה:</b> מלאי רכב שמנוהל באקסל ובוואטסאפ.</p>
-        <p><b>בניתי:</b> מערכת ניהול מלאי לסוכנות מכוניות — מהמגרש ועד הליד.</p>
-        <span class="tag">IN PRODUCTION</span>
+      <li>
+        <a class="product" href="https://myautomate.co.il">
+          <span class="name">AutoMate ↗</span>
+          <p><b>הבעיה:</b> מלאי רכב שמנוהל באקסל ובוואטסאפ.</p>
+          <p><b>בניתי:</b> מערכת לסוחרי רכב — כל רכב, הוצאה, מסמך וסטטוס במקום אחד. בעברית, בענן.</p>
+          <span class="tag">SAAS · LIVE</span>
+        </a>
       </li>
-      <li class="product">
-        <span class="name">Pulse</span>
-        <p><b>הבעיה:</b> נתוני לקוחות מפוזרים בין עשרות דשבורדים.</p>
-        <p><b>בניתי:</b> אנליטיקס אחוד לסוכנויות — כל הלקוחות במסך אחד.</p>
-        <span class="tag">IN PRODUCTION</span>
+      <li>
+        <a class="product" href="https://linky.co.il">
+          <span class="name">Linky ↗</span>
+          <p><b>הבעיה:</b> קישורים שיווקיים מתפזרים בלי מעקב, מיתוג או ייחוס.</p>
+          <p><b>בניתי:</b> קיצור וניהול קישורים — QR, ‏UTM, ‏deep links ואנליטיקה לפי מדינה ומכשיר.</p>
+          <span class="tag">SAAS · LIVE</span>
+        </a>
+      </li>
+      <li>
+        <a class="product" href="https://quoty.co.il">
+          <span class="name">Quoty ↗</span>
+          <p><b>הבעיה:</b> הצעות מחיר נבנות ידנית — ואז נעלמות אצל הלקוח.</p>
+          <p><b>בניתי:</b> הצעות מקצועיות בדקות — שיתוף בקישור, מעקב צפייה וסגירה מהירה.</p>
+          <span class="tag">SAAS · LIVE</span>
+        </a>
       </li>
     </ul>
+
+    <div class="oss-head">
+      <h3>קוד פתוח</h3>
+      <p>כלים שאני משחרר לקהילה — סוכנים, שרתי MCP וסקילים ל-Claude Code ו-OpenClaw.</p>
+    </div>
+    <ul class="oss-grid">
+      <li><a class="oss-item" href="https://wordpress.org/plugins/digitizer-site-worker/"><span class="oss-name">SiteAgent</span><span class="oss-desc">סוכן ניהול וורדפרס מרחוק עבור Aura — חי ב-WordPress.org</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/deepclaw-openclaw"><span class="oss-name">deepclaw-openclaw</span><span class="oss-desc">טלמטריית LLM בזמן אמת ל-OpenClaw — טוקנים, קאש ועלויות</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/Notary"><span class="oss-name">Notary</span><span class="oss-desc">שכבת ממשל לזיכרון של מערכות רב-סוכניות</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/notary-memory-kit"><span class="oss-name">notary-memory-kit</span><span class="oss-desc">ערכת ראיות סינתטיות לבנצ'מרק של Notary</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/agent-skills"><span class="oss-name">agent-skills</span><span class="oss-desc">סקילים ניידים לתהליכי פיתוח — PR-first, ‏codex-review ועוד</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/wordpress-api-pro"><span class="oss-name">wordpress-api-pro</span><span class="oss-desc">ניהול וורדפרס מלא דרך REST — פוסטים, Elementor, ‏WooCommerce</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/elementor-mcp"><span class="oss-name">elementor-mcp</span><span class="oss-desc">Elementor פתוח לסוכני AI דרך Model Context Protocol</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/siteagent-elementor-studio"><span class="oss-name">siteagent-elementor-studio</span><span class="oss-desc">בניית אתרי וורדפרס עם Claude Code — ערכה מלאה</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/sumit-mcp"><span class="oss-name">sumit-mcp</span><span class="oss-desc">חיוב ישראלי (SUMIT) כשירות שסוכנים יודעים להפעיל</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/sumit-api"><span class="oss-name">sumit-api</span><span class="oss-desc">ספריית TypeScript לזרימות חיוב של SUMIT</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/sumit-react"><span class="oss-name">sumit-react</span><span class="oss-desc">קומפוננטות React ועזרי Next.js לתשלומי SUMIT</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/cloudways-mcp"><span class="oss-name">cloudways-mcp</span><span class="oss-desc">סקיל לניהול אחסון Cloudways מתוך Claude Code</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/hostinger-mcp"><span class="oss-name">hostinger-mcp</span><span class="oss-desc">סקיל production-grade לתשתיות Hostinger</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/aura-mcp"><span class="oss-name">aura-mcp</span><span class="oss-desc">סקיל בקרה ל-Aura — אישורים, סנאפשוטים ו-rollbacks</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/meta-ads-mcp"><span class="oss-name">meta-ads-mcp</span><span class="oss-desc">סקיל תפעול קמפיינים של Meta Ads לסוכנים</span></a></li>
+      <li><a class="oss-item" href="https://github.com/Digitizers/digitizer-pro-tools"><span class="oss-name">digitizer-pro-tools</span><span class="oss-desc">באנר הסכמת עוגיות רב-לשוני לוורדפרס, עם חסימת סקריפטים</span></a></li>
+      <li><a class="oss-item" href="https://marketplace.visualstudio.com/items?itemName=Digitizers.rtl-support"><span class="oss-name">RTL Support</span><span class="oss-desc">תוסף VS Code שמוסיף תמיכת עברית RTL ל-Claude Code</span></a></li>
+    </ul>
+
+    <p class="net-row">עוד ברשת: <a href="https://clawhub.ai/benkalsky" dir="ltr">clawhub.ai/benkalsky</a> · <a href="https://www.npmjs.com/~benkal" dir="ltr">npmjs.com/~benkal</a> · <a href="https://github.com/BenKalsky" dir="ltr">github.com/BenKalsky</a></p>
+  </ul>
   </section>
 
   <section class="sec" aria-labelledby="why-title">
