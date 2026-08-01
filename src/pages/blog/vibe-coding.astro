@@ -8,6 +8,8 @@ export const meta = {
   datePublished: '2026-08-01',
 };
 
+const dateLabel = meta.datePublished.split('-').reverse().join('.');
+
 const faq = [
   {
     q: 'מה זה vibe coding במשפט אחד?',
@@ -85,7 +87,7 @@ const jsonLd = {
     <h1>Vibe Coding: המדריך המעשי בעברית</h1>
     <p class="post-meta">
       <span>בן קלסקי · CTO, DIGITIZER</span>
-      <time datetime="2026-08-01">01.08.2026</time>
+      <time datetime={meta.datePublished}>{dateLabel}</time>
     </p>
 
     <p class="lede">המונח <span class="kw">vibe coding</span> נמתח לשני קצוות: יש מי שמוכר אותו כקסם שמייתר מתכנתים, ויש מי שמבטל אותו כצעצוע מסוכן. שניהם טועים. אני בונה ככה מוצרים שרצים בפרודקשן מול לקוחות משלמים, וזה המדריך שהייתי רוצה לקרוא לפני שהתחלתי.</p>
