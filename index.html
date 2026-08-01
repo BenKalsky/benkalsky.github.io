@@ -11,9 +11,8 @@
 <meta property="og:description" content="בינה מלאכותית שרצה בפרודקשן. לא במצגת. סוכני AI, אוטומציות ופיתוח מהיר — עם פגישת אבחון חינם.">
 <meta property="og:url" content="https://www.benkalsky.co.il/">
 <link rel="canonical" href="https://www.benkalsky.co.il/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23201743'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23AF8FE2' font-family='Georgia,serif' font-weight='bold'%3Eב%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2312130F'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23E8FF52' font-family='Georgia,serif' font-weight='bold'%3Eב%3C/text%3E%3C/svg%3E">
 <link rel="preload" href="/fonts/GreycliffHebrewCF-Bold.woff2" as="font" type="font/woff2" crossorigin>
-<script>document.documentElement.classList.add('js');</script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -92,510 +91,544 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
          url('/fonts/GreycliffHebrewCF-Bold.woff') format('woff');
   }
 
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/JetBrainsMono-Latin.woff2') format('woff2');
+  }
+
   :root {
-    --ink: #201743;
-    --ink-soft: #4A4165;
-    --paper: #F6F4FA;
-    --paper-raised: #FFFFFF;
-    --lavender: #AF8FE2;
-    --violet: #6C4BC8;
-    --amber: #E8A33D;
-    --line: #DDD7EC;
-    --radius: 14px;
-    --font-display: 'GreycliffHebrewCF', sans-serif;
+    --ink: #12130F;
+    --ink-soft: #3a3b34;
+    --ink-mute: #55564d;
+    --paper: #F7F6F2;
+    --paper-alt: #EDEBE3;
+    --acid: #E8FF52;
+    --line-soft: #d6d5cc;
+    --line-chip: #c9c8bf;
     --font-body: 'GreycliffHebrewCF', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --pad-x: clamp(20px, 4vw, 56px);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html { scroll-behavior: smooth; }
 
+  html, body { background: var(--paper); }
+
   body {
     font-family: var(--font-body);
     font-weight: 300;
-    background: var(--paper);
     color: var(--ink);
-    line-height: 1.7;
+    line-height: 1.65;
     font-size: 17px;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .wrap {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 0 24px;
+  ::selection { background: var(--acid); color: var(--ink); }
+
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .sec-dark :focus-visible, footer :focus-visible, .consent-banner :focus-visible {
+    outline-color: var(--acid);
   }
 
-  a { color: var(--violet); text-decoration: none; }
-  a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  a:focus-visible, button:focus-visible, summary:focus-visible {
-    outline: 3px solid var(--violet);
-    outline-offset: 3px;
-    border-radius: 4px;
+  input::placeholder, textarea::placeholder { color: var(--ink-mute); }
+  summary::-webkit-details-marker { display: none; }
+  summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
   }
-  .bridge :focus-visible, footer :focus-visible {
-    outline-color: var(--lavender);
+  summary::after {
+    content: '+';
+    font-family: var(--font-mono);
+    font-weight: 700;
+    flex: 0 0 auto;
   }
+  details[open] > summary::after { content: '−'; }
+
+  section[id] { scroll-margin-top: 84px; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .mono { font-family: var(--font-mono); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-18px, 14px); } }
+
+  /* ---------- header ---------- */
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 18px var(--pad-x);
+    border-bottom: 1px solid var(--ink);
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 40;
+  }
+  .brand {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .18em;
+  }
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(14px, 2vw, 26px);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .site-nav a { border-bottom: 1px solid transparent; }
+  .site-nav a:hover { border-bottom-color: var(--ink); }
+  .nav-cta {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 20px;
+    border-bottom: none !important;
+  }
+  .nav-cta:hover { background: var(--acid); color: var(--ink); }
 
   /* ---------- hero ---------- */
-  .hero { padding: 88px 0 56px; }
-
+  .hero {
+    position: relative;
+    padding: clamp(48px, 7vw, 74px) var(--pad-x) 0;
+  }
+  .hero-blob {
+    position: absolute;
+    top: 20px;
+    left: clamp(-80px, 4vw, 70px);
+    width: clamp(180px, 26vw, 330px);
+    height: clamp(180px, 26vw, 330px);
+    border-radius: 50%;
+    background: var(--acid);
+    animation: drift 10s ease-in-out infinite;
+  }
+  .hero-inner { position: relative; }
   .eyebrow {
-    font-weight: 500;
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    color: var(--violet);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .2em;
+    margin-bottom: 22px;
+    animation: fadeUp .6s ease both;
   }
-  .eyebrow::after {
-    content: '';
-    flex: 0 0 56px;
-    height: 1px;
-    background: var(--lavender);
-  }
-
   h1 {
-    font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.2rem, 6vw, 3.9rem);
-    line-height: 1.25;
-    letter-spacing: -0.01em;
-    max-width: 17ch;
+    font-size: clamp(38px, 8vw, 104px);
+    line-height: .98;
+    letter-spacing: -.035em;
+    margin: 0 0 30px;
+    max-width: 16ch;
+    animation: fadeUp .7s ease .05s both;
   }
-  h1 em {
-    font-style: normal;
-    color: var(--violet);
+  .h1-mark {
+    display: inline-block;
+    background: var(--acid);
+    padding: 0 14px;
+    transform: rotate(-1.4deg);
   }
-
   .hero-sub {
-    margin-top: 26px;
-    max-width: 58ch;
-    font-size: 1.1rem;
+    font-size: clamp(17px, 1.6vw, 20px);
+    line-height: 1.6;
+    margin: 0 0 30px;
+    max-width: 62ch;
     color: var(--ink-soft);
+    animation: fadeUp .7s ease .1s both;
   }
-  .hero-sub strong { color: var(--ink); font-weight: 700; }
-
+  .link-hl {
+    font-weight: 700;
+    box-shadow: inset 0 -9px 0 var(--acid);
+  }
   .hero-cta {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 34px;
+    gap: 12px;
+    margin-bottom: 40px;
+    animation: fadeUp .7s ease .16s both;
   }
-
   .btn {
     display: inline-block;
-    padding: 14px 28px;
-    border-radius: 999px;
+    padding: 16px 30px;
     font-weight: 700;
-    font-size: 1rem;
-    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    font-size: 17px;
+    cursor: pointer;
   }
-  .btn:hover { text-decoration: none; transform: translateY(-2px); }
-  .btn-solid {
-    background: var(--violet);
-    color: #fff;
-  }
-  .btn-solid:hover { background: #5A3BB0; }
-  .btn-outline {
-    border: 1px solid var(--violet);
-    color: var(--violet);
-  }
-  .btn-primary {
-    background: var(--lavender);
-    color: var(--ink);
-  }
-  .btn-primary:hover { background: #C3A9EE; }
-  .btn-ghost {
-    border: 1px solid #8F85AD;
-    color: #EFEAFB;
-  }
-  .btn-ghost:hover { border-color: var(--lavender); }
-
-  /* trust strip */
-  .trust {
-    margin-top: 48px;
-    padding-top: 28px;
-    border-top: 1px solid var(--line);
-  }
-  .stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px 40px;
-    list-style: none;
-  }
-  .stats b {
-    font-weight: 700;
-    font-size: 1.55rem;
-    color: var(--ink);
-    display: block;
-    line-height: 1.2;
-  }
-  .stats span {
-    font-size: 0.85rem;
-    color: var(--ink-soft);
-  }
-  .trust-clients {
-    margin-top: 18px;
-    font-size: 0.92rem;
-    color: var(--ink-soft);
-  }
-  .trust-clients b { font-weight: 500; color: var(--ink); }
-
-  .social {
+  .btn-solid { background: var(--ink); color: var(--paper); }
+  .btn-solid:hover { background: var(--acid); color: var(--ink); }
+  .btn-outline { border: 1.5px solid var(--ink); }
+  .btn-outline:hover { background: var(--ink); color: var(--paper); }
+  .hero-social {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 24px;
+    animation: fadeUp .7s ease .22s both;
+  }
+  .hero-social a {
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: .08em;
+    border: 1px solid var(--line-chip);
+    background: #fff;
+    padding: 8px 15px;
+  }
+  .hero-social a:hover { border-color: var(--ink); }
+
+  /* ---------- stats band ---------- */
+  .stats {
+    margin-top: clamp(40px, 6vw, 66px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
     list-style: none;
   }
-  .social a {
-    font-weight: 500;
-    font-size: 13px;
-    padding: 9px 16px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--paper-raised);
-    color: var(--ink);
-    transition: border-color 0.2s, transform 0.2s;
-    display: inline-block;
+  .stats li {
+    padding: clamp(24px, 3vw, 34px) var(--pad-x);
+    box-shadow: -1px 0 0 var(--ink);
   }
-  .social a:hover {
-    text-decoration: none;
-    border-color: var(--violet);
-    transform: translateY(-2px);
-  }
-
-  /* ---------- sections ---------- */
-  section { padding: 56px 0; }
-
-  .sec-title {
-    font-family: var(--font-display);
+  .stats li:last-child { box-shadow: none; }
+  .stats b {
+    display: block;
     font-weight: 700;
-    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
-    margin-bottom: 10px;
+    font-size: clamp(40px, 5vw, 62px);
+    line-height: 1;
+    letter-spacing: -.04em;
+  }
+  .stats span { font-size: 15px; color: var(--ink-mute); }
+
+  /* ---------- marquee ---------- */
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+  }
+  .marquee-group {
+    display: flex;
+    gap: 40px;
+    padding-left: 40px;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    letter-spacing: .1em;
+    white-space: nowrap;
+  }
+  .marquee-group .star { color: var(--acid); }
+  .marquee.paused .marquee-track { animation-play-state: paused; }
+  .marquee-toggle {
+    position: absolute;
+    inset-inline-end: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid #55564d;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 9px;
+    cursor: pointer;
+  }
+  .marquee-toggle:hover { border-color: var(--acid); color: var(--acid); }
+
+  /* ---------- shared section bits ---------- */
+  .sec { padding: clamp(48px, 6vw, 76px) var(--pad-x); }
+  .sec-tight { padding: 0 var(--pad-x) clamp(48px, 6vw, 76px); }
+  .sec-alt { background: var(--paper-alt); }
+  .sec-dark { background: var(--ink); color: var(--paper); }
+  .sec-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-weight: 700;
+    font-size: clamp(30px, 4vw, 52px);
+    letter-spacing: -.03em;
+    margin: 0;
   }
   .sec-lead {
-    color: var(--ink-soft);
-    max-width: 56ch;
-    margin-bottom: 36px;
+    margin: 0;
+    font-size: 17px;
+    color: var(--ink-mute);
+    max-width: 44ch;
   }
+  .sec-dark .sec-lead { color: #9a9b93; }
 
-  /* pain */
-  .pain p {
-    max-width: 60ch;
-    margin-bottom: 16px;
-    font-size: 1.05rem;
-    color: var(--ink-soft);
-  }
-  .pain p strong { color: var(--ink); font-weight: 700; }
-
-  /* craft cards */
-  .craft {
+  /* ---------- pain ---------- */
+  .pain {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: clamp(28px, 4vw, 56px);
+    align-items: start;
+  }
+  .pain h2 { font-size: clamp(30px, 3.6vw, 46px); line-height: 1.06; }
+  .pain-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-size: clamp(16px, 1.4vw, 18px);
+    color: var(--ink-soft);
+  }
+  .pain-copy p { margin: 0; }
+  .pain-copy strong { font-weight: 700; color: var(--ink); }
+
+  /* ---------- services ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 18px;
     list-style: none;
   }
-  @media (max-width: 780px) {
-    .craft { grid-template-columns: 1fr; }
+  .card {
+    background: #fff;
+    border: 1px solid var(--ink);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background .2s;
   }
-  .craft li {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 26px 24px;
-  }
-  .craft h3 {
-    font-size: 1.05rem;
+  .card:hover { background: var(--acid); }
+  .card .tick { width: 34px; height: 5px; background: var(--ink); }
+  .card h3 {
     font-weight: 700;
-    margin-bottom: 8px;
+    font-size: 22px;
+    margin: 6px 0 0;
+    letter-spacing: -.02em;
   }
-  .craft h3::before {
-    content: '';
-    display: block;
-    width: 30px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--lavender);
-    margin-bottom: 14px;
-  }
-  .craft li:nth-child(2) h3::before { background: var(--violet); }
-  .craft li:nth-child(3) h3::before { background: var(--amber); }
-  .craft p { font-size: 0.95rem; color: var(--ink-soft); }
+  .card p { margin: 0; font-size: 16px; color: var(--ink-soft); }
 
-  /* use cases */
+  /* ---------- use cases ---------- */
   .usecases {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--ink);
     list-style: none;
-    border-top: 1px solid var(--line);
   }
   .usecases li {
     display: grid;
-    grid-template-columns: 170px 1fr;
-    gap: 8px 24px;
-    padding: 18px 4px;
-    border-bottom: 1px solid var(--line);
+    grid-template-columns: minmax(140px, 200px) 1fr;
+    gap: 6px 32px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line-soft);
   }
-  @media (max-width: 640px) {
+  .usecases li:last-child { border-bottom-color: var(--ink); }
+  .usecases .area { font-weight: 700; font-size: 19px; }
+  .usecases p { margin: 0; font-size: 16px; color: var(--ink-soft); }
+  @media (max-width: 560px) {
     .usecases li { grid-template-columns: 1fr; }
   }
-  .usecases .area {
-    font-weight: 700;
-    font-size: 1rem;
-  }
-  .usecases p { font-size: 0.95rem; color: var(--ink-soft); }
 
-  /* process */
+  /* ---------- process ---------- */
   .process {
-    list-style: none;
-    counter-reset: step;
     display: grid;
-    gap: 14px;
-    max-width: 720px;
-  }
-  .process li {
-    counter-increment: step;
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 4px 18px;
-  }
-  .process li::before {
-    content: counter(step);
-    grid-row: span 2;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--lavender);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-  }
-  .process h3 { font-size: 1rem; font-weight: 700; }
-  .process h3 span { color: var(--violet); font-weight: 500; font-size: 0.88rem; }
-  .process p { font-size: 0.93rem; color: var(--ink-soft); }
-
-  /* products */
-  .products {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
     list-style: none;
   }
-  @media (max-width: 680px) {
-    .products { grid-template-columns: 1fr; }
-  }
-  .products li {
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 22px;
-    background: var(--paper-raised);
-    transition: border-color 0.2s;
-  }
-  .products li:hover { border-color: var(--lavender); }
-  .products .name {
-    font-weight: 700;
-    font-size: 1.05rem;
-    display: block;
+  .process li { border-top: 4px solid var(--ink); padding-top: 18px; }
+  .process li.hot { border-top-color: var(--acid); }
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    color: var(--ink-mute);
     margin-bottom: 8px;
   }
-  .products .name a { color: var(--ink); }
-  .products p { font-size: 0.92rem; color: var(--ink-soft); margin-bottom: 6px; }
-  .products p b { color: var(--ink); font-weight: 500; }
-  .products .tag {
-    font-weight: 500;
-    font-size: 11.5px;
-    letter-spacing: 0.04em;
-    color: var(--violet);
-    display: inline-block;
-    margin-top: 8px;
-  }
+  .process h3 { font-weight: 700; font-size: 19px; margin: 0 0 6px; }
+  .process h3 span { font-weight: 300; font-size: 15px; color: var(--ink-mute); }
+  .process p { margin: 0; font-size: 15.5px; color: var(--ink-soft); }
+  .link-hl-sm { font-weight: 500; box-shadow: inset 0 -7px 0 var(--acid); }
 
-  /* why me */
-  .why {
+  /* ---------- products ---------- */
+  .products {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: 18px;
     list-style: none;
   }
-  @media (max-width: 680px) {
-    .why { grid-template-columns: 1fr; }
+  .product {
+    border: 1px solid #33342d;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--paper);
+    transition: border-color .2s;
   }
-  .why li {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 22px;
+  a.product:hover { border-color: var(--acid); }
+  .product .name { font-weight: 700; font-size: 26px; }
+  .product p { margin: 0; font-size: 16px; color: #b3b4ab; }
+  .product b { color: var(--acid); font-weight: 500; }
+  .product .lite { color: var(--paper); }
+  .product .tag {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: #9a9b93;
+    margin-top: 6px;
+    letter-spacing: .1em;
   }
-  .why h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-  .why p { font-size: 0.93rem; color: var(--ink-soft); }
+  .sec-dark h2 .hl { color: var(--acid); }
+
+  /* ---------- why me ---------- */
+  .why-cards { margin-bottom: 28px; }
+  .why-card { background: #fff; border: 1px solid var(--ink); padding: 28px; }
+  .why-card h3 { font-weight: 700; font-size: 20px; margin: 0 0 8px; }
+  .why-card p { margin: 0; font-size: 16px; color: var(--ink-soft); }
   .keywords {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 24px;
+    gap: 9px;
     list-style: none;
   }
   .keywords li {
-    font-weight: 500;
-    font-size: 12.5px;
-    padding: 6px 13px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: var(--paper-raised);
-    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .06em;
+    border: 1px solid var(--line-chip);
+    padding: 8px 15px;
+    color: var(--ink-mute);
   }
   .keywords li.hot {
-    border-color: var(--lavender);
-    color: var(--violet);
+    background: var(--acid);
+    border-color: var(--acid);
+    color: var(--ink);
   }
 
-  /* fit */
+  /* ---------- fit ---------- */
   .fit-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: 18px;
   }
-  @media (max-width: 680px) {
-    .fit-grid { grid-template-columns: 1fr; }
-  }
-  .fit-col {
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--paper-raised);
-    padding: 22px;
-  }
-  .fit-col h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
-  .fit-col.yes h3 { color: var(--violet); }
-  .fit-col.no h3 { color: var(--ink-soft); }
-  .fit-col ul { list-style: none; display: grid; gap: 8px; }
-  .fit-col li {
-    font-size: 0.93rem;
-    color: var(--ink-soft);
-    padding-inline-start: 22px;
-    position: relative;
-  }
-  .fit-col li::before {
-    position: absolute;
-    inset-inline-start: 0;
-    font-weight: 700;
-  }
-  .fit-col.yes li::before { content: '✓'; color: var(--violet); }
-  .fit-col.no li::before { content: '✕'; color: #B0A8C8; }
-
-  /* faq */
-  .faq { max-width: 760px; display: grid; gap: 10px; }
-  .faq details {
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-  }
-  .faq summary {
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-  }
-  .faq details[open] summary { color: var(--violet); }
-  .faq details p {
-    margin-top: 10px;
-    font-size: 0.95rem;
-    color: var(--ink-soft);
-  }
-
-  /* ---------- digitizer bridge / contact ---------- */
-  .bridge {
-    margin-top: 40px;
-    background: var(--ink);
-    color: #EFEAFB;
-    border-radius: 28px 28px 0 0;
-    position: relative;
-    overflow: hidden;
-    padding: 80px 0 96px;
-  }
-  .bridge::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: -120px;
-    top: -160px;
-    width: 420px;
-    height: 420px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(175,143,226,0.28), transparent 70%);
-    pointer-events: none;
-  }
-  .bridge .eyebrow { color: var(--lavender); }
-  .bridge .eyebrow::after { background: var(--violet); }
-  .bridge h2 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.9rem, 4.6vw, 3rem);
-    line-height: 1.3;
-    max-width: 20ch;
-  }
-  .bridge .bridge-lead {
-    margin-top: 22px;
-    max-width: 54ch;
-    color: #C9C0E4;
-  }
-  .cta-row {
+  .fit-col { padding: 30px; }
+  .fit-col h3 { font-weight: 700; font-size: 20px; margin: 0 0 16px; }
+  .fit-col ul {
+    list-style: none;
     display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 32px;
+    flex-direction: column;
+    gap: 11px;
+    font-size: 16px;
+  }
+  .fit-col .mark { font-weight: 700; }
+  .fit-yes { background: var(--ink); color: #cfd0c8; }
+  .fit-yes h3 { color: var(--acid); }
+  .fit-yes .mark { color: var(--acid); }
+  .fit-no { border: 1px solid var(--line-chip); color: var(--ink-mute); }
+  .fit-no h3 { color: var(--ink-mute); }
+
+  /* ---------- faq ---------- */
+  .faq {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .faq details { background: #fff; border: 1px solid var(--ink); padding: 18px 22px; }
+  .faq summary { cursor: pointer; font-weight: 700; font-size: 17px; }
+  .faq details p { margin: 12px 0 0; font-size: 16px; color: var(--ink-soft); }
+
+  /* ---------- contact ---------- */
+  .contact { background: var(--acid); padding: clamp(48px, 6vw, 80px) var(--pad-x); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+  .contact .eyebrow { animation: none; margin-bottom: 18px; }
+  .contact h2 {
+    font-size: clamp(32px, 4.4vw, 54px);
+    line-height: 1.03;
+    margin-bottom: 20px;
+  }
+  .contact-lead { margin: 0 0 26px; font-size: 18px; max-width: 50ch; }
+  .contact-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; }
+  .btn-contact { background: var(--ink); color: var(--acid); padding: 16px 32px; }
+  .btn-contact:hover { background: var(--paper); color: var(--ink); }
+  .btn-contact-outline { border: 1.5px solid var(--ink); padding: 16px 32px; }
+  .btn-contact-outline:hover { background: var(--ink); color: var(--acid); }
+  .quote {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding-right: 16px;
+    border-right: 3px solid var(--ink);
+    font-style: normal;
   }
 
-  /* contact form */
-  .contact-form { margin-top: 48px; max-width: 640px; }
-  .contact-form .form-title {
-    font-weight: 700;
-    font-size: 1.15rem;
-    margin-bottom: 18px;
-    color: #EFEAFB;
-  }
-  .contact-form label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #C9C0E4;
-    margin-bottom: 16px;
-  }
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-title { font-weight: 700; font-size: 19px; }
   .field-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0 14px;
-  }
-  @media (max-width: 680px) {
-    .field-row { grid-template-columns: 1fr; }
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
   }
   .contact-form input[type="text"],
   .contact-form input[type="email"],
-  .contact-form input[type="tel"],
-  .contact-form textarea {
-    display: block;
+  .contact-form input[type="tel"] {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    padding: 12px 2px;
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--ink);
     width: 100%;
-    margin-top: 6px;
-    padding: 11px 14px;
-    font: inherit;
-    font-size: 0.95rem;
-    color: #EFEAFB;
-    background: #2B2153;
-    border: 1px solid #8F85AD;
-    border-radius: 10px;
   }
-  .contact-form textarea { resize: vertical; }
-  .contact-form input:focus, .contact-form textarea:focus {
-    outline: 3px solid var(--lavender);
-    outline-offset: 1px;
-    border-color: var(--lavender);
+  .contact-form input[type="email"],
+  .contact-form input[type="tel"] {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    text-align: right;
+  }
+  .contact-form textarea {
+    background: transparent;
+    border: 2px solid var(--ink);
+    padding: 14px;
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--ink);
+    resize: vertical;
+    width: 100%;
   }
   .hp-field {
     position: absolute;
@@ -603,60 +636,79 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     height: 1px;
     overflow: hidden;
   }
-  .privacy {
-    margin: 4px 0 16px;
-    font-size: 0.85rem;
-    color: #C9C0E4;
-    border: 1px solid #4A4165;
-    border-radius: 10px;
-    padding: 12px 16px;
-  }
-  .privacy summary {
-    cursor: pointer;
-    color: var(--lavender);
-    font-weight: 500;
-  }
-  .privacy p { margin-top: 10px; color: #C9C0E4; }
-  .privacy a { color: var(--lavender); }
+  .privacy { border: 1px solid var(--ink); padding: 14px 18px; font-size: 14px; }
+  .privacy summary { cursor: pointer; font-weight: 500; }
+  .privacy p { margin: 12px 0 0; line-height: 1.75; }
+  .privacy a { font-weight: 500; text-decoration: underline; }
   .consent {
-    display: flex !important;
+    display: flex;
     gap: 10px;
     align-items: flex-start;
-    font-weight: 300 !important;
+    font-size: 15px;
+    cursor: pointer;
   }
   .consent input {
-    margin-top: 5px;
+    margin-top: 4px;
     width: 17px;
     height: 17px;
-    accent-color: var(--lavender);
+    accent-color: var(--ink);
     flex: 0 0 auto;
   }
-  .btn-primary:disabled { opacity: 0.6; cursor: wait; transform: none; }
-  .form-status {
-    margin-top: 14px;
-    font-size: 0.95rem;
-    min-height: 1.6em;
+  .btn-submit {
+    background: var(--ink);
+    color: var(--acid);
+    border: none;
+    padding: 16px 40px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 17px;
+    cursor: pointer;
+    align-self: flex-start;
   }
-  .form-status.ok { color: #B8E6C1; }
-  .form-status.err { color: #F2B8C6; }
+  .btn-submit:hover { background: var(--paper); color: var(--ink); }
+  .btn-submit:disabled { opacity: .6; cursor: wait; }
+  .form-status { min-height: 1.6em; font-weight: 500; font-size: 16px; }
+  .form-status.ok {
+    background: var(--ink);
+    color: var(--acid);
+    padding: 16px 24px;
+    align-self: flex-start;
+  }
+  .form-status.err { color: #8f1d2c; }
+
+  /* ---------- footer ---------- */
+  footer {
+    background: var(--ink);
+    color: #8b8c84;
+    padding: 26px var(--pad-x);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 28px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  footer a { color: #8b8c84; }
+  footer a:hover { color: var(--acid); }
+  footer .accent { color: var(--acid); }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
 
   /* ---------- whatsapp float ---------- */
   .wa-float {
     position: fixed;
     bottom: 22px;
-    inset-inline-end: 22px;
+    left: 22px;
     z-index: 50;
-    width: 56px;
-    height: 56px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     background: #25D366;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(32, 23, 67, 0.25);
-    transition: transform 0.2s;
+    box-shadow: 0 6px 20px rgba(18, 19, 15, .28);
   }
-  .wa-float:hover { transform: scale(1.08); text-decoration: none; }
+  .wa-float:hover { background: #1EBE5A; }
   .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 
   /* ---------- consent banner ---------- */
@@ -666,78 +718,38 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     inset-inline: 0;
     z-index: 60;
     background: var(--ink);
-    color: #EFEAFB;
-    padding: 16px 24px;
+    color: var(--paper);
+    padding: 16px var(--pad-x);
     display: none;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 12px 20px;
-    box-shadow: 0 -4px 20px rgba(32, 23, 67, 0.3);
+    border-top: 1px solid var(--acid);
   }
   .consent-banner.show { display: flex; }
-  .consent-banner p { font-size: 0.9rem; max-width: 56ch; }
-  .consent-banner a { color: var(--lavender); }
+  .consent-banner p { font-size: 14.5px; max-width: 62ch; margin: 0; }
   .consent-banner .btns { display: flex; gap: 10px; flex: 0 0 auto; }
   .consent-banner button {
-    font: inherit;
+    font-family: var(--font-body);
     font-weight: 700;
-    font-size: 0.9rem;
-    padding: 10px 20px;
-    border-radius: 999px;
+    font-size: 15px;
+    padding: 10px 22px;
     cursor: pointer;
     border: none;
   }
-  .consent-accept { background: var(--lavender); color: var(--ink); }
-  .consent-decline { background: none; border: 1px solid #8F85AD !important; color: #EFEAFB; }
+  .consent-accept { background: var(--acid); color: var(--ink); }
+  .consent-decline { background: none; border: 1px solid #8b8c84; color: var(--paper); }
+  .consent-decline:hover, .consent-accept:hover { opacity: .85; }
 
-  /* ---------- footer ---------- */
-  footer {
-    background: var(--ink);
-    color: #8F85AD;
-    padding: 8px 0 40px;
-    font-size: 0.85rem;
+  @media (max-width: 760px) {
+    .site-header { position: static; }
+    section[id] { scroll-margin-top: 0; }
   }
-  footer .wrap {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 12px 24px;
-    border-top: 1px solid #372E58;
-    padding-top: 24px;
-  }
-  footer a { color: var(--lavender); }
-  footer .quote {
-    font-style: italic;
-    color: #9A90B8;
-  }
-
-  /* ---------- motion (hidden state only when JS is running) ---------- */
-  .js .hero .fade {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .js .hero .fade.in {
-    opacity: 1;
-    transform: none;
-  }
-  .hero .fade:nth-child(1) { transition-delay: 0.05s; }
-  .hero .fade:nth-child(2) { transition-delay: 0.15s; }
-  .hero .fade:nth-child(3) { transition-delay: 0.28s; }
-  .hero .fade:nth-child(4) { transition-delay: 0.38s; }
-  .hero .fade:nth-child(5) { transition-delay: 0.48s; }
 
   @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
     html { scroll-behavior: auto; }
-    .js .hero .fade { opacity: 1; transform: none; transition: none; }
-    .social a, .btn, .wa-float { transition: none; }
-  }
-
-  @media (max-width: 560px) {
-    .hero { padding: 60px 0 44px; }
-    section { padding: 40px 0; }
-    .stats { gap: 14px 28px; }
   }
 </style>
 </head>
@@ -747,263 +759,300 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
-<header class="hero">
-  <div class="wrap">
-    <p class="eyebrow fade"><span dir="ltr">BEN KALSKY</span> · בן קלסקי</p>
-    <h1 class="fade">בינה מלאכותית שרצה בפרודקשן. <em>לא במצגת.</em></h1>
-    <p class="hero-sub fade">אני בן קלסקי, שותף-מייסד ו-CTO ב<strong><a href="https://www.digitizer.co.il">דיגיטייזר</a></strong>. אחרי 15+ שנים של בניית מערכות שמחזיקות בפרודקשן, היום אני עוזר לחברות טכנולוגיה, SaaS, איקומרס ועסקים בצמיחה להטמיע AI שבאמת עובד: סוכנים אוטונומיים, אוטומציות מקצה לקצה ומוצרים שנבנים מהר.</p>
-    <div class="hero-cta fade">
-      <a class="btn btn-solid" href="https://digitizer.li/schedule">קביעת פגישת אבחון AI — חינם</a>
-      <a class="btn btn-outline" href="https://wa.me/972528816959">דברו איתי בוואטסאפ</a>
-    </div>
-    <div class="trust fade">
-      <ul class="stats">
-        <li><b>15+</b><span>שנות בנייה לרשת</span></li>
-        <li><b>100+</b><span>פרויקטים שנמסרו</span></li>
-        <li><b>4</b><span>מוצרים חיים</span></li>
-      </ul>
-      <p class="trust-clients">בין החברות שבנינו עבורן: <b>Reposify</b> (נרכשה ע"י CrowdStrike) · <b>Deci</b> (נרכשה ע"י NVIDIA) · <b>Balance</b> · <b>PractiTest</b></p>
-      <ul class="social">
-        <li><a href="https://github.com/BenKalsky" rel="me">GitHub</a></li>
-        <li><a href="https://www.linkedin.com/in/benkalsky" rel="me">LinkedIn</a></li>
-        <li><a href="https://stackoverflow.com/users/1491580/ben-kalsky" rel="me">Stack Overflow</a></li>
-        <li><a href="https://profiles.wordpress.org/benkalsky" rel="me">WordPress.org</a></li>
-      </ul>
-    </div>
-  </div>
+<header class="site-header">
+  <span class="brand"><span dir="ltr">BEN KALSKY</span> · בן קלסקי</span>
+  <nav class="site-nav" aria-label="ניווט ראשי">
+    <a href="#services">מה אני עושה</a>
+    <a href="#process">תהליך</a>
+    <a href="#proof">מוצרים</a>
+    <a href="#faq">שאלות</a>
+    <a class="nav-cta" href="https://digitizer.li/schedule">פגישת אבחון — חינם</a>
+  </nav>
 </header>
 
 <main>
-  <section class="pain" aria-labelledby="pain-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="pain-title">רוב פרויקטי ה-AI נתקעים בין הדמו לפרודקשן</h2>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-blob" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="eyebrow">יישום בינה מלאכותית לעסקים</p>
+      <h1 id="hero-title">בינה מלאכותית שרצה בפרודקשן. <span class="h1-mark">לא במצגת.</span></h1>
+      <p class="hero-sub">אני בן קלסקי, שותף-מייסד ו-CTO ב<a class="link-hl" href="https://www.digitizer.co.il">דיגיטייזר</a>. אחרי 15+ שנים של בניית מערכות שמחזיקות בפרודקשן, היום אני עוזר לחברות טכנולוגיה, SaaS, איקומרס ועסקים בצמיחה להטמיע AI שבאמת עובד: סוכנים אוטונומיים, אוטומציות מקצה לקצה ומוצרים שנבנים מהר.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="https://digitizer.li/schedule">קביעת פגישת אבחון AI — חינם</a>
+        <a class="btn btn-outline" href="https://wa.me/972528816959">דברו איתי בוואטסאפ</a>
+      </div>
+      <div class="hero-social">
+        <a href="https://github.com/BenKalsky" rel="me">GitHub</a>
+        <a href="https://www.linkedin.com/in/benkalsky" rel="me">LinkedIn</a>
+        <a href="https://stackoverflow.com/users/1491580/ben-kalsky" rel="me">Stack Overflow</a>
+        <a href="https://profiles.wordpress.org/benkalsky" rel="me">WordPress.org</a>
+      </div>
+    </div>
+  </section>
+
+  <ul class="stats">
+    <li><b>15+</b><span>שנות בנייה לרשת</span></li>
+    <li><b>100+</b><span>פרויקטים שנמסרו</span></li>
+    <li><b>4</b><span>מוצרים חיים</span></li>
+  </ul>
+
+  <div class="marquee" id="marquee" dir="ltr">
+    <button type="button" class="marquee-toggle" id="marquee-toggle" aria-pressed="false" aria-label="השהיית התנועה בפס הלוגואים" lang="he">⏸</button>
+    <p class="sr-only" lang="he" dir="rtl">בין החברות שבנינו עבורן: Reposify (נרכשה ע"י CrowdStrike), Deci (נרכשה ע"י NVIDIA), Balance, PractiTest</p>
+    <div class="marquee-track" aria-hidden="true">
+      <div class="marquee-group"><span>REPOSIFY → CROWDSTRIKE</span><span class="star">✳</span><span>DECI → NVIDIA</span><span class="star">✳</span><span>BALANCE</span><span class="star">✳</span><span>PRACTITEST</span><span class="star">✳</span></div>
+      <div class="marquee-group"><span>REPOSIFY → CROWDSTRIKE</span><span class="star">✳</span><span>DECI → NVIDIA</span><span class="star">✳</span><span>BALANCE</span><span class="star">✳</span><span>PRACTITEST</span><span class="star">✳</span></div>
+    </div>
+  </div>
+
+  <section class="sec pain" aria-labelledby="pain-title">
+    <h2 id="pain-title">רוב פרויקטי ה-AI נתקעים בין הדמו לפרודקשן</h2>
+    <div class="pain-copy">
       <p>ניסיתם כלים. אולי אפילו הרצתם פיילוט מרשים. ואז זה נעצר: הידע לא מחובר למערכות האמיתיות, אין הרשאות ובקרה, וההתלהבות פוגשת את היומיום — העתק-הדבק ידני, מידע מפוזר בין מערכות, ותהליכים שממשיכים לרוץ בדיוק כמו קודם.</p>
       <p><strong>הפער הוא לא בכלים. הוא בחיבור.</strong> מי שמחבר את ה-AI ל-CRM, לאתר, למייל ולנתונים של העסק, מגדיר לו גבולות ברורים, ומוסר מערכת שרצה כל יום — סוגר את הפער הזה. זה בדיוק מה שאני עושה.</p>
     </div>
   </section>
 
-  <section aria-labelledby="craft-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="craft-title">מה אני עושה</h2>
+  <section id="services" class="sec-tight" aria-labelledby="services-title">
+    <div class="sec-head">
+      <h2 id="services-title">מה אני עושה</h2>
       <p class="sec-lead">לא הרצאות על AI — מערכות שרצות אצלך בעסק ומחזירות את ההשקעה.</p>
-      <ul class="craft">
-        <li>
-          <h3>סוכני AI ותהליכים אג'נטיים</h3>
-          <p>סוכנים שמבצעים משימות אמיתיות: מחוברים למקורות המידע של העסק, עם הרשאות מוגדרות, יומני פעולה ובקרה אנושית. לא צ'אטבוט — עובד דיגיטלי.</p>
-        </li>
-        <li>
-          <h3>אוטומציות עסקיות</h3>
-          <p>ה-CRM, האתר, המייל והדוחות מדברים ביניהם בלי ידיים. פחות העתק-הדבק, פחות טעויות אנוש, יותר זמן לעבודה שמייצרת כסף.</p>
-        </li>
-        <li>
-          <h3>פיתוח מהיר של מוצרים ומערכות AI</h3>
-          <p>מרעיון למוצר עובד בשבועות, לא בחודשים — פיתוח מונחה AI עם הקפדה של מהנדס: בדיקות, אבטחה וקוד שאפשר לתחזק.</p>
-        </li>
-      </ul>
     </div>
+    <ul class="cards">
+      <li class="card">
+        <span class="tick" aria-hidden="true"></span>
+        <h3>סוכני AI ותהליכים אג'נטיים</h3>
+        <p>סוכנים שמבצעים משימות אמיתיות: מחוברים למקורות המידע של העסק, עם הרשאות מוגדרות, יומני פעולה ובקרה אנושית. לא צ'אטבוט — עובד דיגיטלי.</p>
+      </li>
+      <li class="card">
+        <span class="tick" aria-hidden="true"></span>
+        <h3>אוטומציות עסקיות</h3>
+        <p>ה-CRM, האתר, המייל והדוחות מדברים ביניהם בלי ידיים. פחות העתק-הדבק, פחות טעויות אנוש, יותר זמן לעבודה שמייצרת כסף.</p>
+      </li>
+      <li class="card">
+        <span class="tick" aria-hidden="true"></span>
+        <h3>פיתוח מהיר של מוצרים ומערכות AI</h3>
+        <p>מרעיון למוצר עובד בשבועות, לא בחודשים — פיתוח מונחה AI עם הקפדה של מהנדס: בדיקות, אבטחה וקוד שאפשר לתחזק.</p>
+      </li>
+    </ul>
   </section>
 
-  <section aria-labelledby="usecases-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="usecases-title">איפה זה פוגש את העסק שלך</h2>
+  <section class="sec-tight" aria-labelledby="usecases-title">
+    <div class="sec-head">
+      <h2 id="usecases-title">איפה זה פוגש את העסק שלך</h2>
       <p class="sec-lead">דוגמאות לתהליכים שסוכנים ואוטומציות מרימים בפועל.</p>
-      <ul class="usecases">
-        <li>
-          <span class="area">מכירות ושיווק</span>
-          <p>העשרת לידים אוטומטית, תקציר חכם לפני כל שיחה, מעקב הצעות מחיר ותזכורות שלא נופלות בין הכיסאות.</p>
-        </li>
-        <li>
-          <span class="area">שירות לקוחות</span>
-          <p>טיוטות מענה מבוססות על הידע הארגוני שלך, ניתוב פניות אוטומטי, וזיהוי פניות דחופות בזמן.</p>
-        </li>
-        <li>
-          <span class="area">תפעול</span>
-          <p>סנכרון נתונים בין מערכות, דוחות שנכתבים לבד, ועדכוני סטטוס שמגיעים אליך במקום שתרדוף אחריהם.</p>
-        </li>
-        <li>
-          <span class="area">ניהול ידע</span>
-          <p>שכבת חיפוש חכמה מעל המסמכים, המיילים והמערכות — תשובה מבוססת מקורות במקום חצי שעה של חיפוש.</p>
-        </li>
-      </ul>
     </div>
+    <ul class="usecases">
+      <li>
+        <span class="area">מכירות ושיווק</span>
+        <p>העשרת לידים אוטומטית, תקציר חכם לפני כל שיחה, מעקב הצעות מחיר ותזכורות שלא נופלות בין הכיסאות.</p>
+      </li>
+      <li>
+        <span class="area">שירות לקוחות</span>
+        <p>טיוטות מענה מבוססות על הידע הארגוני שלך, ניתוב פניות אוטומטי, וזיהוי פניות דחופות בזמן.</p>
+      </li>
+      <li>
+        <span class="area">תפעול</span>
+        <p>סנכרון נתונים בין מערכות, דוחות שנכתבים לבד, ועדכוני סטטוס שמגיעים אליך במקום שתרדוף אחריהם.</p>
+      </li>
+      <li>
+        <span class="area">ניהול ידע</span>
+        <p>שכבת חיפוש חכמה מעל המסמכים, המיילים והמערכות — תשובה מבוססת מקורות במקום חצי שעה של חיפוש.</p>
+      </li>
+    </ul>
   </section>
 
-  <section aria-labelledby="process-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="process-title">איך נראה תהליך העבודה</h2>
+  <section id="process" class="sec sec-alt" aria-labelledby="process-title">
+    <div class="sec-head">
+      <h2 id="process-title">איך נראה תהליך העבודה</h2>
       <p class="sec-lead">מתחילים בקטן, מוכיחים ערך, ורק אז מרחיבים.</p>
-      <ol class="process">
-        <li>
-          <h3>פגישת אבחון <span>· 30 דקות, חינם</span></h3>
-          <p>ממפים יחד את התהליכים בעסק ומזהים 2–3 הזדמנויות הטמעה עם החזר מהיר. יוצאים עם תמונה ברורה גם אם לא נעבוד יחד.</p>
-        </li>
-        <li>
-          <h3>Quick Win ראשון</h3>
-          <p>בוחרים את ההזדמנות הקטנה עם הערך הברור ביותר ובונים אותה תוך שבועות ספורים — הוכחת ערך לפני התחייבות גדולה.</p>
-        </li>
-        <li>
-          <h3>פיילוט בסביבה אמיתית</h3>
-          <p>המערכת עובדת על נתונים אמיתיים מול מדד שהוגדר מראש. רואים תוצאות, לא מצגות.</p>
-        </li>
-        <li>
-          <h3>הטמעה לפרודקשן</h3>
-          <p>חיבור מלא למערכות, הגדרות אבטחה והרשאות, ניטור וגבולות פעולה ברורים. המערכת עוברת מ"עובדת אצלי" ל"עובדת אצלכם".</p>
-        </li>
-        <li>
-          <h3>ליווי וצמיחה</h3>
-          <p>המערכת מתוחזקת, משתפרת ומתרחבת לתהליכים נוספים — עם הצוות של <a href="https://www.digitizer.co.il">דיגיטייזר</a> שמלווה אתכם גם אחרי ההשקה.</p>
-        </li>
-      </ol>
     </div>
+    <ol class="process">
+      <li class="hot">
+        <div class="step-num">STEP 01</div>
+        <h3>פגישת אבחון <span>· 30 דק', חינם</span></h3>
+        <p>ממפים יחד את התהליכים בעסק ומזהים 2–3 הזדמנויות הטמעה עם החזר מהיר. יוצאים עם תמונה ברורה גם אם לא נעבוד יחד.</p>
+      </li>
+      <li class="hot">
+        <div class="step-num">STEP 02</div>
+        <h3>Quick Win ראשון</h3>
+        <p>בוחרים את ההזדמנות הקטנה עם הערך הברור ביותר ובונים אותה תוך שבועות ספורים — הוכחת ערך לפני התחייבות גדולה.</p>
+      </li>
+      <li>
+        <div class="step-num">STEP 03</div>
+        <h3>פיילוט בסביבה אמיתית</h3>
+        <p>המערכת עובדת על נתונים אמיתיים מול מדד שהוגדר מראש. רואים תוצאות, לא מצגות.</p>
+      </li>
+      <li>
+        <div class="step-num">STEP 04</div>
+        <h3>הטמעה לפרודקשן</h3>
+        <p>חיבור מלא למערכות, הגדרות אבטחה והרשאות, ניטור וגבולות פעולה ברורים. המערכת עוברת מ"עובדת אצלי" ל"עובדת אצלכם".</p>
+      </li>
+      <li>
+        <div class="step-num">STEP 05</div>
+        <h3>ליווי וצמיחה</h3>
+        <p>המערכת מתוחזקת, משתפרת ומתרחבת לתהליכים נוספים — עם הצוות של <a class="link-hl-sm" href="https://www.digitizer.co.il">דיגיטייזר</a> שמלווה אתכם גם אחרי ההשקה.</p>
+      </li>
+    </ol>
   </section>
 
-  <section aria-labelledby="products-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="products-title">הוכחה, לא הבטחה</h2>
+  <section id="proof" class="sec sec-dark" aria-labelledby="proof-title">
+    <div class="sec-head">
+      <h2 id="proof-title">הוכחה, <span class="hl">לא הבטחה</span></h2>
       <p class="sec-lead">מוצרים חיים שבניתי בתהליך אג'נטי — אותה גישה שאני מביא לעסק שלך.</p>
-      <ul class="products">
-        <li>
-          <span class="name"><a href="https://deep-claw.com">DeepClaw</a></span>
+    </div>
+    <ul class="products">
+      <li>
+        <a class="product" href="https://deep-claw.com">
+          <span class="name">DeepClaw ↗</span>
           <p><b>הבעיה:</b> ארגונים לא רואים מה סוכני ה-AI שלהם באמת עושים.</p>
           <p><b>בניתי:</b> SaaS לניטור שערי AI — כל קריאה, כל סוכן, בשקיפות מלאה.</p>
-          <span class="tag">AI · SaaS · live</span>
-        </li>
-        <li>
-          <span class="name"><a href="https://wordpress.org/plugins/digitizer-site-worker/">SiteAgent</a></span>
+          <span class="tag">AI · SAAS · LIVE</span>
+        </a>
+      </li>
+      <li>
+        <a class="product" href="https://wordpress.org/plugins/digitizer-site-worker/">
+          <span class="name">SiteAgent ↗</span>
           <p><b>הבעיה:</b> תחזוקת אתרים גוזלת שעות של עבודה ידנית.</p>
-          <p><b>בניתי:</b> סוכן וורדפרס שמבצע פעולות אמיתיות מרחוק, עבור <a href="https://my-aura.app">Aura</a>. חי ב-WordPress.org.</p>
-          <span class="tag">Agent · WordPress.org</span>
-        </li>
-        <li>
-          <span class="name">AutoMate</span>
-          <p><b>הבעיה:</b> מלאי רכב שמנוהל באקסל ובוואטסאפ.</p>
-          <p><b>בניתי:</b> מערכת ניהול מלאי לסוכנות מכוניות — מהמגרש ועד הליד.</p>
-          <span class="tag">in production</span>
-        </li>
-        <li>
-          <span class="name">Pulse</span>
-          <p><b>הבעיה:</b> נתוני לקוחות מפוזרים בין עשרות דשבורדים.</p>
-          <p><b>בניתי:</b> אנליטיקס אחוד לסוכנויות — כל הלקוחות במסך אחד.</p>
-          <span class="tag">in production</span>
-        </li>
-      </ul>
+          <p><b>בניתי:</b> סוכן וורדפרס שמבצע פעולות אמיתיות מרחוק, עבור <span class="lite">Aura</span>. חי ב-WordPress.org.</p>
+          <span class="tag">AGENT · WORDPRESS.ORG</span>
+        </a>
+      </li>
+      <li class="product">
+        <span class="name">AutoMate</span>
+        <p><b>הבעיה:</b> מלאי רכב שמנוהל באקסל ובוואטסאפ.</p>
+        <p><b>בניתי:</b> מערכת ניהול מלאי לסוכנות מכוניות — מהמגרש ועד הליד.</p>
+        <span class="tag">IN PRODUCTION</span>
+      </li>
+      <li class="product">
+        <span class="name">Pulse</span>
+        <p><b>הבעיה:</b> נתוני לקוחות מפוזרים בין עשרות דשבורדים.</p>
+        <p><b>בניתי:</b> אנליטיקס אחוד לסוכנויות — כל הלקוחות במסך אחד.</p>
+        <span class="tag">IN PRODUCTION</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="sec" aria-labelledby="why-title">
+    <div class="sec-head">
+      <h2 id="why-title">למה אני, ולא יועץ AI</h2>
+    </div>
+    <ul class="cards why-cards">
+      <li class="why-card">
+        <h3>אני בונה, לא רק ממליץ</h3>
+        <p>אתם לא מקבלים מסמך המלצות שמחפש ספק שיממש אותו. אני מלווה מהרעיון ועד מערכת עובדת.</p>
+      </li>
+      <li class="why-card">
+        <h3>מהממשק ועד התשתית</h3>
+        <p>15+ שנות תשתיות ווב, מערכות ופרודקשן. מערכת AI צריכה להיות פשוטה לצוות — ויציבה מתחת למכסה.</p>
+      </li>
+      <li class="why-card">
+        <h3>לא נעול על כלי מסוים</h3>
+        <p>Claude, OpenAI, Gemini, מודלים מקומיים, MCP, n8n, Make — הבחירה נעשית לפי הצורך והתקציב שלכם, לא לפי מה שנוח לי.</p>
+      </li>
+      <li class="why-card">
+        <h3>מוסר מערכת שעובדת</h3>
+        <p>עם ניטור, תיעוד והדרכה — כך שהמערכת ממשיכה לרוץ גם כשאני לא בחדר.</p>
+      </li>
+    </ul>
+    <ul class="keywords" aria-label="תחומי התמחות">
+      <li class="hot">Claude</li>
+      <li class="hot">MCP</li>
+      <li class="hot">סוכני AI</li>
+      <li>תהליכים אג'נטיים</li>
+      <li>אוטומציות</li>
+      <li>Vibe Coding</li>
+    </ul>
+  </section>
+
+  <section class="sec-tight" aria-labelledby="fit-title">
+    <div class="sec-head">
+      <h2 id="fit-title">למי זה מתאים</h2>
+    </div>
+    <div class="fit-grid">
+      <div class="fit-col fit-yes">
+        <h3>נעבוד מצוין יחד אם</h3>
+        <ul>
+          <li><span class="mark" aria-hidden="true">✓</span> יש בעסק תהליכים חוזרים שגוזלים שעות כל שבוע</li>
+          <li><span class="mark" aria-hidden="true">✓</span> המידע מפוזר בין מערכות שלא מדברות ביניהן</li>
+          <li><span class="mark" aria-hidden="true">✓</span> יש רעיון למוצר או יכולת AI שצריך להפוך למשהו חי</li>
+          <li><span class="mark" aria-hidden="true">✓</span> רוצים צעד ראשון קטן ומדיד, לא פרויקט ענק</li>
+        </ul>
+      </div>
+      <div class="fit-col fit-no">
+        <h3>כנראה לא בשבילכם אם</h3>
+        <ul>
+          <li><span class="mark" aria-hidden="true">✕</span> מחפשים הרצאת השראה על AI</li>
+          <li><span class="mark" aria-hidden="true">✕</span> רוצים צ'אטבוט גנרי "כדי שיהיה"</li>
+          <li><span class="mark" aria-hidden="true">✕</span> מחפשים AI בשביל הכותרת, בלי תוצאה עסקית מוגדרת</li>
+        </ul>
+      </div>
     </div>
   </section>
 
-  <section aria-labelledby="why-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="why-title">למה אני, ולא יועץ AI</h2>
-      <ul class="why">
-        <li>
-          <h3>אני בונה, לא רק ממליץ</h3>
-          <p>אתם לא מקבלים מסמך המלצות שמחפש ספק שיממש אותו. אני מלווה מהרעיון ועד מערכת עובדת.</p>
-        </li>
-        <li>
-          <h3>מהממשק ועד התשתית</h3>
-          <p>15+ שנות תשתיות ווב, מערכות ופרודקשן. מערכת AI צריכה להיות פשוטה לצוות — ויציבה מתחת למכסה.</p>
-        </li>
-        <li>
-          <h3>לא נעול על כלי מסוים</h3>
-          <p>Claude, OpenAI, Gemini, מודלים מקומיים, MCP, n8n, Make — הבחירה נעשית לפי הצורך והתקציב שלכם, לא לפי מה שנוח לי.</p>
-        </li>
-        <li>
-          <h3>מוסר מערכת שעובדת</h3>
-          <p>עם ניטור, תיעוד והדרכה — כך שהמערכת ממשיכה לרוץ גם כשאני לא בחדר.</p>
-        </li>
-      </ul>
-      <ul class="keywords" aria-label="תחומי התמחות">
-        <li class="hot">Claude</li>
-        <li class="hot">MCP</li>
-        <li class="hot">סוכני AI</li>
-        <li>תהליכים אג'נטיים</li>
-        <li>אוטומציות</li>
-        <li>Vibe Coding</li>
-      </ul>
+  <section id="faq" class="sec sec-alt" aria-labelledby="faq-title">
+    <div class="sec-head">
+      <h2 id="faq-title">שאלות נפוצות</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>כמה עולה פרויקט הטמעת AI?</summary>
+        <p>תלוי בהיקף. בגלל זה התהליך מתחיל ב-Quick Win קטן שמוכיח ערך לפני כל התחייבות גדולה — ובפגישת האבחון (שהיא חינם) תקבלו הערכה כנה, כולל אם המסקנה היא שזה לא משתלם לכם עכשיו.</p>
+      </details>
+      <details>
+        <summary>מה עם אבטחת המידע שלנו?</summary>
+        <p>כל מערכת נבנית עם הרשאות מינימליות, והמידע נשאר במערכות שלכם. אפשר לעבוד עם ספקים שעומדים בדרישות הפרטיות שלכם, ובמקרים רגישים — עם מודלים בסביבה הפרטית שלכם.</p>
+      </details>
+      <details>
+        <summary>הסוכן יכול "להשתולל"? מה הגבולות?</summary>
+        <p>כל סוכן מקבל הרשאות מוגדרות, יומן פעולות מלא וגבולות ברורים. פעולות רגישות — שליחה החוצה, מחיקה, תשלום — דורשות אישור אנושי. אוטונומיה היא הגדרה מפורשת, לא ברירת מחדל.</p>
+      </details>
+      <details>
+        <summary>כמה זמן עד שרואים תוצאות?</summary>
+        <p>ה-Quick Win הראשון עולה תוך שבועות ספורים, עם מדד שהוגדר מראש. פיילוט והטמעה מלאה — לפי היקף, ותמיד בשלבים שאפשר לעצור אחרי כל אחד מהם.</p>
+      </details>
+      <details>
+        <summary>צריך להחליף את המערכות הקיימות?</summary>
+        <p>לא. הגישה היא להתחבר למה שכבר עובד אצלכם — CRM, אתר, מייל, גיליונות — בלי לכפות מעבר מערכת. רק אם מערכת קיימת באמת חוסמת, נדבר על זה בכנות.</p>
+      </details>
+      <details>
+        <summary>איך מודדים שזה באמת עובד?</summary>
+        <p>מגדירים מדד לפני שבונים: שעות שנחסכו, זמן תגובה, מספר פניות שטופלו, לידים שלא נפלו. מודדים לפני ואחרי — ואם המספרים לא זזים, אומרים את זה.</p>
+      </details>
     </div>
   </section>
 
-  <section aria-labelledby="fit-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="fit-title">למי זה מתאים</h2>
-      <div class="fit-grid">
-        <div class="fit-col yes">
-          <h3>נעבוד מצוין יחד אם</h3>
-          <ul>
-            <li>יש בעסק תהליכים חוזרים שגוזלים שעות כל שבוע</li>
-            <li>המידע מפוזר בין מערכות שלא מדברות ביניהן</li>
-            <li>יש רעיון למוצר או יכולת AI שצריך להפוך למשהו חי</li>
-            <li>רוצים צעד ראשון קטן ומדיד, לא פרויקט ענק</li>
-          </ul>
+  <section id="contact" class="contact" aria-labelledby="contact-title">
+    <div class="contact-grid">
+      <div>
+        <p class="eyebrow"><span dir="ltr">DIGITIZER</span> · דיגיטייזר</p>
+        <h2 id="contact-title">מוכנים לצעד ראשון שאפשר למדוד?</h2>
+        <p class="contact-lead">פגישת אבחון של 30 דקות, בלי עלות ובלי התחייבות. יוצאים עם 2–3 הזדמנויות AI קונקרטיות לעסק שלכם — והיישום, כשתהיו מוכנים, קורה עם הצוות של דיגיטייזר.</p>
+        <div class="contact-cta">
+          <a class="btn btn-contact" href="https://digitizer.li/schedule">קביעת פגישת אבחון AI</a>
+          <a class="btn btn-contact-outline" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
         </div>
-        <div class="fit-col no">
-          <h3>כנראה לא בשבילכם אם</h3>
-          <ul>
-            <li>מחפשים הרצאת השראה על AI</li>
-            <li>רוצים צ'אטבוט גנרי "כדי שיהיה"</li>
-            <li>מחפשים AI בשביל הכותרת, בלי תוצאה עסקית מוגדרת</li>
-          </ul>
-        </div>
+        <p class="quote">"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</p>
       </div>
-    </div>
-  </section>
-
-  <section aria-labelledby="faq-title">
-    <div class="wrap">
-      <h2 class="sec-title" id="faq-title">שאלות נפוצות</h2>
-      <div class="faq">
-        <details>
-          <summary>כמה עולה פרויקט הטמעת AI?</summary>
-          <p>תלוי בהיקף. בגלל זה התהליך מתחיל ב-Quick Win קטן שמוכיח ערך לפני כל התחייבות גדולה — ובפגישת האבחון (שהיא חינם) תקבלו הערכה כנה, כולל אם המסקנה היא שזה לא משתלם לכם עכשיו.</p>
-        </details>
-        <details>
-          <summary>מה עם אבטחת המידע שלנו?</summary>
-          <p>כל מערכת נבנית עם הרשאות מינימליות, והמידע נשאר במערכות שלכם. אפשר לעבוד עם ספקים שעומדים בדרישות הפרטיות שלכם, ובמקרים רגישים — עם מודלים בסביבה הפרטית שלכם.</p>
-        </details>
-        <details>
-          <summary>הסוכן יכול "להשתולל"? מה הגבולות?</summary>
-          <p>כל סוכן מקבל הרשאות מוגדרות, יומן פעולות מלא וגבולות ברורים. פעולות רגישות — שליחה החוצה, מחיקה, תשלום — דורשות אישור אנושי. אוטונומיה היא הגדרה מפורשת, לא ברירת מחדל.</p>
-        </details>
-        <details>
-          <summary>כמה זמן עד שרואים תוצאות?</summary>
-          <p>ה-Quick Win הראשון עולה תוך שבועות ספורים, עם מדד שהוגדר מראש. פיילוט והטמעה מלאה — לפי היקף, ותמיד בשלבים שאפשר לעצור אחרי כל אחד מהם.</p>
-        </details>
-        <details>
-          <summary>צריך להחליף את המערכות הקיימות?</summary>
-          <p>לא. הגישה היא להתחבר למה שכבר עובד אצלכם — CRM, אתר, מייל, גיליונות — בלי לכפות מעבר מערכת. רק אם מערכת קיימת באמת חוסמת, נדבר על זה בכנות.</p>
-        </details>
-        <details>
-          <summary>איך מודדים שזה באמת עובד?</summary>
-          <p>מגדירים מדד לפני שבונים: שעות שנחסכו, זמן תגובה, מספר פניות שטופלו, לידים שלא נפלו. מודדים לפני ואחרי — ואם המספרים לא זזים, אומרים את זה.</p>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <section class="bridge" aria-labelledby="bridge-title">
-    <div class="wrap">
-      <p class="eyebrow">DIGITIZER · דיגיטייזר</p>
-      <h2 id="bridge-title">מוכנים לצעד ראשון שאפשר למדוד?</h2>
-      <p class="bridge-lead">פגישת אבחון של 30 דקות, בלי עלות ובלי התחייבות. יוצאים עם 2–3 הזדמנויות AI קונקרטיות לעסק שלכם — והיישום, כשתהיו מוכנים, קורה עם הצוות של דיגיטייזר.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://digitizer.li/schedule">קביעת פגישת אבחון AI</a>
-        <a class="btn btn-ghost" href="https://www.digitizer.co.il">לאתר דיגיטייזר</a>
-      </div>
-
       <form id="contact-form" class="contact-form" novalidate>
         <p class="form-title">או השאירו פרטים ואחזור אליכם</p>
         <div class="field-row">
-          <label>שם מלא *
-            <input type="text" name="name" required maxlength="200" autocomplete="name">
+          <label>
+            <span class="sr-only">שם מלא</span>
+            <input type="text" name="name" required maxlength="200" autocomplete="name" placeholder="שם מלא *" aria-label="שם מלא">
           </label>
-          <label>אימייל *
-            <input type="email" name="email" required maxlength="320" autocomplete="email" dir="ltr">
+          <label>
+            <span class="sr-only">אימייל</span>
+            <input type="email" name="email" required maxlength="320" autocomplete="email" dir="ltr" placeholder="Email *" aria-label="אימייל">
           </label>
-          <label>טלפון
-            <input type="tel" name="phone" maxlength="50" autocomplete="tel" dir="ltr">
+          <label>
+            <span class="sr-only">טלפון</span>
+            <input type="tel" name="phone" maxlength="50" autocomplete="tel" dir="ltr" placeholder="Phone" aria-label="טלפון">
           </label>
         </div>
-        <label>איזה תהליך הייתם רוצים לשפר? *
-          <textarea name="message" required maxlength="5000" rows="4"></textarea>
+        <label>
+          <span class="sr-only">איזה תהליך הייתם רוצים לשפר?</span>
+          <textarea name="message" required maxlength="5000" rows="4" placeholder="איזה תהליך הייתם רוצים לשפר? *" aria-label="איזה תהליך הייתם רוצים לשפר?"></textarea>
         </label>
         <p class="hp-field" aria-hidden="true">
           <label>אתר
@@ -1016,11 +1065,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </details>
         <label class="consent">
           <input type="checkbox" name="consent" required>
-          קראתי את הודעת הפרטיות ואני מסכימ/ה למסירת הפרטים למטרה שצוינה. *
+          <span>קראתי את הודעת הפרטיות ואני מסכימ/ה למסירת הפרטים למטרה שצוינה. *</span>
         </label>
-        <div class="cta-row">
-          <button type="submit" class="btn btn-primary" id="submit-btn">שליחה</button>
-        </div>
+        <button type="submit" class="btn-submit" id="submit-btn">שליחה ←</button>
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
@@ -1040,9 +1087,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 
 <footer>
-  <div class="wrap">
-    <span>© <span id="year">2026</span> בן קלסקי · <a href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a> · <a href="#" id="cookie-settings">הגדרות עוגיות</a></span>
-    <span class="quote">"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</span>
+  <span>© <span id="year">2026</span> בן קלסקי · <a class="accent" href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a> · <span>"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</span></span>
+  <div class="footer-links">
+    <a href="https://www.digitizer.co.il">דיגיטייזר</a>
+    <a href="https://www.linkedin.com/in/benkalsky" lang="en" dir="ltr">LinkedIn</a>
+    <a href="https://github.com/BenKalsky" lang="en" dir="ltr">GitHub</a>
+    <a href="#" id="cookie-settings">הגדרות עוגיות</a>
   </div>
 </footer>
 
@@ -1069,13 +1119,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
   })();
 
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
-      document.querySelectorAll('.hero .fade').forEach(function (el) {
-        el.classList.add('in');
-      });
+  (function () {
+    var mq = document.getElementById('marquee');
+    var toggle = document.getElementById('marquee-toggle');
+    toggle.addEventListener('click', function () {
+      var paused = mq.classList.toggle('paused');
+      toggle.setAttribute('aria-pressed', String(paused));
+      toggle.textContent = paused ? '▶' : '⏸';
+      toggle.setAttribute('aria-label', paused ? 'הפעלת התנועה בפס הלוגואים' : 'השהיית התנועה בפס הלוגואים');
     });
-  });
+  })();
 
   var form = document.getElementById('contact-form');
   var statusEl = document.getElementById('form-status');
