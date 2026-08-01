@@ -4,10 +4,18 @@ import { meta as vibeCoding } from './vibe-coding.astro';
 import { meta as mcp } from './mcp.astro';
 import { meta as aiAgents } from './ai-agents.astro';
 import { meta as chatbotVsAgent } from './chatbot-vs-agent.astro';
+import { meta as productionGap } from './ai-production-gap.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/ai-production-gap/',
+    title: 'בינה מלאכותית לעסקים: למה הדמו מרשים והפרודקשן לא מגיע',
+    description:
+      'רוב פרויקטי ה-AI לא נכשלים בקול גדול, הם פשוט נעצרים אחרי הדמו. ארבע הסיבות האמיתיות, ותהליך שמגיע לפרודקשן בלי לשרוף שנה.',
+    date: productionGap.datePublished,
+  },
   {
     href: '/blog/chatbot-vs-agent/',
     title: 'צ\'אטבוט מול סוכן AI: ההבדל שמשנה כסף',
