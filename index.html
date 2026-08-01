@@ -347,6 +347,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     white-space: nowrap;
   }
   .marquee-group .star { color: var(--acid); }
+  .marquee.paused .marquee-track { animation-play-state: paused; }
+  .marquee-toggle {
+    position: absolute;
+    inset-inline-end: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid #55564d;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 9px;
+    cursor: pointer;
+  }
+  .marquee-toggle:hover { border-color: var(--acid); color: var(--acid); }
 
   /* ---------- shared section bits ---------- */
   .sec { padding: clamp(48px, 6vw, 76px) var(--pad-x); }
@@ -779,7 +796,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <li><b>4</b><span>מוצרים חיים</span></li>
   </ul>
 
-  <div class="marquee" dir="ltr">
+  <div class="marquee" id="marquee" dir="ltr">
+    <button type="button" class="marquee-toggle" id="marquee-toggle" aria-pressed="false" aria-label="השהיית התנועה בפס הלוגואים" lang="he">⏸</button>
     <p class="sr-only" lang="he" dir="rtl">בין החברות שבנינו עבורן: Reposify (נרכשה ע"י CrowdStrike), Deci (נרכשה ע"י NVIDIA), Balance, PractiTest</p>
     <div class="marquee-track" aria-hidden="true">
       <div class="marquee-group"><span>REPOSIFY → CROWDSTRIKE</span><span class="star">✳</span><span>DECI → NVIDIA</span><span class="star">✳</span><span>BALANCE</span><span class="star">✳</span><span>PRACTITEST</span><span class="star">✳</span></div>
@@ -1098,6 +1116,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       ev.preventDefault();
       try { localStorage.removeItem('bk-consent'); } catch (e) {}
       banner.classList.add('show');
+    });
+  })();
+
+  (function () {
+    var mq = document.getElementById('marquee');
+    var toggle = document.getElementById('marquee-toggle');
+    toggle.addEventListener('click', function () {
+      var paused = mq.classList.toggle('paused');
+      toggle.setAttribute('aria-pressed', String(paused));
+      toggle.textContent = paused ? '▶' : '⏸';
+      toggle.setAttribute('aria-label', paused ? 'הפעלת התנועה בפס הלוגואים' : 'השהיית התנועה בפס הלוגואים');
     });
   })();
 
