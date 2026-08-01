@@ -1,0 +1,41 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import { meta as vibeCoding } from './vibe-coding.astro';
+
+const posts = [
+  {
+    href: '/blog/vibe-coding/',
+    title: 'Vibe Coding: המדריך המעשי בעברית',
+    description:
+      'מה זה vibe coding, מה זה לא, ואיך בונים ככה מוצר אמיתי שמחזיק בפרודקשן. התהליך המלא: הגדרה, סוכן שבונה, לולאות ביקורת ובדיקות.',
+    date: vibeCoding.datePublished,
+    dateLabel: '01.08.2026',
+  },
+];
+---
+<BlogLayout
+  title="בלוג — בן קלסקי | AI, סוכנים ופיתוח אג'נטי בעברית"
+  description="מדריכים מעשיים בעברית על יישום AI בעסקים: vibe coding, סוכנים אוטונומיים, MCP ואוטומציות. מניסיון של CTO שבונה מוצרים חיים."
+  canonicalPath="/blog/"
+>
+  <div class="blog-head">
+    <p class="eyebrow">מהשטח, לא מהמצגת</p>
+    <h1>הבלוג <span class="h1-mark">בעברית</span></h1>
+    <p>מדריכים מעשיים על AI, סוכנים ופיתוח אג'נטי. מה שאני לומד תוך כדי בנייה של מוצרים אמיתיים, בלי ז'רגון מיותר.</p>
+  </div>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <a class="post-card" href={post.href}>
+          <time datetime={post.date}>{post.dateLabel}</time>
+          <div>
+            <h2>{post.title}</h2>
+            <p>{post.description}</p>
+            <span class="read">לקריאה ←</span>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
+</BlogLayout>
