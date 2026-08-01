@@ -3,6 +3,8 @@ import BlogLayout from '../../layouts/BlogLayout.astro';
 import { meta as vibeCoding } from './vibe-coding.astro';
 import { meta as mcp } from './mcp.astro';
 
+const formatDate = (iso) => iso.split('-').reverse().join('.');
+
 const posts = [
   {
     href: '/blog/mcp/',
@@ -10,7 +12,6 @@ const posts = [
     description:
       'הסבר מעשי על Model Context Protocol: הבעיה שהוא פותר, איך הוא מחבר סוכני AI למערכות העסק, ודוגמאות חיות משרתים שפרסמתי בקוד פתוח.',
     date: mcp.datePublished,
-    dateLabel: '02.08.2026',
   },
   {
     href: '/blog/vibe-coding/',
@@ -18,7 +19,6 @@ const posts = [
     description:
       'מה זה vibe coding, מה זה לא, ואיך בונים ככה מוצר אמיתי שמחזיק בפרודקשן. התהליך המלא: הגדרה, סוכן שבונה, לולאות ביקורת ובדיקות.',
     date: vibeCoding.datePublished,
-    dateLabel: '01.08.2026',
   },
 ];
 ---
@@ -37,7 +37,7 @@ const posts = [
     {posts.map((post) => (
       <li>
         <a class="post-card" href={post.href}>
-          <time datetime={post.date}>{post.dateLabel}</time>
+          <time datetime={post.date}>{formatDate(post.date)}</time>
           <div>
             <h2>{post.title}</h2>
             <p>{post.description}</p>
