@@ -16,9 +16,9 @@ No personal data enters any event — no form values, no phone numbers, no free 
 
 ## GTM setup (one-time, in the GTM UI)
 
-1. **Variable:** Data Layer Variable, name `cta_location`, DLV name `cta_location`.
+1. **Variables:** two Data Layer Variables — `cta_location` (DLV name `cta_location`) and `method` (DLV name `method`).
 2. **Trigger:** Custom Event, name `conv-events`, event name `generate_lead|whatsapp_click|schedule_click`, ✅ "Use regex matching".
-3. **Tag:** GA4 Event, measurement ID `G-Z3NYH9CH0F`, Event Name `{{Event}}`, parameter `cta_location = {{cta_location}}`, trigger `conv-events`.
+3. **Tag:** GA4 Event, measurement ID `G-Z3NYH9CH0F`, Event Name `{{Event}}`, parameters `cta_location = {{cta_location}}` and `method = {{method}}`, trigger `conv-events`.
 4. **GA4 → Admin → Key events:** mark `generate_lead`, `whatsapp_click`, `schedule_click` as key events (counting: once per session).
 5. Optional: register `cta_location` as a custom dimension (event scope) in GA4.
 
