@@ -1,8 +1,17 @@
 ---
 import BlogLayout from '../../layouts/BlogLayout.astro';
 import { meta as vibeCoding } from './vibe-coding.astro';
+import { meta as mcp } from './mcp.astro';
 
 const posts = [
+  {
+    href: '/blog/mcp/',
+    title: 'מה זה MCP ולמה כל עולם ה-AI אימץ אותו',
+    description:
+      'הסבר מעשי על Model Context Protocol: הבעיה שהוא פותר, איך הוא מחבר סוכני AI למערכות העסק, ודוגמאות חיות משרתים שפרסמתי בקוד פתוח.',
+    date: mcp.datePublished,
+    dateLabel: '02.08.2026',
+  },
   {
     href: '/blog/vibe-coding/',
     title: 'Vibe Coding: המדריך המעשי בעברית',
