@@ -1174,10 +1174,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       body: JSON.stringify(data)
     }).then(function (r) {
       if (!r.ok) throw new Error('http ' + r.status);
+      // The API returns 200 for honeypot submissions too (to fool bots) —
+      // only count a lead when the honeypot was empty.
+      var wasBot = data.website !== '';
       form.reset();
       statusEl.textContent = 'ההודעה נשלחה. אחזור אליך בהקדם.';
       statusEl.className = 'form-status ok';
-      window.dataLayer.push({ event: 'generate_lead', method: 'contact_form', cta_location: 'form' });
+      if (!wasBot) {
+        window.dataLayer.push({ event: 'generate_lead', method: 'contact_form', cta_location: 'form' });
+      }
     }).catch(function () {
       statusEl.textContent = 'השליחה נכשלה. נסו שוב, או כתבו לי בוואטסאפ.';
       statusEl.className = 'form-status err';
