@@ -279,6 +279,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     padding: 1px 7px;
     white-space: nowrap;
   }
+  .prose .table-wrap { overflow-x: auto; margin: 22px 0 24px; }
+  .prose table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 480px;
+    font-size: 15.5px;
+  }
+  .prose th, .prose td {
+    border: 1px solid var(--ink);
+    padding: 10px 14px;
+    text-align: right;
+    vertical-align: top;
+  }
+  .prose th {
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+  }
+  .prose tbody th {
+    background: var(--paper-alt);
+    color: var(--ink);
+    font-weight: 700;
+    white-space: nowrap;
+  }
   .prose blockquote {
     border-right: 3px solid var(--ink);
     padding-right: 16px;
