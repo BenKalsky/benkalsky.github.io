@@ -7,10 +7,8 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 const TO_ADDRESS = 'benkalsky@gmail.com';
-// TODO: verify benkalsky.co.il in Resend and switch the sender to
-// forms@benkalsky.co.il — quoty.co.il is used only because it is
-// currently the sole verified sending domain in the account.
-const FROM_ADDRESS = 'Ben Kalsky Site <forms@quoty.co.il>';
+const FROM_ADDRESS = 'hello@benkalsky.co.il';
+const FROM_NAME = 'Ben Kalsky Site';
 
 // Best-effort throttling. State is per warm lambda instance, so these are
 // soft caps, not guarantees — good enough to stop naive scripted abuse and
@@ -132,24 +130,32 @@ export default async function handler(req, res) {
   }
   dailyCount += 1;
 
-  const r = await fetch('https://api.resend.com/emails', {
+  if (!process.env.ELASTIC_EMAIL_API_KEY) {
+    console.error('ELASTIC_EMAIL_API_KEY is not configured');
+    res.status(502).json({ error: 'send failed' });
+    return;
+  }
+
+  const r = await fetch('https://api.elasticemail.com/v4/emails/transactional', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'X-ElasticEmail-ApiKey': process.env.ELASTIC_EMAIL_API_KEY,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: FROM_ADDRESS,
-      to: [TO_ADDRESS],
-      reply_to: email,
-      subject: `פנייה מהאתר: ${name}`,
-      html,
+      Recipients: { To: [TO_ADDRESS] },
+      Content: {
+        From: `${FROM_NAME} <${FROM_ADDRESS}>`,
+        ReplyTo: email,
+        Subject: `פנייה מהאתר: ${name}`,
+        Body: [{ ContentType: 'HTML', Content: html }],
+      },
     }),
   });
 
   if (!r.ok) {
     const detail = await r.text().catch(() => '');
-    console.error('resend failed', r.status, detail);
+    console.error('elasticemail failed', r.status, detail);
     res.status(502).json({ error: 'send failed' });
     return;
   }
