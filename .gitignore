@@ -1,11 +1,19 @@
-_site
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# system / IDE
 .DS_Store
+.idea
+
+# legacy jekyll leftovers
+_site
 .jekyll
 .jekyll-metadata
 .bundle
 .sass-cache
 Gemfile
 Gemfile.lock
-node_modules
-package.json
-.idea

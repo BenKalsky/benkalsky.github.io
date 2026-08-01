@@ -1,0 +1,580 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  ogType?: string;
+}
+
+const { title, description, canonicalPath, ogType = 'website' } = Astro.props;
+const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
+---
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title}</title>
+<meta name="description" content={description}>
+<meta property="og:locale" content="he_IL">
+<meta property="og:type" content={ogType}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={canonicalURL}>
+<link rel="canonical" href={canonicalURL}>
+<link rel="sitemap" href="/sitemap-index.xml">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2312130F'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle' fill='%23E8FF52' font-family='Georgia,serif' font-weight='bold'%3Eב%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="/fonts/GreycliffHebrewCF-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied',
+    wait_for_update: 500
+  });
+  try {
+    if (localStorage.getItem('bk-consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) { /* storage blocked — stay denied */ }
+</script>
+<!-- Google Tag Manager -->
+<script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PXVVP37');</script>
+<!-- End Google Tag Manager -->
+<slot name="head" />
+<style is:global>
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('/fonts/GreycliffHebrewCF-Light.woff2') format('woff2'),
+         url('/fonts/GreycliffHebrewCF-Light.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/GreycliffHebrewCF-Medium.woff2') format('woff2'),
+         url('/fonts/GreycliffHebrewCF-Medium.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'GreycliffHebrewCF';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/GreycliffHebrewCF-Bold.woff2') format('woff2'),
+         url('/fonts/GreycliffHebrewCF-Bold.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/JetBrainsMono-Latin.woff2') format('woff2');
+  }
+
+  :root {
+    --ink: #12130F;
+    --ink-soft: #3a3b34;
+    --ink-mute: #55564d;
+    --paper: #F7F6F2;
+    --paper-alt: #EDEBE3;
+    --acid: #E8FF52;
+    --line-soft: #d6d5cc;
+    --line-chip: #c9c8bf;
+    --font-body: 'GreycliffHebrewCF', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --pad-x: clamp(20px, 4vw, 56px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  html, body { background: var(--paper); }
+
+  body {
+    font-family: var(--font-body);
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--acid); color: var(--ink); }
+
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+  footer :focus-visible, .consent-banner :focus-visible {
+    outline-color: var(--acid);
+  }
+
+  summary::-webkit-details-marker { display: none; }
+  summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  summary::after {
+    content: '+';
+    font-family: var(--font-mono);
+    font-weight: 700;
+    flex: 0 0 auto;
+  }
+  details[open] > summary::after { content: '−'; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .mono { font-family: var(--font-mono); }
+
+  /* ---------- header ---------- */
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 18px var(--pad-x);
+    border-bottom: 1px solid var(--ink);
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 40;
+  }
+  .brand {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .18em;
+  }
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(14px, 2vw, 26px);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .site-nav a { border-bottom: 1px solid transparent; }
+  .site-nav a:hover { border-bottom-color: var(--ink); }
+  .site-nav a[aria-current] { border-bottom-color: var(--ink); }
+  .nav-cta {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 20px;
+    border-bottom: none !important;
+  }
+  .nav-cta:hover { background: var(--acid); color: var(--ink); }
+
+  /* ---------- page shell ---------- */
+  .page {
+    padding: clamp(40px, 6vw, 72px) var(--pad-x) clamp(56px, 7vw, 96px);
+  }
+  .page-inner { max-width: 720px; }
+
+  .crumb {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .18em;
+    margin-bottom: 26px;
+  }
+  .crumb a { border-bottom: 1px solid var(--line-chip); }
+  .crumb a:hover { border-bottom-color: var(--ink); }
+
+  /* ---------- article typography ---------- */
+  .prose { max-width: 65ch; }
+  .prose h1 {
+    font-weight: 700;
+    font-size: clamp(34px, 5.6vw, 58px);
+    line-height: 1.04;
+    letter-spacing: -.03em;
+    margin: 0 0 18px;
+  }
+  .prose .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: .08em;
+    color: var(--ink-mute);
+    margin-bottom: 34px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .prose .lede {
+    font-size: clamp(17px, 1.6vw, 20px);
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+  }
+  .prose h2 {
+    font-weight: 700;
+    font-size: clamp(24px, 3vw, 34px);
+    letter-spacing: -.02em;
+    line-height: 1.15;
+    margin: 44px 0 14px;
+  }
+  .prose h3 {
+    font-weight: 700;
+    font-size: 20px;
+    margin: 30px 0 10px;
+  }
+  .prose p { margin: 0 0 16px; }
+  .prose strong { font-weight: 700; }
+  .prose a {
+    font-weight: 500;
+    box-shadow: inset 0 -7px 0 var(--acid);
+  }
+  .prose a:hover { box-shadow: inset 0 -1.2em 0 var(--acid); }
+  .prose ul, .prose ol {
+    margin: 0 0 16px;
+    padding-inline-start: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .prose li::marker { font-weight: 700; }
+  .prose code {
+    font-family: var(--font-mono);
+    font-size: .85em;
+    background: var(--paper-alt);
+    border: 1px solid var(--line-chip);
+    padding: 1px 6px;
+    white-space: nowrap;
+  }
+  .prose .kw {
+    font-family: var(--font-mono);
+    font-size: .82em;
+    letter-spacing: .04em;
+    background: var(--acid);
+    padding: 1px 7px;
+    white-space: nowrap;
+  }
+  .prose blockquote {
+    border-right: 3px solid var(--ink);
+    padding-right: 16px;
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    margin: 0 0 16px;
+  }
+
+  /* flow steps */
+  .flow {
+    list-style: none;
+    padding: 0 !important;
+    border-top: 1px solid var(--ink);
+    margin: 22px 0 24px !important;
+    gap: 0 !important;
+  }
+  .flow li {
+    display: grid;
+    grid-template-columns: minmax(92px, 120px) 1fr;
+    gap: 4px 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .flow li:last-child { border-bottom-color: var(--ink); }
+  .flow .step {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    color: var(--ink-mute);
+    padding-top: 5px;
+  }
+  .flow b { font-weight: 700; display: block; }
+  .flow p { margin: 0 !important; font-size: 15.5px; color: var(--ink-soft); }
+  @media (max-width: 480px) {
+    .flow li { grid-template-columns: 1fr; }
+  }
+
+  /* Q&A */
+  .qa {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 22px 0 8px;
+  }
+  .qa details { background: #fff; border: 1px solid var(--ink); padding: 18px 22px; }
+  .qa summary { cursor: pointer; font-weight: 700; font-size: 17px; }
+  .qa details p { margin: 12px 0 0; font-size: 16px; color: var(--ink-soft); }
+
+  /* article CTA */
+  .post-cta {
+    margin-top: 44px;
+    background: var(--acid);
+    padding: clamp(26px, 4vw, 40px);
+  }
+  .post-cta h2 { margin: 0 0 10px; }
+  .post-cta p { margin: 0 0 20px; max-width: 52ch; }
+  .btn {
+    display: inline-block;
+    padding: 16px 30px;
+    font-weight: 700;
+    font-size: 17px;
+    cursor: pointer;
+  }
+  .btn-solid { background: var(--ink); color: var(--paper); }
+  .btn-solid:hover { background: var(--paper); color: var(--ink); }
+
+  /* ---------- blog index ---------- */
+  .blog-head { margin-bottom: 36px; }
+  .blog-head .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .2em;
+    margin-bottom: 18px;
+  }
+  .blog-head h1 {
+    font-weight: 700;
+    font-size: clamp(38px, 7vw, 84px);
+    line-height: .98;
+    letter-spacing: -.035em;
+    margin: 0 0 18px;
+  }
+  .blog-head .h1-mark {
+    display: inline-block;
+    background: var(--acid);
+    padding: 0 14px;
+    transform: rotate(-1.4deg);
+  }
+  .blog-head p {
+    margin: 0;
+    font-size: clamp(17px, 1.6vw, 19px);
+    color: var(--ink-soft);
+    max-width: 58ch;
+  }
+  .post-list {
+    list-style: none;
+    border-top: 1px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+  }
+  .post-list > li { border-bottom: 1px solid var(--ink); }
+  .post-card {
+    display: grid;
+    grid-template-columns: minmax(min(100%, 130px), 170px) 1fr;
+    gap: 8px 28px;
+    padding: 26px 0;
+    transition: background .15s;
+  }
+  .post-card:hover { background: #fff; }
+  .post-card time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .1em;
+    color: var(--ink-mute);
+    padding-top: 8px;
+  }
+  .post-card h2 {
+    font-weight: 700;
+    font-size: clamp(22px, 2.6vw, 30px);
+    letter-spacing: -.02em;
+    margin: 0 0 8px;
+  }
+  .post-card:hover h2 { box-shadow: inset 0 -10px 0 var(--acid); }
+  .post-card p { margin: 0; font-size: 16px; color: var(--ink-soft); max-width: 60ch; }
+  .post-card .read {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .12em;
+  }
+  @media (max-width: 560px) {
+    .post-card { grid-template-columns: 1fr; }
+    .post-card time { padding-top: 0; }
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    background: var(--ink);
+    color: #8b8c84;
+    padding: 26px var(--pad-x);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 28px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  footer a { color: #8b8c84; }
+  footer a:hover { color: var(--acid); }
+  footer .accent { color: var(--acid); }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
+
+  /* ---------- whatsapp float ---------- */
+  .wa-float {
+    position: fixed;
+    bottom: 22px;
+    left: 22px;
+    z-index: 50;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #25D366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(18, 19, 15, .28);
+  }
+  .wa-float:hover { background: #1EBE5A; }
+  .wa-float svg { width: 30px; height: 30px; fill: #fff; }
+
+  /* ---------- consent banner ---------- */
+  .consent-banner {
+    position: fixed;
+    bottom: 0;
+    inset-inline: 0;
+    z-index: 60;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px var(--pad-x);
+    display: none;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    border-top: 1px solid var(--acid);
+  }
+  .consent-banner.show { display: flex; }
+  .consent-banner p { font-size: 14.5px; max-width: 62ch; margin: 0; }
+  .consent-banner .btns { display: flex; gap: 10px; flex: 0 0 auto; }
+  .consent-banner button {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 10px 22px;
+    cursor: pointer;
+    border: none;
+  }
+  .consent-accept { background: var(--acid); color: var(--ink); }
+  .consent-decline { background: none; border: 1px solid #8b8c84; color: var(--paper); }
+  .consent-decline:hover, .consent-accept:hover { opacity: .85; }
+
+  @media (max-width: 760px) {
+    .site-header { position: static; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PXVVP37"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<header class="site-header">
+  <span class="brand"><a href="/"><span dir="ltr">BEN KALSKY</span> · בן קלסקי</a></span>
+  <nav class="site-nav" aria-label="ניווט ראשי">
+    <a href="/#services">מה אני עושה</a>
+    <a href="/#process">תהליך</a>
+    <a href="/#proof">מוצרים</a>
+    <a
+      href="/blog/"
+      aria-current={canonicalPath === '/blog/' ? 'page' : canonicalPath.startsWith('/blog/') ? 'true' : undefined}
+    >בלוג</a>
+    <a class="nav-cta" href="https://digitizer.li/schedule" data-cta-loc="header">פגישת אבחון — חינם</a>
+  </nav>
+</header>
+
+<main class="page">
+  <slot />
+</main>
+
+<div class="consent-banner" id="consent-banner" role="region" aria-label="הסכמה לעוגיות" aria-describedby="consent-desc">
+  <p id="consent-desc">האתר משתמש בעוגיות למדידת שימוש ושיפור החוויה. אפשר לאשר או להמשיך עם עוגיות הכרחיות בלבד. פירוט בהודעת הפרטיות שבטופס יצירת הקשר.</p>
+  <div class="btns">
+    <button type="button" class="consent-accept" id="consent-accept">מאשר/ת</button>
+    <button type="button" class="consent-decline" id="consent-decline">רק הכרחי</button>
+  </div>
+</div>
+
+<a class="wa-float" href="https://wa.me/972528816959" data-cta-loc="float" aria-label="דברו איתי בוואטסאפ">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16.004 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.26.59 4.46 1.71 6.4L3.2 28.8l6.58-1.68a12.74 12.74 0 0 0 6.22 1.61h.01c7.06 0 12.79-5.74 12.79-12.8 0-3.42-1.33-6.63-3.75-9.05a12.72 12.72 0 0 0-9.05-3.68zm0 23.36h-.01a10.6 10.6 0 0 1-5.4-1.48l-.39-.23-4.02 1.03 1.07-3.92-.25-.4a10.55 10.55 0 0 1-1.63-5.66c0-5.87 4.78-10.64 10.65-10.64 2.84 0 5.51 1.11 7.52 3.12a10.57 10.57 0 0 1 3.11 7.53c0 5.87-4.78 10.65-10.65 10.65zm5.84-7.97c-.32-.16-1.89-.93-2.19-1.04-.29-.11-.5-.16-.72.16-.21.32-.82 1.04-1.01 1.25-.18.21-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.59-.95-.85-1.59-1.9-1.78-2.22-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.73-.98-2.37-.26-.62-.52-.54-.72-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.12 1.09-1.12 2.66s1.15 3.09 1.31 3.3c.16.21 2.26 3.45 5.47 4.84.76.33 1.36.53 1.83.68.77.24 1.47.21 2.02.13.62-.09 1.89-.77 2.16-1.52.27-.75.27-1.39.19-1.52-.08-.13-.29-.21-.61-.37z"/></svg>
+</a>
+
+<footer>
+  <span>© <span id="year">2026</span> בן קלסקי · <a class="accent" href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a> · <span>"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</span></span>
+  <div class="footer-links">
+    <a href="https://www.digitizer.co.il">דיגיטייזר</a>
+    <a href="https://www.linkedin.com/in/benkalsky" lang="en" dir="ltr">LinkedIn</a>
+    <a href="https://github.com/BenKalsky" lang="en" dir="ltr">GitHub</a>
+    <a href="#" id="cookie-settings">הגדרות עוגיות</a>
+  </div>
+</footer>
+
+<script is:inline>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  (function () {
+    var banner = document.getElementById('consent-banner');
+    function readConsent() {
+      try { return localStorage.getItem('bk-consent'); } catch (e) { return null; }
+    }
+    if (!readConsent()) banner.classList.add('show');
+    function decide(state) {
+      try { localStorage.setItem('bk-consent', state); } catch (e) { /* session-only choice */ }
+      banner.classList.remove('show');
+      gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
+    }
+    document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
+    document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });
+    document.getElementById('cookie-settings').addEventListener('click', function (ev) {
+      ev.preventDefault();
+      try { localStorage.removeItem('bk-consent'); } catch (e) {}
+      banner.classList.add('show');
+    });
+  })();
+
+  document.addEventListener('click', function (ev) {
+    var t = ev.target;
+    var el = (t instanceof Element) ? t : (t && t.parentElement);
+    var a = el && el.closest && el.closest('a[href]');
+    if (!a) return;
+    var loc = a.getAttribute('data-cta-loc') || 'other';
+    // Every push sets BOTH parameter keys: dataLayer values persist
+    // across pushes, so an unset key would reuse the previous event's
+    // value in the shared GA4 tag.
+    if (a.href.indexOf('wa.me') !== -1) {
+      window.dataLayer.push({ event: 'whatsapp_click', cta_location: loc, method: undefined });
+    } else if (a.href.indexOf('digitizer.li/schedule') !== -1) {
+      window.dataLayer.push({ event: 'schedule_click', cta_location: loc, method: undefined });
+    }
+  });
+</script>
+
+</body>
+</html>
