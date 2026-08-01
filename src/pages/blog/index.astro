@@ -3,10 +3,18 @@ import BlogLayout from '../../layouts/BlogLayout.astro';
 import { meta as vibeCoding } from './vibe-coding.astro';
 import { meta as mcp } from './mcp.astro';
 import { meta as aiAgents } from './ai-agents.astro';
+import { meta as chatbotVsAgent } from './chatbot-vs-agent.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/chatbot-vs-agent/',
+    title: 'צ\'אטבוט מול סוכן AI: ההבדל שמשנה כסף',
+    description:
+      'למה רוב הצ\'אטבוטים מאכזבים, מתי צ\'אטבוט בכל זאת מספיק, ומתי צריך סוכן שסוגר משימות. השוואה שורה מול שורה ודרך פשוטה להחליט.',
+    date: chatbotVsAgent.datePublished,
+  },
   {
     href: '/blog/ai-agents/',
     title: 'סוכן AI זה לא צ\'אטבוט: מה עובד דיגיטלי באמת עושה',
