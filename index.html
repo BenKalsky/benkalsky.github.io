@@ -494,7 +494,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     color: var(--paper);
     transition: border-color .2s;
   }
-  a.product:hover { border-color: var(--acid); }
+  a.product:hover, a.product:focus-visible { border-color: var(--acid); }
+  .products > li { display: flex; }
+  .products > li > .product { flex: 1; }
   .product .name { font-weight: 700; font-size: 26px; }
   .product p { margin: 0; font-size: 16px; color: #b3b4ab; }
   .product b { color: var(--acid); font-weight: 500; }
@@ -533,7 +535,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     height: 100%;
     transition: background .15s;
   }
-  .oss-item:hover { background: #1c1d17; }
+  .oss-item:hover, .oss-item:focus-visible { background: #1c1d17; }
   .oss-item .oss-name {
     font-family: var(--font-mono);
     font-size: 13px;
@@ -541,7 +543,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     color: var(--paper);
     display: block;
   }
-  .oss-item:hover .oss-name { color: var(--acid); }
+  .oss-item:hover .oss-name, .oss-item:focus-visible .oss-name { color: var(--acid); }
   .oss-item .oss-desc {
     font-size: 13px;
     color: #9a9b93;
