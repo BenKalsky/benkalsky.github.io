@@ -184,7 +184,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
   .site-nav a { border-bottom: 1px solid transparent; }
   .site-nav a:hover { border-bottom-color: var(--ink); }
-  .site-nav a[aria-current="page"] { border-bottom-color: var(--ink); }
+  .site-nav a[aria-current] { border-bottom-color: var(--ink); }
   .nav-cta {
     background: var(--ink);
     color: var(--paper);
@@ -502,7 +502,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="/#services">מה אני עושה</a>
     <a href="/#process">תהליך</a>
     <a href="/#proof">מוצרים</a>
-    <a href="/blog/" aria-current={canonicalPath === '/blog/' ? 'page' : undefined}>בלוג</a>
+    <a
+      href="/blog/"
+      aria-current={canonicalPath === '/blog/' ? 'page' : canonicalPath.startsWith('/blog/') ? 'true' : undefined}
+    >בלוג</a>
     <a class="nav-cta" href="https://digitizer.li/schedule" data-cta-loc="header">פגישת אבחון — חינם</a>
   </nav>
 </header>
@@ -511,7 +514,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <slot />
 </main>
 
-<div class="consent-banner" id="consent-banner" role="dialog" aria-label="הסכמה לעוגיות" aria-describedby="consent-desc">
+<div class="consent-banner" id="consent-banner" role="region" aria-label="הסכמה לעוגיות" aria-describedby="consent-desc">
   <p id="consent-desc">האתר משתמש בעוגיות למדידת שימוש ושיפור החוויה. אפשר לאשר או להמשיך עם עוגיות הכרחיות בלבד. פירוט בהודעת הפרטיות שבטופס יצירת הקשר.</p>
   <div class="btns">
     <button type="button" class="consent-accept" id="consent-accept">מאשר/ת</button>
