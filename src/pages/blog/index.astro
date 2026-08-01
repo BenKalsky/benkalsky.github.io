@@ -2,10 +2,18 @@
 import BlogLayout from '../../layouts/BlogLayout.astro';
 import { meta as vibeCoding } from './vibe-coding.astro';
 import { meta as mcp } from './mcp.astro';
+import { meta as aiAgents } from './ai-agents.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/ai-agents/',
+    title: 'סוכן AI זה לא צ\'אטבוט: מה עובד דיגיטלי באמת עושה',
+    description:
+      'מה סוכני AI עושים בעסקים אמיתיים: מכירות, שירות, תפעול וידע. איך הם עובדים, אילו גבולות הם צריכים, ומתי מספיקה אוטומציה פשוטה.',
+    date: aiAgents.datePublished,
+  },
   {
     href: '/blog/mcp/',
     title: 'מה זה MCP ולמה כל עולם ה-AI אימץ אותו',
