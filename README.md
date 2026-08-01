@@ -39,7 +39,7 @@ cmp dist/index.html public/index.html   # must be silent
 
 ## Privacy
 
-The contact form ships with an Israeli Privacy Protection Law (Amendment 13) disclosure, and analytics run only after explicit consent. Form submissions are relayed by ElasticEmail; the API key lives in a Vercel environment variable, never in this repo.
+The contact form ships with an Israeli Privacy Protection Law (Amendment 13) disclosure. Analytics run under Google Consent Mode v2: all storage stays denied until the visitor opts in via the consent banner — before that, GA4 receives only cookieless, unidentified pings (see [TRACKING.md](TRACKING.md)). Form submissions are relayed by ElasticEmail; the API key lives in a Vercel environment variable, never in this repo.
 
 ---
 
