@@ -8,11 +8,13 @@ Consent: Google Consent Mode v2, all storage denied by default; `analytics_stora
 
 | Event | Convention | Properties | Trigger | Decision it informs |
 |---|---|---|---|---|
-| `generate_lead` | GA4 recommended | `method: "contact_form"` | Contact form POST returns 200 (success message shown) | Is the form earning its place; lead volume per traffic source |
+| `generate_lead` | GA4 recommended | `method: "contact_form"`, `cta_location: "form"` | Contact form POST returns 200 (success message shown) | Is the form earning its place; lead volume per traffic source |
 | `whatsapp_click` | object_action | `cta_location: header \| hero \| float \| contact \| other` | Click on any `wa.me` link | Which placement drives WhatsApp conversations; float vs inline |
 | `schedule_click` | object_action | `cta_location: header \| hero \| contact \| other` | Click on any `digitizer.li/schedule` link | Which CTA placement drives audit bookings; form vs meeting preference |
 
 No personal data enters any event — no form values, no phone numbers, no free text. `cta_location` comes from a static `data-cta-loc` attribute.
+
+Data-layer keys persist across pushes, so **every push sets both parameter keys** — click events reset `method` to `undefined`, and `generate_lead` carries its own `cta_location` — preventing a previous event's value from leaking into the next one through the shared GA4 tag.
 
 ## GTM setup (one-time, in the GTM UI)
 

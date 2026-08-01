@@ -1131,13 +1131,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   })();
 
   document.addEventListener('click', function (ev) {
-    var a = ev.target.closest && ev.target.closest('a[href]');
+    var t = ev.target;
+    var el = (t instanceof Element) ? t : (t && t.parentElement);
+    var a = el && el.closest && el.closest('a[href]');
     if (!a) return;
     var loc = a.getAttribute('data-cta-loc') || 'other';
+    // Every push sets BOTH parameter keys: dataLayer values persist
+    // across pushes, so an unset key would reuse the previous event's
+    // value in the shared GA4 tag.
     if (a.href.indexOf('wa.me') !== -1) {
-      window.dataLayer.push({ event: 'whatsapp_click', cta_location: loc });
+      window.dataLayer.push({ event: 'whatsapp_click', cta_location: loc, method: undefined });
     } else if (a.href.indexOf('digitizer.li/schedule') !== -1) {
-      window.dataLayer.push({ event: 'schedule_click', cta_location: loc });
+      window.dataLayer.push({ event: 'schedule_click', cta_location: loc, method: undefined });
     }
   });
 
@@ -1172,7 +1177,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       form.reset();
       statusEl.textContent = 'ההודעה נשלחה. אחזור אליך בהקדם.';
       statusEl.className = 'form-status ok';
-      window.dataLayer.push({ event: 'generate_lead', method: 'contact_form' });
+      window.dataLayer.push({ event: 'generate_lead', method: 'contact_form', cta_location: 'form' });
     }).catch(function () {
       statusEl.textContent = 'השליחה נכשלה. נסו שוב, או כתבו לי בוואטסאפ.';
       statusEl.className = 'form-status err';
