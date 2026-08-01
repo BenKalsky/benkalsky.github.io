@@ -1027,11 +1027,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </section>
 </main>
 
-<div class="consent-banner" id="consent-banner" role="dialog" aria-label="הסכמה לעוגיות">
-  <p>האתר משתמש בעוגיות למדידת שימוש ושיפור החוויה. אפשר לאשר או להמשיך עם עוגיות הכרחיות בלבד. פירוט בהודעת הפרטיות שבטופס יצירת הקשר.</p>
+<div class="consent-banner" id="consent-banner" role="dialog" aria-label="הסכמה לעוגיות" aria-describedby="consent-desc">
+  <p id="consent-desc">האתר משתמש בעוגיות למדידת שימוש ושיפור החוויה. אפשר לאשר או להמשיך עם עוגיות הכרחיות בלבד. פירוט בהודעת הפרטיות שבטופס יצירת הקשר.</p>
   <div class="btns">
-    <button class="consent-accept" id="consent-accept">מאשר/ת</button>
-    <button class="consent-decline" id="consent-decline">רק הכרחי</button>
+    <button type="button" class="consent-accept" id="consent-accept">מאשר/ת</button>
+    <button type="button" class="consent-decline" id="consent-decline">רק הכרחי</button>
   </div>
 </div>
 
@@ -1041,7 +1041,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <footer>
   <div class="wrap">
-    <span>© <span id="year">2026</span> בן קלסקי · <a href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a></span>
+    <span>© <span id="year">2026</span> בן קלסקי · <a href="https://www.digitizer.studio" lang="en" dir="ltr">Digitizer in English</a> · <a href="#" id="cookie-settings">הגדרות עוגיות</a></span>
     <span class="quote">"זה לא מסע אל הירח ואינו מצריך להיות מדען טילים"</span>
   </div>
 </footer>
@@ -1058,12 +1058,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     function decide(state) {
       try { localStorage.setItem('bk-consent', state); } catch (e) { /* session-only choice */ }
       banner.classList.remove('show');
-      if (state === 'granted') {
-        gtag('consent', 'update', { analytics_storage: 'granted' });
-      }
+      gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });
+    document.getElementById('cookie-settings').addEventListener('click', function (ev) {
+      ev.preventDefault();
+      try { localStorage.removeItem('bk-consent'); } catch (e) {}
+      banner.classList.add('show');
+    });
   })();
 
   requestAnimationFrame(function () {

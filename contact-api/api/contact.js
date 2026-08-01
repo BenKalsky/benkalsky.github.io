@@ -130,6 +130,12 @@ export default async function handler(req, res) {
   }
   dailyCount += 1;
 
+  if (!process.env.ELASTIC_EMAIL_API_KEY) {
+    console.error('ELASTIC_EMAIL_API_KEY is not configured');
+    res.status(502).json({ error: 'send failed' });
+    return;
+  }
+
   const r = await fetch('https://api.elasticemail.com/v4/emails/transactional', {
     method: 'POST',
     headers: {
