@@ -143,7 +143,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   input::placeholder, textarea::placeholder { color: var(--ink-mute); }
   summary::-webkit-details-marker { display: none; }
-  summary { list-style: none; }
+  summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  summary::after {
+    content: '+';
+    font-family: var(--font-mono);
+    font-weight: 700;
+    flex: 0 0 auto;
+  }
+  details[open] > summary::after { content: '−'; }
 
   section[id] { scroll-margin-top: 84px; }
 
