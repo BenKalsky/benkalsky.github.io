@@ -30,14 +30,18 @@ function dailyQuotaExhausted() {
   return dailyCount >= DAILY_CAP;
 }
 
-function rateLimited(req) {
-  const now = Date.now();
-  // Evict every expired bucket on each request — before any
-  // short-circuit — so an IP is held only for its active rate window,
-  // matching the site's privacy policy.
+// Evict every expired bucket. Runs unconditionally at the top of the
+// handler — before any short-circuit (OPTIONS, method, origin, quota) —
+// so an IP is held only for its active rate window, matching the
+// site's privacy policy.
+function evictExpiredBuckets(now) {
   for (const [key, b] of ipBuckets) {
     if (now > b.resetAt) ipBuckets.delete(key);
   }
+}
+
+function rateLimited(req) {
+  const now = Date.now();
   if (dailyQuotaExhausted()) return true;
 
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
@@ -69,6 +73,7 @@ const escapeHtml = (s) =>
   })[c]);
 
 export default async function handler(req, res) {
+  evictExpiredBuckets(Date.now());
   const originAllowed = setCors(req, res);
 
   if (req.method === 'OPTIONS') {
