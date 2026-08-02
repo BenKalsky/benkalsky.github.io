@@ -6,10 +6,15 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "audit:a11y": "node scripts/a11y-audit.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^7.1.6"
+  },
+  "devDependencies": {
+    "axe-core": "^4.12.1",
+    "playwright": "^1.62.1"
   }
 }

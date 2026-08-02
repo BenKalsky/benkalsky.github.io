@@ -1,0 +1,29 @@
+name: Accessibility audit
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Homepage byte-identity
+        run: cmp dist/index.html public/index.html
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run axe (WCAG 2.1 A+AA, all pages)
+        run: npm run audit:a11y
