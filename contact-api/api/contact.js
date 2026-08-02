@@ -31,9 +31,12 @@ function dailyQuotaExhausted() {
 }
 
 // Evict every expired bucket. Runs unconditionally at the top of the
-// handler — before any short-circuit (OPTIONS, method, origin, quota) —
-// so an IP is held only for its active rate window, matching the
-// site's privacy policy.
+// handler, before any short-circuit (OPTIONS, method, origin, quota).
+// Serverless note: instances are frozen between invocations, so timers
+// cannot expire entries in the background — cleanup is necessarily
+// invocation-driven. An expired IP is therefore removed on the next
+// request to the instance, or when the instance is destroyed; the
+// privacy policy discloses exactly that.
 function evictExpiredBuckets(now) {
   for (const [key, b] of ipBuckets) {
     if (now > b.resetAt) ipBuckets.delete(key);
