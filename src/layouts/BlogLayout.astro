@@ -155,6 +155,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   .mono { font-family: var(--font-mono); }
 
+  .skip-link {
+    position: absolute;
+    top: -70px;
+    right: 16px;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 22px;
+    font-weight: 700;
+    transition: top .15s;
+  }
+  .skip-link:focus { top: 12px; }
+
   /* ---------- header ---------- */
   .site-header {
     display: flex;
@@ -515,6 +528,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">דילוג לתוכן הראשי</a>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PXVVP37"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -534,7 +548,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </nav>
 </header>
 
-<main class="page">
+<main class="page" id="main-content" tabindex="-1">
   <slot />
 </main>
 
@@ -556,6 +570,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="https://www.digitizer.co.il">דיגיטייזר</a>
     <a href="https://www.linkedin.com/in/benkalsky" lang="en" dir="ltr">LinkedIn</a>
     <a href="https://github.com/BenKalsky" lang="en" dir="ltr">GitHub</a>
+    <a href="/accessibility/">הצהרת נגישות</a>
     <a href="#" id="cookie-settings">הגדרות עוגיות</a>
   </div>
 </footer>
