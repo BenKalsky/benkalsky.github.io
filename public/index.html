@@ -849,6 +849,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     border-top: 1px solid var(--acid);
   }
   .consent-banner.show { display: flex; }
+  .consent-banner p a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .consent-banner p a:hover { color: var(--acid); }
+
   .consent-banner p { font-size: 14.5px; max-width: 62ch; margin: 0; }
   .consent-banner .btns { display: flex; gap: 10px; flex: 0 0 auto; }
   .consent-banner button {
