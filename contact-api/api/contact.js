@@ -31,14 +31,15 @@ function dailyQuotaExhausted() {
 }
 
 function rateLimited(req) {
-  if (dailyQuotaExhausted()) return true;
-
   const now = Date.now();
-  // Evict every expired bucket on each request so an IP is held only
-  // for its active rate window, matching the site's privacy policy.
+  // Evict every expired bucket on each request — before any
+  // short-circuit — so an IP is held only for its active rate window,
+  // matching the site's privacy policy.
   for (const [key, b] of ipBuckets) {
     if (now > b.resetAt) ipBuckets.delete(key);
   }
+  if (dailyQuotaExhausted()) return true;
+
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   const bucket = ipBuckets.get(ip);
   if (!bucket) {
