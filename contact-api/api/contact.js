@@ -34,9 +34,14 @@ function rateLimited(req) {
   if (dailyQuotaExhausted()) return true;
 
   const now = Date.now();
+  // Evict every expired bucket on each request so an IP is held only
+  // for its active rate window, matching the site's privacy policy.
+  for (const [key, b] of ipBuckets) {
+    if (now > b.resetAt) ipBuckets.delete(key);
+  }
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   const bucket = ipBuckets.get(ip);
-  if (!bucket || now > bucket.resetAt) {
+  if (!bucket) {
     if (ipBuckets.size > 5000) ipBuckets.clear();
     ipBuckets.set(ip, { count: 1, resetAt: now + IP_WINDOW_MS });
     return false;
