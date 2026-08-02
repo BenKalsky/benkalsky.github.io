@@ -567,6 +567,55 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .net-row a { color: var(--paper); border-bottom: 1px solid #55564d; }
   .net-row a:hover { color: var(--acid); border-bottom-color: var(--acid); }
 
+  /* ---------- testimonials ---------- */
+  #testimonials h2 .hl {
+    background: var(--acid);
+    padding: 0 12px;
+    display: inline-block;
+    transform: rotate(-1.2deg);
+  }
+  .tst-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+    gap: 14px;
+    margin-top: 34px;
+  }
+  .tst {
+    background: #fff;
+    border: 1px solid var(--ink);
+    padding: 22px 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+  }
+  .tst .stars {
+    font-size: 13px;
+    letter-spacing: .28em;
+    background: var(--acid);
+    align-self: flex-start;
+    padding: 2px 8px 2px 3px;
+  }
+  .tst blockquote {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    flex: 1;
+  }
+  .tst figcaption {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .06em;
+    color: var(--ink-mute);
+  }
+  .tst figcaption b { color: var(--ink); font-weight: 700; }
+  .press-row { margin-top: 30px; font-size: 16px; max-width: 62ch; }
+  .press-row a { font-weight: 500; box-shadow: inset 0 -7px 0 var(--acid); }
+  .press-row a:hover { box-shadow: inset 0 -1.2em 0 var(--acid); }
+
   /* ---------- why me ---------- */
   .why-cards { margin-bottom: 28px; }
   .why-card { background: #fff; border: 1px solid var(--ink); padding: 28px; }
@@ -1042,6 +1091,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </ul>
 
     <p class="net-row">עוד ברשת: <a href="https://clawhub.ai/benkalsky" dir="ltr">clawhub.ai/benkalsky</a> · <a href="https://www.npmjs.com/~benkal" dir="ltr">npmjs.com/~benkal</a> · <a href="https://github.com/BenKalsky" dir="ltr">github.com/BenKalsky</a></p>
+  </section>
+
+  <section id="testimonials" class="sec" aria-labelledby="tst-title">
+    <div class="sec-head">
+      <h2 id="tst-title">לקוחות <span class="hl">ממליצים</span></h2>
+      <p class="sec-lead">מתוך 43 ביקורות אמיתיות (4.9★) על דיגיטייזר בגוגל ובפייסבוק, והמלצות לינקדאין ישירות עליי.</p>
+    </div>
+    <ul class="tst-grid">
+      <li><figure class="tst"><span class="stars" aria-label="חמישה כוכבים">★★★★★</span><blockquote>ממליצה בחום על בן ואבי שהגעתי אליהם גם דרך המלצה. קיבלתי שירות מעל ומעבר לציפיות והכי חשוב מקצועיות וזמינות. ממליצה בעיניים עצומות</blockquote><figcaption><b>Anat Michaelovitch</b> · Google</figcaption></figure></li>
+      <li><figure class="tst"><span class="stars" aria-label="חמישה כוכבים">★★★★★</span><blockquote>הייתה לי הזכות לעבוד מקרוב עם בן והצוות שלו בדיגיטייזר ואני יכול לומר מכל הלב שמדובר במקצוען אמיתי… תמיד גמיש לשינויים, אלוף בלפתור בעיות, ולא פחות חשוב — הכל בסבלנות ועם חיוך. תענוג אמיתי לעבוד איתך בן. ממליץ בחום!</blockquote><figcaption><b>Asaf Boxer</b> · COO · LinkedIn</figcaption></figure></li>
+      <li><figure class="tst"><span class="stars" aria-label="חמישה כוכבים">★★★★★</span><blockquote>ממליץ מאוד על אבי ובן — מענה מידי באופן תמידי… אם אתם מחפשים אאוטסורס לבניית אתר, דפי נחיתה, שיפור של הקיים מכל הבחינות — דיגיטייזר נותנים מענה מקיף. מאוד ממליץ</blockquote><figcaption><b>Ron Cohen</b> · Google</figcaption></figure></li>
+      <li><figure class="tst"><span class="stars" aria-label="חמישה כוכבים">★★★★★</span><blockquote>מההתחלה כל התקשורת עם בן, דרך איפיון הפרויקט והאתר שהם בנו לי היה יוצא מן הכלל! עבודה נקייה, יפה, מקצועית, האתר מהיר ועולה מהר! ממליץ בחום לכל מי שחושב לעשות כסף מהאתר שלו</blockquote><figcaption><b>Asaf Galon</b> · LinkedIn</figcaption></figure></li>
+      <li><figure class="tst"><span class="stars" aria-label="חמישה כוכבים">★★★★★</span><blockquote>יש לנו כל כך הרבה ניסיון מר עם בוני אתרים אבל סוף־סוף הגענו לנחלה בזכות אבי ובן, שהם מקצוענים אמיתיים, דקדקנים, לא מתפשרים על פרטים גדולים וקטנים. ממליצים בחום רב עליהם, ממש לא להסס.</blockquote><figcaption><b>Rome's Roads</b> · Google</figcaption></figure></li>
+      <li><figure class="tst"><span class="stars" aria-label="חמישה כוכבים">★★★★★</span><blockquote>מידי פעם יוצא להיתקל בעולם הדיגיטל בכישרון באמת יוצא דופן… ללא ספק אתה ואבי כאלה. אני יכול להגיד ברמת ביטחון שמי שיעבוד איתך רק ירוויח.</blockquote><figcaption><b>Alon Moshe</b> · LinkedIn</figcaption></figure></li>
+    </ul>
+    <p class="press-row">🏆 ‏Cloudways (מבית DigitalOcean) פרסמו <a href="https://digitizer.li/cw-spotlight">ספוטלייט עלינו</a> — לקריאה על איך אנחנו עובדים, במילים שלהם.</p>
   </section>
 
   <section class="sec" aria-labelledby="why-title">
