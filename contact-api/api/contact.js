@@ -46,7 +46,7 @@ function rateLimited(req) {
 
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   const bucket = ipBuckets.get(ip);
-  if (!bucket) {
+  if (!bucket || now > bucket.resetAt) {
     if (ipBuckets.size > 5000) ipBuckets.clear();
     ipBuckets.set(ip, { count: 1, resetAt: now + IP_WINDOW_MS });
     return false;
