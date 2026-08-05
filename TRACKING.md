@@ -4,6 +4,26 @@
 
 Consent: Google Consent Mode v2, all storage denied by default; `analytics_storage` granted only after the cookie banner is accepted (choice stored in `localStorage['bk-consent']`, revocable via the footer "הגדרות עוגיות" link). Events still push to the dataLayer regardless — GA4 handles them per consent state (cookieless pings or drop).
 
+## Loader timing
+
+The GTM container is **deferred off the critical path**. The loader is inline in the document head, but it only injects `gtm.js` when one of these happens first:
+
+- the visitor interacts — `pointerdown`, `keydown`, `touchstart` or `scroll` (capture phase, passive);
+- the page has fired `load` and the browser reports idle, capped by a 2.5s `requestIdleCallback` timeout (1.2s `setTimeout` fallback where the API is missing).
+
+Two invariants make this safe to change:
+
+1. **The Consent Mode block stays synchronous and runs first.** It only pushes to `window.dataLayer`, issues no network request, and therefore costs nothing on the critical path. Defaults are recorded before the container can load, which is what Consent Mode v2 requires.
+2. **`window.dataLayer` is created before the loader.** Events pushed early queue in the array and are processed when the container initialises, so nothing is dropped. `pointerdown` also precedes `click`, so a CTA click always has the container already loading.
+
+Why: mobile Lighthouse attributed 187KB of unused JavaScript and ~1.1s of LCP to the container. Desktop was already fine (LCP 802ms); mobile was 5.7s.
+
+Cost of the change: a visitor who leaves before `load` fires, without any interaction, is not counted. On a static page that window is small, but it is not zero — treat total pageviews as a slight undercount rather than an exact figure.
+
+Regression coverage: `npm run verify:tracking` (`scripts/verify-gtm-defer.mjs`) asserts no request during `DOMContentLoaded`, a load on idle with no interaction, a load within 900ms of a click, consent defaults present in the dataLayer, and an attempted GA4 collect hit on both the homepage and an article.
+
+The script serves `dist/` locally and **aborts every outbound request to Google Analytics** — the assertion only needs the hit to be attempted, and letting it through would file localhost pageviews in the live property on every run. `googletagmanager.com` stays reachable on purpose, since the container has to load for the dataLayer assertions to mean anything. That is also why this is a local pre-merge check and not a CI job: a workflow running on every PR would either pollute the property or need this same shim, and the external dependency would make the build flaky.
+
 ## Events
 
 | Event | Convention | Properties | Trigger | Decision it informs |

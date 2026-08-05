@@ -45,11 +45,27 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
     }
   } catch (e) { /* storage blocked — stay denied */ }
 </script>
-<!-- Google Tag Manager -->
-<script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+<!-- Google Tag Manager (deferred: off the critical path, see README) -->
+<script is:inline>(function(w,d,s,l,i){
+  w[l]=w[l]||[];
+  var started=false;
+  var triggers=['pointerdown','keydown','touchstart','scroll'];
+  function start(){
+    if(started)return;
+    started=true;
+    for(var k=0;k<triggers.length;k++)w.removeEventListener(triggers[k],start,true);
+    w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+    var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+    j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+    f.parentNode.insertBefore(j,f);
+  }
+  for(var k=0;k<triggers.length;k++)w.addEventListener(triggers[k],start,{capture:true,passive:true});
+  function idle(){
+    if(w.requestIdleCallback)w.requestIdleCallback(start,{timeout:2500});
+    else w.setTimeout(start,1200);
+  }
+  if(d.readyState==='complete')idle();
+  else w.addEventListener('load',idle,{once:true});
 })(window,document,'script','dataLayer','GTM-PXVVP37');</script>
 <!-- End Google Tag Manager -->
 <slot name="head" />
