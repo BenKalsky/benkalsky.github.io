@@ -94,10 +94,15 @@ try {
   // The tracked CTA must produce a GA4 event hit.
   const cta = page.locator('a[data-cta-loc]').first();
   if (await cta.count()) {
-    const href = await cta.getAttribute('href');
-    await page.evaluate((h) => {
-      document.querySelector(`a[href="${h}"]`).setAttribute('target', '_blank');
-    }, href);
+    // The whole reason an early CTA click survives deferral is that the click
+    // queues in dataLayer while the page stays alive. That only holds because
+    // the external-link pass has already marked these anchors target="_blank".
+    // Assert it rather than setting it here — setting it would hide a
+    // regression in that pass and make this check meaningless.
+    const target = await cta.getAttribute('target');
+    if (target !== '_blank') {
+      fail.push(`interaction: CTA is target="${target}" — an early click would unload the page before the queued event is processed`);
+    }
     await cta.click();
     await page.waitForTimeout(3000);
     const events = collect.filter((u) => /en=|ep\.|whatsapp|schedule|cta/.test(u));

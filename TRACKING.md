@@ -15,6 +15,7 @@ Two invariants make this safe to change:
 
 1. **The Consent Mode block stays synchronous and runs first.** It only pushes to `window.dataLayer`, issues no network request, and therefore costs nothing on the critical path. Defaults are recorded before the container can load, which is what Consent Mode v2 requires.
 2. **`window.dataLayer` is created before the loader.** Events pushed early queue in the array and are processed when the container initialises, so nothing is dropped. `pointerdown` also precedes `click`, so a CTA click always has the container already loading.
+3. **Conversion CTAs open in a new tab.** A queued event is only delivered if the page survives long enough for the container to process the queue. Every `wa.me` and `digitizer.li/schedule` link is external, so the external-link pass marks it `target="_blank"` and the originating page stays alive. This is the invariant that makes an early first-click safe, and it is asserted rather than assumed — the verification script fails if a tracked CTA is not `_blank`.
 
 Why: mobile Lighthouse attributed 187KB of unused JavaScript and ~1.1s of LCP to the container. Desktop was already fine (LCP 802ms); mobile was 5.7s.
 
