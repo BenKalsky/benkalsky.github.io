@@ -6,10 +6,18 @@ import { meta as aiAgents } from './ai-agents.astro';
 import { meta as chatbotVsAgent } from './chatbot-vs-agent.astro';
 import { meta as productionGap } from './ai-production-gap.astro';
 import { meta as smallBizAutomation } from './small-business-automation.astro';
+import { meta as buildAiAgent } from './build-ai-agent.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/build-ai-agent/',
+    title: 'סוכן AI לעסק: איך בונים אחד שמגיע לעבודה אמיתית',
+    description:
+      'מפרט בארבע שורות, שלוש רמות הרשאה, חיבור למערכות ופיילוט קצוב שמסתיים במספר. מה באמת מזמינים כשמזמינים סוכן.',
+    date: buildAiAgent.datePublished,
+  },
   {
     href: '/blog/small-business-automation/',
     title: 'אוטומציה לעסקים קטנים: מאיפה מתחילים',
