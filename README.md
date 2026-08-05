@@ -14,7 +14,7 @@ Built end-to-end with an agentic workflow — [Claude Code](https://claude.com/c
 | Blog | [Astro](https://astro.build) static build (`src/pages/blog/`), shared RTL layout, auto sitemap |
 | Hosting | GitHub Pages behind a custom domain, deployed by GitHub Actions on every push to `master` |
 | Contact form | Vercel serverless function (`contact-api/`) relaying via ElasticEmail, with honeypot + rate limiting |
-| Analytics | GTM + GA4 behind Google Consent Mode v2 (denied by default, Hebrew consent banner) |
+| Analytics | GTM + GA4 behind Google Consent Mode v2 (denied by default, Hebrew consent banner); the container loads off the critical path, on first interaction or browser idle |
 | Fonts | Greycliff Hebrew CF, self-hosted and licensed — not for reuse |
 
 ## Development
