@@ -5,10 +5,18 @@ import { meta as mcp } from './mcp.astro';
 import { meta as aiAgents } from './ai-agents.astro';
 import { meta as chatbotVsAgent } from './chatbot-vs-agent.astro';
 import { meta as productionGap } from './ai-production-gap.astro';
+import { meta as smallBizAutomation } from './small-business-automation.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/small-business-automation/',
+    title: 'אוטומציה לעסקים קטנים: מאיפה מתחילים',
+    description:
+      'איך בוחרים את התהליך הראשון לאוטומציה, ארבעת התנאים שהופכים אותו למשתלם, המועמדים הקבועים מהשטח, ומתי צריך סוכן במקום.',
+    date: smallBizAutomation.datePublished,
+  },
   {
     href: '/blog/ai-production-gap/',
     title: 'בינה מלאכותית לעסקים: למה הדמו מרשים והפרודקשן לא מגיע',
