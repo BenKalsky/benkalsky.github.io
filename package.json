@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "audit:a11y": "node scripts/a11y-audit.mjs",
     "verify:tracking": "node scripts/verify-gtm-defer.mjs",
-    "verify:csp": "node scripts/verify-csp.mjs"
+    "verify:csp": "node scripts/verify-csp.mjs",
+    "validate:articles": "node scripts/validate-articles.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "axe-core": "^4.12.1",
+    "cheerio": "^1.2.0",
     "playwright": "^1.62.1"
   }
 }

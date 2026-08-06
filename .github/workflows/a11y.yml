@@ -34,3 +34,9 @@ jobs:
       # whose analytics quietly stopped.
       - name: Verify Content-Security-Policy
         run: npm run verify:csp
+      # Enforces the article standard from SEO-PLAN.md, including the
+      # cross-article heading check. Both rules it gates hardest were things
+      # a human missed by hand: title length, and headings that duplicate an
+      # existing article's.
+      - name: Validate articles against the content standard
+        run: npm run validate:articles
