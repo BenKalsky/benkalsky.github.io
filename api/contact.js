@@ -159,5 +159,14 @@ export default async function handler(req, res) {
     return;
   }
 
+  // A 2xx from ElasticEmail means *accepted for delivery*, not delivered.
+  // Without this line a message that is accepted and then silently dropped
+  // downstream is indistinguishable from one that arrived, which is exactly
+  // the state this endpoint was in the first time it happened. The response
+  // carries a MessageID/TransactionID; log it so a missing email can be
+  // traced in the ElasticEmail activity log instead of guessed at.
+  const accepted = await r.text().catch(() => '');
+  console.log('elasticemail accepted', accepted);
+
   res.status(200).json({ ok: true });
 }
