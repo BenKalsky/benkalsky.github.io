@@ -7,10 +7,18 @@ import { meta as chatbotVsAgent } from './chatbot-vs-agent.astro';
 import { meta as productionGap } from './ai-production-gap.astro';
 import { meta as smallBizAutomation } from './small-business-automation.astro';
 import { meta as buildAiAgent } from './build-ai-agent.astro';
+import { meta as n8nVsMake } from './n8n-vs-make.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/n8n-vs-make/',
+    title: 'מה זה n8n, ומתי כלי אוטומציה ויזואלי מפסיק להספיק',
+    description:
+      'ההבדלים שמרגישים בין n8n ל-Make אחרי חודש, למה השוואת מחיר לחודש שגויה, ושלושת הסימנים שהלוח הוויזואלי נשבר.',
+    date: n8nVsMake.datePublished,
+  },
   {
     href: '/blog/build-ai-agent/',
     title: 'סוכן AI לעסק: איך בונים אחד שמגיע לעבודה אמיתית',
