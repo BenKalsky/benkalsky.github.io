@@ -12,7 +12,7 @@ Built end-to-end with an agentic workflow — [Claude Code](https://claude.com/c
 | --- | --- |
 | Homepage | Hand-crafted static `public/index.html`, passed through the build byte-for-byte |
 | Blog | [Astro](https://astro.build) static build (`src/pages/blog/`), shared RTL layout, auto sitemap |
-| Hosting | GitHub Pages behind a custom domain, deployed by GitHub Actions on every push to `master` |
+| Hosting | Vercel, deployed from `master`, with the contact function in the same project |
 | Contact form | Vercel serverless function (`api/contact.js`) relaying via ElasticEmail, with honeypot + rate limiting |
 | Analytics | GTM + GA4 behind Google Consent Mode v2 (denied by default, Hebrew consent banner); the container loads off the critical path, on first interaction or browser idle |
 | Fonts | Greycliff Hebrew CF, self-hosted and licensed — not for reuse |
@@ -42,6 +42,14 @@ cmp dist/index.html public/index.html   # must be silent
 The function accepts one origin, `https://www.benkalsky.co.il`. Browsers do send `Origin` on a same-origin POST — verified on both Chromium and WebKit, so Safari is covered — which is what makes a one-constant check sufficient after the CORS layer was removed.
 
 **A consequence: the contact form returns 403 on every preview deployment**, because a preview's origin is never the production one. That is correct behaviour, not a regression. Do not widen the check to make previews convenient.
+
+## Content Security Policy
+
+The policy lives in `csp.json`, is served from `vercel.json`, and is proven by `npm run verify:csp` — which loads every built page in a real browser, collects `securitypolicyviolation` events, and fails on anything not documented as intentionally blocked. It also fails if `csp.json` and `vercel.json` have drifted, since otherwise it would be proving a policy nobody serves.
+
+`script-src` carries `'unsafe-inline'`. The site has 44 inline script blocks and GTM injects more at runtime, so the honest description is that this policy stops external script injection, framing, plugins, form redirection and base-tag hijacking — **not inline XSS.** Tightening it means hashes plus `strict-dynamic` and a build step to keep the hashes current; worth doing, but it is a project rather than a config line.
+
+Writing this policy is what found a GTM-injected Meta Pixel setting an `_fbp` advertising cookie before consent, on every page, while the privacy policy stated no advertising use and listed no Meta processor. Consent Mode v2 gates Google tags automatically and third-party tags not at all. The tag was removed from the container rather than allowlisted here.
 
 ## Conventions
 
