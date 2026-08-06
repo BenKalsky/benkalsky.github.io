@@ -7,8 +7,7 @@
 //
 // Browsers post here with no Origin header and no user gesture, so this
 // endpoint deliberately does NOT reuse the contact form's origin check. What
-// keeps it cheap to abuse is that it stores nothing, sends nothing and always
-// answers 204.
+// keeps it pointless to abuse is that it stores nothing and sends nothing.
 
 // Reports are bursty by nature — one bad tag produces one per page view — so
 // the log is capped per instance. State is per warm instance, same caveat as
@@ -62,8 +61,13 @@ export default async function handler(req, res) {
     }
   }
 
-  // Always 204, even when capped or malformed. A reporting endpoint that
-  // returns errors gives an attacker a signal and gives browsers a reason to
-  // retry, and neither buys us anything.
+  // 204 for anything this handler sees, including a report it could not make
+  // sense of and one dropped by the cap — an error there would give browsers
+  // a reason to retry and tell a prober which shapes register.
+  //
+  // Note the limit: a body that is not valid JSON never reaches here. Vercel's
+  // parser answers 400 first, verified against a deployment. Browsers send
+  // well-formed reports, so this costs nothing in practice, but the handler
+  // cannot claim to answer 204 unconditionally.
   res.status(204).end();
 }
