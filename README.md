@@ -13,7 +13,7 @@ Built end-to-end with an agentic workflow — [Claude Code](https://claude.com/c
 | Homepage | Hand-crafted static `public/index.html`, passed through the build byte-for-byte |
 | Blog | [Astro](https://astro.build) static build (`src/pages/blog/`), shared RTL layout, auto sitemap |
 | Hosting | GitHub Pages behind a custom domain, deployed by GitHub Actions on every push to `master` |
-| Contact form | Vercel serverless function (`contact-api/`) relaying via ElasticEmail, with honeypot + rate limiting |
+| Contact form | Vercel serverless function (`api/contact.js`) relaying via ElasticEmail, with honeypot + rate limiting |
 | Analytics | GTM + GA4 behind Google Consent Mode v2 (denied by default, Hebrew consent banner); the container loads off the critical path, on first interaction or browser idle |
 | Fonts | Greycliff Hebrew CF, self-hosted and licensed — not for reuse |
 
@@ -30,6 +30,18 @@ npm run build    # static build into dist/
 ```bash
 cmp dist/index.html public/index.html   # must be silent
 ```
+
+## Hosting and the trailing-slash contract
+
+`vercel.json` sets `trailingSlash: true`. Astro builds with `format: 'directory'`, so every canonical URL on the site ends in a slash; without this setting each one would become a 308 redirect target.
+
+**It applies to `/api` as well, and there is no per-path override.** A request to `/api/contact` is 308-redirected to `/api/contact/`. That matters more than it looks: browsers do not follow redirects on a CORS preflight, so a cross-origin form posting to the unslashed path fails outright rather than degrading.
+
+**Always call the API at `/api/contact/`, with the slash.** Verified against a real deployment: the slashed path returns 204 on preflight, 200 on the honeypot path, 400 on validation failure and 403 on a disallowed origin, while every one of those returns 308 without the slash.
+
+The function accepts one origin, `https://www.benkalsky.co.il`. Browsers do send `Origin` on a same-origin POST — verified on both Chromium and WebKit, so Safari is covered — which is what makes a one-constant check sufficient after the CORS layer was removed.
+
+**A consequence: the contact form returns 403 on every preview deployment**, because a preview's origin is never the production one. That is correct behaviour, not a regression. Do not widen the check to make previews convenient.
 
 ## Conventions
 

@@ -1377,7 +1377,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   var form = document.getElementById('contact-form');
   var statusEl = document.getElementById('form-status');
   var submitBtn = document.getElementById('submit-btn');
-  var API_URL = 'https://benkalsky-contact.vercel.app/api/contact';
+  // Same-origin now that the site and the function share a deployment.
+  // The trailing slash is REQUIRED: vercel.json sets trailingSlash globally
+  // with no per-path override, so /api/contact 308s here — and browsers do
+  // not follow redirects on a CORS preflight. See README.
+  var API_URL = '/api/contact/';
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();

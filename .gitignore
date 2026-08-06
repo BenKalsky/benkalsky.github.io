@@ -5,6 +5,9 @@ dist/
 # dependencies
 node_modules/
 
+# vercel
+.vercel
+
 # system / IDE
 .DS_Store
 .idea

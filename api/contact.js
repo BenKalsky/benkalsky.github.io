@@ -1,10 +1,8 @@
-const ALLOWED_ORIGINS = new Set([
-  'https://benkalsky.net',
-  'https://www.benkalsky.net',
-  'https://benkalsky.co.il',
-  'https://www.benkalsky.co.il',
-  'https://benkalsky.github.io',
-]);
+// The site and this function now ship in the same deployment, so every
+// legitimate request is same-origin and no CORS headers are needed. What
+// remains is the origin *check*, kept deliberately: it costs nothing and it
+// rejects scripted POSTs that carry no Origin header at all.
+const SELF_ORIGIN = 'https://www.benkalsky.co.il';
 
 const TO_ADDRESS = 'benkalsky@gmail.com';
 const FROM_ADDRESS = 'hello@benkalsky.co.il';
@@ -58,17 +56,6 @@ function rateLimited(req) {
   return bucket.count > IP_LIMIT;
 }
 
-function setCors(req, res) {
-  const origin = req.headers.origin;
-  if (origin && ALLOWED_ORIGINS.has(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    return true;
-  }
-  return false;
-}
 
 const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({
@@ -77,17 +64,15 @@ const escapeHtml = (s) =>
 
 export default async function handler(req, res) {
   evictExpiredBuckets(Date.now());
-  const originAllowed = setCors(req, res);
 
-  if (req.method === 'OPTIONS') {
-    res.status(originAllowed ? 204 : 403).end();
-    return;
-  }
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method not allowed' });
     return;
   }
-  if (!originAllowed) {
+  // No OPTIONS branch: a same-origin request never triggers a preflight, and
+  // a cross-origin one gets no Allow-Origin header back, so it fails in the
+  // browser regardless of what this returns.
+  if (req.headers.origin !== SELF_ORIGIN) {
     res.status(403).json({ error: 'origin not allowed' });
     return;
   }
