@@ -1,5 +1,13 @@
 {
-  "_comment": "Single source of truth for the Content-Security-Policy. vercel.json serves it and scripts/verify-csp.mjs proves it in a real browser; the script fails if the two drift. expectedBlocked documents anything the policy is meant to block on purpose - it is empty because nothing currently should be. A GTM-injected Meta Pixel was found here on 2026-08-06 setting an _fbp advertising cookie before consent; the tag was removed from the container rather than allowlisted.",
+  "_comment": "Single source of truth for the Content-Security-Policy. vercel.json serves it and scripts/verify-csp.mjs proves it in a real browser; the script fails if the two drift. expectedBlocked documents anything the policy is meant to block on purpose. Two advertising endpoints have shown up here so far. A GTM-injected Meta Pixel was found on 2026-08-06 setting an _fbp cookie before consent; the tag was removed from the container rather than allowlisted. Later the same day GA4 began attempting conversion pings to pagead2.googlesyndication.com - see the entry below.",
   "policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.googletagmanager.com https://*.analytics.google.com; frame-src https://www.googletagmanager.com; manifest-src 'self'; upgrade-insecure-requests; report-uri /api/csp-report/; report-to csp",
-  "expectedBlocked": []
+  "expectedBlocked": [
+    {
+      "pattern": "pagead2.googlesyndication.com",
+      "why": "GA4 (G-Z3NYH9CH0F) attempts page_view, first_visit and session_start conversion pings to Google's ad-serving domain on every page. The request carries the full page URL, the page title and a gacid client identifier, and it is attempted even though the consent signal says denied (gcs=G100, npa=1). Blocking it is the intended behaviour, not a defect to allowlist.",
+      "cause": "A GA4-to-Google-Ads link was created on 2026-08-06 to account Digitizer 299-357-1794 with Personalized Advertising enabled. verify:csp reported clean earlier the same day, before the link existed.",
+      "action_taken": "Personalized Advertising was disabled on 2026-08-06. The pings were still firing immediately afterwards; whether that is gtag config caching or because the ping belongs to the link rather than to personalisation is unresolved, and a re-run on a later day separates the two.",
+      "limit": "The CSP blocks the BROWSER channel only. It does not affect the server-side GA4-to-Ads data sharing that the link itself creates. If that sharing is unwanted, the link has to go; if it is wanted, the privacy policy has to name Google Ads as a processor. Neither has been done."
+    }
+  ]
 }

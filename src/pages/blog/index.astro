@@ -8,10 +8,18 @@ import { meta as productionGap } from './ai-production-gap.astro';
 import { meta as smallBizAutomation } from './small-business-automation.astro';
 import { meta as buildAiAgent } from './build-ai-agent.astro';
 import { meta as n8nVsMake } from './n8n-vs-make.astro';
+import { meta as claudeHebrew } from './claude-hebrew.astro';
 
 const formatDate = (iso) => iso.split('-').reverse().join('.');
 
 const posts = [
+  {
+    href: '/blog/claude-hebrew/',
+    title: 'קלוד בעברית: מה עובד, מה נשבר, ואיך עוקפים את זה',
+    description:
+      'למה הכיווניות שוברת יותר מהשפה, שלושת המקומות שבהם זה קורה בפועל, ומתי דווקא כדאי לכתוב את הפרומפט באנגלית.',
+    date: claudeHebrew.datePublished,
+  },
   {
     href: '/blog/n8n-vs-make/',
     title: 'מה זה n8n, ומתי כלי אוטומציה ויזואלי מפסיק להספיק',
