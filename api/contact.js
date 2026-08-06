@@ -4,12 +4,19 @@
 // rejects scripted POSTs that carry no Origin header at all.
 const SELF_ORIGIN = 'https://www.benkalsky.co.il';
 
-// Two recipients on purpose. Suppression is per-address and silent: the API
-// still returns 2xx while the message is dropped, which is exactly how a
-// single suppressed address took the whole lead pipeline down without any
-// signal. A second address on a different domain means one suppression
-// degrades delivery instead of ending it.
-const TO_ADDRESSES = ['benkalsky@gmail.com', 'ben@digitizer.co.il'];
+// Recipients come from config, not code. The reason is a regression this
+// line already caused once: the ElasticEmail account is on a trial tier that
+// rejects the whole message — 400, no partial delivery — if any recipient is
+// not the address the account was registered with. Hardcoding a second
+// address took the contact form down for every real submission.
+//
+// The default is therefore the single address that is always permitted.
+// Adding ben@digitizer.co.il for redundancy is a LEAD_NOTIFY_TO change once
+// the plan allows other recipients, with no deploy needed.
+const TO_ADDRESSES = (process.env.LEAD_NOTIFY_TO || 'benkalsky@gmail.com')
+  .split(',')
+  .map((a) => a.trim())
+  .filter(Boolean);
 const FROM_ADDRESS = 'hello@benkalsky.co.il';
 const FROM_NAME = 'Ben Kalsky Site';
 
