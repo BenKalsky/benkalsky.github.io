@@ -4,7 +4,12 @@
 // rejects scripted POSTs that carry no Origin header at all.
 const SELF_ORIGIN = 'https://www.benkalsky.co.il';
 
-const TO_ADDRESS = 'benkalsky@gmail.com';
+// Two recipients on purpose. Suppression is per-address and silent: the API
+// still returns 2xx while the message is dropped, which is exactly how a
+// single suppressed address took the whole lead pipeline down without any
+// signal. A second address on a different domain means one suppression
+// degrades delivery instead of ending it.
+const TO_ADDRESSES = ['benkalsky@gmail.com', 'ben@digitizer.co.il'];
 const FROM_ADDRESS = 'hello@benkalsky.co.il';
 const FROM_NAME = 'Ben Kalsky Site';
 
@@ -142,7 +147,7 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      Recipients: { To: [TO_ADDRESS] },
+      Recipients: { To: TO_ADDRESSES },
       Content: {
         From: `${FROM_NAME} <${FROM_ADDRESS}>`,
         ReplyTo: email,
@@ -158,6 +163,15 @@ export default async function handler(req, res) {
     res.status(502).json({ error: 'send failed' });
     return;
   }
+
+  // A 2xx from ElasticEmail means *accepted for delivery*, not delivered.
+  // Without this line a message that is accepted and then silently dropped
+  // downstream is indistinguishable from one that arrived, which is exactly
+  // the state this endpoint was in the first time it happened. The response
+  // carries a MessageID/TransactionID; log it so a missing email can be
+  // traced in the ElasticEmail activity log instead of guessed at.
+  const accepted = await r.text().catch(() => '');
+  console.log('elasticemail accepted', accepted);
 
   res.status(200).json({ ok: true });
 }
