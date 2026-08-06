@@ -39,6 +39,10 @@ cmp dist/index.html public/index.html   # must be silent
 
 **Always call the API at `/api/contact/`, with the slash.** Verified against a real deployment: the slashed path returns 204 on preflight, 200 on the honeypot path, 400 on validation failure and 403 on a disallowed origin, while every one of those returns 308 without the slash.
 
+The function accepts one origin, `https://www.benkalsky.co.il`. Browsers do send `Origin` on a same-origin POST — verified on both Chromium and WebKit, so Safari is covered — which is what makes a one-constant check sufficient after the CORS layer was removed.
+
+**A consequence: the contact form returns 403 on every preview deployment**, because a preview's origin is never the production one. That is correct behaviour, not a regression. Do not widen the check to make previews convenient.
+
 ## Conventions
 
 - Every change lands through a pull request and an AI code-review loop; merges happen only on a clean review of the branch head.
