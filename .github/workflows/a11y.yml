@@ -1,4 +1,4 @@
-name: Accessibility audit
+name: Page checks
 
 on:
   pull_request:
@@ -27,3 +27,10 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run axe (WCAG 2.1 A+AA, all pages)
         run: npm run audit:a11y
+      # Gates the policy itself, not just the pages: verify:csp fails if
+      # csp.json and vercel.json have drifted, and if any page trips a
+      # violation that is not documented as intentional. Without this, a
+      # future GTM tag that the policy blocks would be found by a visitor
+      # whose analytics quietly stopped.
+      - name: Verify Content-Security-Policy
+        run: npm run verify:csp
