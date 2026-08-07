@@ -106,7 +106,16 @@ function contentAfter($, el, root) {
     const siblings = node.parent().contents().toArray();
     for (const s of siblings.slice(siblings.indexOf(node[0]) + 1)) {
       text += ' ' + $(s).text();
-      if (s.type === 'tag' && !INLINE.has(s.name)) els.push(s.name);
+      if (s.type !== 'tag') continue;
+      // The wrapper's own tag is not the whole answer. "<span><img></span>"
+      // contributes no text and its outermost tag is phrasing content, so
+      // checking the sibling alone accepted an arbitrarily large media block
+      // as the end of the article. Descendants are checked too, so an allowed
+      // wrapper cannot smuggle a disallowed element through.
+      if (!INLINE.has(s.name)) els.push(s.name);
+      for (const d of $(s).find('*').toArray()) {
+        if (!INLINE.has(d.name)) els.push(d.name);
+      }
     }
     node = node.parent();
   }
