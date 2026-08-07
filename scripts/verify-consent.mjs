@@ -53,6 +53,9 @@ const PAGES = ['/', '/blog/mcp/', '/privacy/'];
 const GTM_TIMEOUT_MS = 20000;
 const RECORDER_TIMEOUT_MS = 20000;
 const SILENCE_WINDOW_MS = 5000;
+// Time the recorder is left running before its violations are read, so a
+// resource it loads lazily has happened by then.
+const EXERCISE_MS = 4000;
 
 // The recorder reaches PostHog through a first-party reverse proxy, so it
 // cannot be matched by vendor name — not having the vendor's name in the
@@ -70,6 +73,15 @@ const AD_SYNC = /bing\.com/;
 // through, or the after-consent assertion would pass against a recorder that
 // never actually ran; /flags/ is read-only and part of init. A CI run must
 // never write a fabricated session into the live project.
+//
+// KNOWN LIMIT, measured 2026-08-07: this abort has never fired. Thirty seconds
+// of scripted mouse movement, scrolling and clicking with recording confirmed
+// running produced zero requests to any of these paths. So the "nothing after
+// the revoke" assertion below proves no NEW upload was attempted — it does not
+// prove an already-buffered one was discarded, because nothing in this
+// environment ever gets far enough to flush. The privacy page is worded to
+// claim only the former. If a future run ever trips this abort, that assertion
+// becomes the stronger one it currently is not.
 const UPLOAD = /\/\/t\.benkalsky\.co\.il\/(i|e|s)\//;
 
 const TYPES = {
@@ -142,13 +154,15 @@ async function open(page, consent) {
 // a slow runner can be seconds before the container has downloaded, let alone
 // run. A silence window started there can expire before a reverted All Pages
 // tag has had any chance to fire, and the run would report a gate that holds
-// when nothing was ever tested. Anchor to the container being ready to execute.
+// when nothing was ever tested.
+//
+// Deliberately not waitForResponse either: that only sees responses arriving
+// after it is called, so a cached container fetched and executed during the
+// nudge would never be seen and the run would report an unavailable container
+// for twenty seconds while GTM was in fact ready. Polling the runtime state
+// answers the question directly and cannot lose a race with it.
 async function waitForContainer(tab) {
   try {
-    await tab.waitForResponse(
-      (r) => /googletagmanager\.com\/gtm\.js/.test(r.url()) && r.status() === 200,
-      { timeout: GTM_TIMEOUT_MS }
-    );
     await tab.waitForFunction(() => !!window.google_tag_manager, null, { timeout: GTM_TIMEOUT_MS });
     return true;
   } catch {
@@ -207,6 +221,15 @@ for (const page of PAGES) {
   await nudge(g.tab);
   const gReady = await waitForContainer(g.tab);
   const running = gReady ? await waitForRecording(g.tab) : false;
+  // Snapshotting the violations the instant recording starts would miss
+  // anything the recorder loads afterwards — a worker built lazily for canvas
+  // capture is exactly that shape. Exercise the page first, and read before
+  // the revoke: the reload replaces the document and with it window.__csp.
+  if (running) {
+    await g.tab.mouse.move(500, 400);
+    await g.tab.mouse.wheel(0, 600);
+    await g.tab.waitForTimeout(EXERCISE_MS);
+  }
   const granted = g.seen.map((s) => s.url);
   const grantedCsp = await cspOf(g.tab);
 
@@ -221,10 +244,15 @@ for (const page of PAGES) {
     // decide() reloads when it finds a live recorder, so the assertion has to
     // survive a navigation.
     await g.tab.waitForLoadState('load');
-    await g.tab.waitForTimeout(2000);
+    await g.tab.waitForTimeout(4000);
     revoked = {
       stillRunning: await recordingState(g.tab),
-      after: g.seen.filter((s) => s.at > at + 1500).map((s) => s.url),
+      // No grace period. An earlier version ignored the first 1.5s, which is
+      // precisely the window in which an unload flush would land — the reload
+      // that is supposed to end the buffer can also be what ships it. Counting
+      // from the click is the only version of this assertion that can fail for
+      // the reason it exists.
+      after: g.seen.filter((s) => s.at >= at).map((s) => s.url),
     };
   }
   await g.ctx.close();
