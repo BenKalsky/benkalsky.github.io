@@ -51,31 +51,25 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
     }
   } catch (e) { /* storage blocked — stay denied */ }
 
-  // Clarity loads through GTM, which is deferred until first interaction, so
-  // window.clarity does not exist when the banner is clicked. Clarity's own
-  // snippet uses `c[a] = c[a] || function(){...q.push(arguments)}`, so a stub
-  // defined first is kept and its queue drained on load. Without it a consent
-  // decision made before GTM starts is silently dropped.
-  window.clarity = window.clarity || function () {
-    (window.clarity.q = window.clarity.q || []).push(arguments);
+  // Withdrawal, not just refusal. The footer reopens the banner, so consent
+  // can be revoked on a page where the recorder is already running — and the
+  // GTM tag fires once per page and cannot be unfired. Nothing else stops it.
+  //
+  // Returns whether a running recorder was found, because that is what tells
+  // the caller a reload is warranted; a first-time visitor clicking "necessary
+  // only" never loaded PostHog and must not be reloaded for nothing.
+  //
+  // Deliberately NOT posthog.opt_out_capturing(): that persists an opt-out
+  // flag in storage, and a visitor who declines today would then stay silently
+  // unrecorded after accepting next week, with nothing reporting it.
+  window.bkStopRecording = function () {
+    var ph = window.posthog;
+    if (!ph || typeof ph.stopSessionRecording !== 'function') return false;
+    try { ph.stopSessionRecording(); } catch (e) { /* never started */ }
+    return true;
   };
 
-  // ad_Storage stays denied unconditionally and is never wired to the banner.
-  // Granting it lets Clarity sync an identifier into Microsoft's advertising
-  // graph (c.clarity.ms/c.gif redirects to c.bing.com with a CtsSyncId); the
-  // CSP blocks that endpoint, and this keeps the site from asking for it in
-  // the first place. Session recording needs analytics_Storage only.
-  window.bkClarityConsent = function (state) {
-    window.clarity('consentv2', {
-      ad_Storage: 'denied',
-      analytics_Storage: state === 'granted' ? 'granted' : 'denied'
-    });
-  };
-  try {
-    window.bkClarityConsent(localStorage.getItem('bk-consent'));
-  } catch (e) { /* storage blocked — stays denied */ }
-
-  // The Clarity tag in GTM fires on this event, not on All Pages, so the
+  // The PostHog tag in GTM fires on this event, not on All Pages, so the
   // script does not load at all until consent is granted.
   //
   // It has to be a trigger and not GTM's Additional Consent Checks: that
@@ -89,7 +83,9 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
   // first interaction, so the push always precedes the container.
   //
   // Guarded to once per page: reopening the settings and accepting again
-  // would otherwise fire the tag a second time and initialise Clarity twice.
+  // would otherwise fire the tag a second time and initialise PostHog twice.
+  // Accepting again after a revoke therefore does nothing here — but the
+  // revoke reloaded the page, so the accept lands on a fresh one.
   window.bkConsentSignalled = false;
   window.bkSignalConsent = function () {
     if (window.bkConsentSignalled) return;
@@ -713,8 +709,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       try { localStorage.setItem('bk-consent', state); } catch (e) { /* session-only choice */ }
       banner.classList.remove('show');
       gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
-      window.bkClarityConsent(state);
-      if (state === 'granted') window.bkSignalConsent();
+      if (state === 'granted') { window.bkSignalConsent(); return; }
+      // Refusing after having accepted on this same page: the recorder is
+      // loaded and holds a buffer it would still flush. Stopping it ends new
+      // capture, and the reload ends the page that holds the buffer — which is
+      // what the privacy page's "change your choice at any time" has to mean
+      // to be true. No recorder running means nothing to undo, so no reload.
+      if (window.bkStopRecording()) location.reload();
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });
