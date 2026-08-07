@@ -1,0 +1,64 @@
+---
+import BlogLayout from '../layouts/BlogLayout.astro';
+---
+<BlogLayout
+  title="הפנייה התקבלה | בן קלסקי"
+  description="אישור קבלת פנייה מטופס יצירת הקשר באתר benkalsky.co.il."
+  canonicalPath="/thank-you/"
+  noindex={true}
+>
+  <article class="prose">
+    <!-- Two states, decided at runtime. The confirmation is shown only to
+         someone whose submission the API actually accepted; anyone arriving
+         at this URL directly gets the fallback. Without that split the page
+         would confirm a submission that never happened, and its pageviews
+         would stop being a usable proxy for leads. -->
+    <div id="ty-confirmed" hidden>
+      <h1>הפנייה התקבלה</h1>
+      <p class="lede">תודה. קראתי את מה שכתבת ואחזור אליך בהקדם — בדרך כלל באותו יום עסקים.</p>
+
+      <h2>אם זה דחוף, או שנוח לך לדבר</h2>
+      <p>שתי דרכים מהירות יותר מהמתנה למייל:</p>
+      <ul>
+        <li><a href="https://wa.me/972528816959" data-cta-loc="thank-you">וואטסאפ</a> — לשאלה קצרה או להשלמת פרטים.</li>
+        <li><a href="https://digitizer.li/schedule" data-cta-loc="thank-you">תיאום שיחה</a> — עשרים דקות, בלי הכנה מצידך.</li>
+      </ul>
+
+      <h2>בינתיים</h2>
+      <p>אם רצית להבין לעומק לפני שנדבר, שלוש נקודות כניסה טובות:</p>
+      <ul>
+        <li><a href="/blog/ai-agents/">סוכן AI זה לא צ'אטבוט</a> — ההבדל שקובע מה בכלל אפשר לבנות.</li>
+        <li><a href="/blog/ai-production-gap/">הדמו והפרודקשן</a> — למה הדגמה שעובדת עדיין לא מערכת.</li>
+        <li><a href="/blog/small-business-automation/">אוטומציה לעסקים קטנים</a> — מאיפה מתחילים כשאין צוות פיתוח.</li>
+      </ul>
+    </div>
+
+    <div id="ty-direct">
+      <h1>לא נמצאה פנייה</h1>
+      <p class="lede">העמוד הזה מוצג אחרי שליחת טופס יצירת הקשר. אם הגעת אליו ישירות, הפנייה לא נשלחה.</p>
+      <p><a href="/">חזרה לעמוד הבית</a> — הטופס נמצא בתחתיתו. אפשר גם <a href="https://wa.me/972528816959" data-cta-loc="thank-you-direct">לכתוב בוואטסאפ</a>.</p>
+    </div>
+  </article>
+</BlogLayout>
+
+<script is:inline>
+  // The flag is written by the form handler only after the API returns 200,
+  // so it stands for "the server accepted this", not "the form was submitted".
+  // sessionStorage rather than localStorage: it should expire with the tab,
+  // otherwise the confirmation would still show days later.
+  //
+  // It is deliberately NOT cleared on read. Clearing it would break a refresh
+  // and the back button, turning a normal action into an apparent error.
+  //
+  // The fallback is the state rendered in HTML, and script only ever swaps
+  // away from it. With scripting off the page still says something true —
+  // and since the form submits over fetch, nobody without scripting can have
+  // reached here from it anyway.
+  (function () {
+    var confirmed = false;
+    try { confirmed = sessionStorage.getItem('bk-lead') === '1'; } catch (e) { /* storage blocked */ }
+    if (!confirmed) return;
+    document.getElementById('ty-direct').hidden = true;
+    document.getElementById('ty-confirmed').hidden = false;
+  })();
+</script>
