@@ -34,7 +34,18 @@ jobs:
       # whose analytics quietly stopped.
       - name: Verify Content-Security-Policy
         run: npm run verify:csp
-      # Enforces the article standard from SEO-PLAN.md, including the
+      # The only check that can catch a revert of the consent gate on the
+      # session-recording tag. Two of that gate's four layers are GTM and
+      # Clarity settings, outside this repo, and verify:csp cannot see them —
+      # it grants consent before every page so the CSP entries stay exercised.
+      #
+      # This makes CI depend on live third-party configuration, which is a real
+      # cost: an unrelated pull request goes red if someone edits the GTM
+      # container. That is the intended behaviour. The alternative is a session
+      # recorder that silently starts running before consent and nothing says so.
+      - name: Verify the consent gate on session recording
+        run: npm run verify:consent
+      # Enforces the article standard, including the
       # cross-article heading check. Both rules it gates hardest were things
       # a human missed by hand: title length, and headings that duplicate an
       # existing article's.

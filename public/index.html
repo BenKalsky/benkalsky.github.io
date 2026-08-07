@@ -32,6 +32,35 @@
       gtag('consent', 'update', { analytics_storage: 'granted' });
     }
   } catch (e) { /* storage blocked — stay denied */ }
+
+  // Kept byte-for-byte in step with src/layouts/BlogLayout.astro. This page is
+  // hand-maintained rather than built from that layout, so the two copies drift
+  // silently — they already did: the Clarity wiring landed in the layout and
+  // never reached here, and the home page recorded nothing at all until
+  // verify-consent.mjs caught it. Change one, change the other.
+  window.clarity = window.clarity || function () {
+    (window.clarity.q = window.clarity.q || []).push(arguments);
+  };
+
+  window.bkClarityConsent = function (state) {
+    window.clarity('consentv2', {
+      ad_Storage: 'denied',
+      analytics_Storage: state === 'granted' ? 'granted' : 'denied'
+    });
+  };
+  try {
+    window.bkClarityConsent(localStorage.getItem('bk-consent'));
+  } catch (e) { /* storage blocked — stays denied */ }
+
+  window.bkConsentSignalled = false;
+  window.bkSignalConsent = function () {
+    if (window.bkConsentSignalled) return;
+    window.bkConsentSignalled = true;
+    window.dataLayer.push({ event: 'bk_consent_granted' });
+  };
+  try {
+    if (localStorage.getItem('bk-consent') === 'granted') window.bkSignalConsent();
+  } catch (e) { /* storage blocked — no signal, tag stays unfired */ }
 </script>
 <!-- Google Tag Manager (deferred: off the critical path, see README) -->
 <script>(function(w,d,s,l,i){
@@ -1327,6 +1356,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       try { localStorage.setItem('bk-consent', state); } catch (e) { /* session-only choice */ }
       banner.classList.remove('show');
       gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
+      window.bkClarityConsent(state);
+      if (state === 'granted') window.bkSignalConsent();
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });
