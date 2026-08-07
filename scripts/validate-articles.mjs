@@ -113,19 +113,37 @@ for (const p of articlePaths) {
   if (h1.length !== 1) flag(p, `${h1.length} h1 elements, must be exactly 1`);
   const h2s = main.find('h2').map((_, el) => norm($(el).text())).get();
   if (h2s.length < LIMITS.minH2) flag(p, `${h2s.length} h2 headings, minimum ${LIMITS.minH2}`);
-  // Every article closes by asking the reader to do something. Two shapes are
-  // in use: .post-cta, a block with its own heading, and .cta-line, a single
-  // paragraph. page-standards.md requires a call to action in the meta
-  // description and says nothing about the closing block's form, so neither
-  // shape is mandated here — but an article with neither is an article that
-  // ends without asking, and until now nothing looked.
-  const ctaBlock = main.find('.post-cta, .cta-line');
-  if (!ctaBlock.length) flag(p, 'no closing call to action (.post-cta or .cta-line)');
-  // Headings inside that block are shared across articles on purpose, and are
-  // exempt from the cannibalisation check below. .cta-line carries no heading,
-  // so the set is empty for those articles — which only makes the check
-  // stricter, never looser.
-  const ctaHeadings = new Set(ctaBlock.find('h2').map((_, el) => norm($(el).text())).get());
+  // Every article must END by asking the reader to do something.
+  //
+  // Deliberately not "contains .post-cta or .cta-line". Those are the two
+  // shapes in today's corpus, and a gate that names them rejects a third
+  // rendering that closes just as well — while a class appearing anywhere,
+  // including mid-body, satisfied it and exempted its headings from the
+  // collision check. Both are the same mistake: describing the markup instead
+  // of the requirement.
+  //
+  // What is asserted is the requirement: the last substantive block of the
+  // article offers a way to act. Tested by DESTINATION rather than by
+  // phrasing — the closing blocks are worded differently from each other and
+  // from the description's call to action, and what makes a close a close is
+  // that the reader can do something from it, not which verb it used.
+  const blocks = main.children().filter((_, el) => $(el).text().trim().length > 0);
+  const closing = blocks.last();
+  const closesWithAsk = closing.length > 0 && closing.find('a').toArray().some((el) => {
+    const href = $(el).attr('href') ?? '';
+    return /#contact\b/.test(href) || /(^|\/\/)(www\.)?(digitizer\.li|wa\.me)\b/.test(href) ||
+      href.startsWith('mailto:') || href.startsWith('tel:');
+  });
+  if (!closesWithAsk) {
+    const where = closing.length
+      ? `${closing.prop('tagName')}${closing.attr('class') ? '.' + closing.attr('class') : ''}`
+      : 'the article has no content';
+    flag(p, `the article does not end with a way to get in touch (last block: ${where})`);
+  }
+  // Headings inside that closing block are shared across articles on purpose,
+  // and are exempt from the cannibalisation check below. A closing block with
+  // no heading leaves the set empty — which only makes the check stricter.
+  const ctaHeadings = new Set(closing.find('h2').map((_, el) => norm($(el).text())).get());
   const forbidden = h2s.filter((h) => FORBIDDEN_HEADINGS.has(h));
   if (forbidden.length) flag(p, `heading "${forbidden[0]}" is not permitted as a section`);
 

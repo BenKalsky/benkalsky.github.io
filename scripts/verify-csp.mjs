@@ -101,18 +101,23 @@ if (!pages.length) {
 const GTM_TIMEOUT_MS = 20000;
 const SETTLE_MS = 3500;
 
-// A page that loads is not a page that works. connect-src, form-action and
-// frame-src are exercised by things a visitor does, not by a page load, so a
-// policy that blocks the contact form's fetch would have passed every check
-// here: the form was never submitted. These flows drive the directives that a
-// load alone leaves untested.
+// A page that loads is not a page that works. connect-src and frame-src are
+// exercised by things a visitor does, not by a page load, so a policy that
+// blocked the contact form's fetch would have passed every check here: the
+// form was never submitted.
+//
+// form-action is NOT covered by these flows and is checked separately below.
+// The probe here calls fetch(), which is governed by connect-src — an earlier
+// comment claimed it exercised form-action, and `form-action 'none'` would
+// have left this green.
 //
 // Everything stays on the local server. The form's fetch reaches a path this
 // server answers 404 for, which is all the assertion needs — the question is
 // whether the policy PERMITS the request, not what comes back. No submitted
 // content leaves the process.
 async function exerciseFlows(page) {
-  // The contact form: fetch() to /api/contact/, gated by connect-src.
+  // The contact form's transport: fetch() to /api/contact/, gated by
+  // connect-src.
   const form = page.locator('form#contact-form, form[data-contact], form').first();
   if (await form.count()) {
     await page.evaluate(async () => {
@@ -194,6 +199,46 @@ try {
       : expected.length ? ' — blocked as intended' : '';
     console.log(`${mark} ${p}${note}`);
     await ctx.close();
+  }
+  // form-action governs where a form may submit, and nothing above touches it:
+  // fetch() is connect-src, and no page in the loop performs a navigation. A
+  // policy of form-action 'none' would have passed every check.
+  //
+  // Done in its own disposable page at the end, because a permitted submission
+  // navigates — which replaces the document and the violation array with it.
+  // The signal is that navigation: if the policy allows the submission the URL
+  // changes, and if it blocks it the URL stays and a violation fires.
+  const formCheck = await (async () => {
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    await page.addInitScript(() => {
+      window.__csp = [];
+      document.addEventListener('securitypolicyviolation', (e) => {
+        window.__csp.push(`${e.violatedDirective} blocked ${e.blockedURI || '(inline)'}`);
+      });
+    });
+    await page.goto(base + '/', { waitUntil: 'load' });
+    const from = page.url();
+    await page.evaluate(() => {
+      const f = document.createElement('form');
+      f.method = 'POST';
+      f.action = '/api/contact/';
+      document.body.appendChild(f);
+      f.submit();
+    });
+    await page.waitForTimeout(2000);
+    const navigated = page.url() !== from;
+    const viol = navigated ? [] : await page.evaluate(() => window.__csp || []);
+    await ctx.close();
+    return { navigated, viol };
+  })();
+  if (!formCheck.navigated) {
+    violations.push({
+      page: '(form submission to /api/contact/)',
+      all: formCheck.viol.length
+        ? formCheck.viol
+        : ['the submission did not navigate and reported no violation — inconclusive'],
+    });
   }
 } finally {
   await browser.close();
