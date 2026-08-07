@@ -4,9 +4,14 @@ interface Props {
   description: string;
   canonicalPath: string;
   ogType?: string;
+  /** Keeps a page out of search results. A thank-you page that ranks is a
+   *  page strangers can land on, which makes its pageviews useless as a
+   *  conversion signal and shows a confirmation to someone who confirmed
+   *  nothing. */
+  noindex?: boolean;
 }
 
-const { title, description, canonicalPath, ogType = 'website' } = Astro.props;
+const { title, description, canonicalPath, ogType = 'website', noindex = false } = Astro.props;
 const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
 ---
 <!DOCTYPE html>
@@ -26,6 +31,7 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href={canonicalURL}>
+{noindex && <meta name="robots" content="noindex, nofollow">}
 <link rel="sitemap" href="/sitemap-index.xml">
 <link rel="icon" href="/logo/orbit-favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/GreycliffHebrewCF-Bold.woff2" as="font" type="font/woff2" crossorigin>

@@ -1445,6 +1445,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       statusEl.className = 'form-status ok';
       if (!wasBot) {
         window.dataLayer.push({ event: 'generate_lead', method: 'contact_form', cta_location: 'form' });
+        // Written only on a 200 from the API, so /thank-you/ can tell an
+        // accepted submission from someone typing the URL. The event above
+        // still fires here rather than on that page: it is the conversion
+        // signal and must not depend on a navigation completing.
+        try { sessionStorage.setItem('bk-lead', '1'); } catch (e) { /* storage blocked — the page falls back */ }
+        window.location.assign('/thank-you/');
       }
     }).catch(function () {
       statusEl.textContent = 'השליחה נכשלה. נסו שוב, או כתבו לי בוואטסאפ.';
