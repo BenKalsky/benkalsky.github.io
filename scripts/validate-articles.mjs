@@ -80,19 +80,34 @@ function isContactHref(href) {
 // "ונראה מאיפה מתחילים." as a text node after it. Measured with nextAll,
 // every article reported zero trailing characters, which was the function
 // failing to see rather than the articles closing cleanly.
-function textAfter($, el, root) {
-  let out = '';
+// Returns the trailing text and any ELEMENTS that follow, separately.
+//
+// A character count alone is not the assertion: an element with no text —
+// a figure, a video, an iframe, an image gallery — follows the CTA while
+// contributing nothing to the count, and a short heading fits under any
+// threshold worth setting. What "closes the article" means is that nothing
+// substantive comes after, and an element is substantive whether or not it
+// says anything.
+function contentAfter($, el, root) {
+  let text = '';
+  const els = [];
   let node = el;
   while (node.length && !node.is(root)) {
     const siblings = node.parent().contents().toArray();
-    for (const s of siblings.slice(siblings.indexOf(node[0]) + 1)) out += ' ' + $(s).text();
+    for (const s of siblings.slice(siblings.indexOf(node[0]) + 1)) {
+      text += ' ' + $(s).text();
+      if (s.type === 'tag') els.push(s.name);
+    }
     node = node.parent();
   }
-  return out;
+  return { text, els };
 }
-// Set from the corpus rather than guessed: the largest trailing run in the
-// nine live articles is the closing half-sentence in .cta-line. A guessed 120
-// let a whole added paragraph through in testing.
+// Bare text after the link is the closing half-sentence in .cta-line
+// articles — "…ונראה מאיפה מתחילים." — and nothing else. Measured across the
+// nine live articles: longest 20 characters, and ZERO elements after the link
+// in every one of them. So elements are forbidden outright and the text
+// allowance is small and evidenced rather than guessed. An earlier guess of
+// 120 let a whole added paragraph through in testing.
 const MAX_TRAILING_AFTER_CTA = 40;
 
 // String.length counts UTF-16 code units. An emoji counts as two, and the
@@ -180,7 +195,11 @@ for (const p of articlePaths) {
   if (!actionable.length) {
     flag(p, 'the article has no way to get in touch');
   } else {
-    const trailing = norm(textAfter($, $(actionable[actionable.length - 1]), main));
+    const after = contentAfter($, $(actionable[actionable.length - 1]), main);
+    if (after.els.length) {
+      flag(p, `<${after.els.join('>, <')}> follow${after.els.length === 1 ? 's' : ''} the last way to get in touch — it does not close the article`);
+    }
+    const trailing = norm(after.text);
     if (trailing.length > MAX_TRAILING_AFTER_CTA) {
       flag(p, `${trailing.length} characters of content follow the last way to get in touch — it does not close the article`);
     }

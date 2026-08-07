@@ -47,29 +47,39 @@ const server = createServer(async (req, res) => {
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const origin = `http://127.0.0.1:${server.address().port}`;
 
-// Checks axe could not decide, that a human has decided instead. Each was
-// measured on 2026-08-07, when reporting `incomplete` was added and turned out
-// to have been discarding a serious-impact check on every page since the gate
-// was written. All are colour contrast, and all pass:
+// Checks axe could not decide, that a human has decided instead. Measured
+// 2026-08-07, when reporting `incomplete` was added and turned out to have
+// been discarding a serious-impact check on every page since this gate was
+// written. All are colour contrast, and all pass — AA asks 4.5:1:
 //
-//   #consent-desc   #F7F6F2 on #12130F  = 17.25:1
-//   .h1-mark        #12130F on #E8FF52  = 16.75:1
-//   .stars          #12130F on #E8FF52  = 16.75:1
+//   rgb(247,246,242) on rgb(18,19,15)    17.25:1   #consent-desc
+//   rgb(232,255,82)  on rgb(18,19,15)    16.75:1   .fit-yes marks
+//   rgb(18,19,15)    on rgb(232,255,82)  16.75:1   .h1-mark, .stars
+//   rgb(85,86,77)    on rgb(247,246,242)  6.88:1   .fit-no marks
 //
-// AA asks 4.5:1. Axe cannot decide them because the elements sit over a
-// backdrop it will not resolve, not because the contrast is marginal.
+// Axe cannot decide them because the elements sit over a backdrop it will not
+// resolve, not because the contrast is marginal.
+//
+// Keyed on the RULE and the RENDERED COLOURS, not on the selector. Two reasons,
+// and they pull the same way:
+//
+//   - A key of rule + selector survives a CSS change. .h1-mark could drop
+//     below 4.5:1 and, as long as axe still could not resolve its background,
+//     the stale approval would match and the gate would stay green. A colour
+//     that changes produces a key nobody has approved.
+//   - The selectors axe reports are positional — li:nth-child(3) > figure >
+//     .stars — so reordering the testimonials would have failed the build for
+//     no real reason. The colours do not move when the markup does.
 //
 // This is an allowlist, not a filter: anything NOT on it fails. Printing the
 // list and passing regardless was the previous version, and it would have let
 // a new unresolved check hide inside a green build — nobody reads a passing
 // log. Adding an entry here is a deliberate act that says someone measured it.
 const REVIEWED = new Set([
-  'color-contrast #consent-desc',
-  'color-contrast .h1-mark',
-  'color-contrast li:nth-child(1) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
-  'color-contrast li:nth-child(2) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
-  'color-contrast li:nth-child(3) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
-  'color-contrast li:nth-child(4) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
+  'color-contrast rgb(247, 246, 242) on rgb(18, 19, 15)',
+  'color-contrast rgb(232, 255, 82) on rgb(18, 19, 15)',
+  'color-contrast rgb(18, 19, 15) on rgb(232, 255, 82)',
+  'color-contrast rgb(85, 86, 77) on rgb(247, 246, 242)',
 ]);
 
 const browser = await chromium.launch();
@@ -99,11 +109,35 @@ try {
       const r = await axe.run(document, {
         runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
       });
+      // The rendered colours of a node, so an approval can be tied to what was
+      // actually measured. A key of rule + selector alone survives a CSS
+      // change: .h1-mark could drop below 4.5:1 and, as long as axe still
+      // cannot resolve its background, the old approval would still match.
+      // Resolved from the selector, not from n.element: axe's node objects
+      // carry a live element reference that does not survive being returned
+      // out of the page, so reading it here produced "unknown" for every node
+      // and the fingerprint would have been a constant.
+      const colours = (selector) => {
+        try {
+          const el = document.querySelector(selector);
+          if (!el) return 'not found';
+          const cs = getComputedStyle(el);
+          let node = el, bg = 'rgba(0, 0, 0, 0)';
+          while (node && bg === 'rgba(0, 0, 0, 0)') { bg = getComputedStyle(node).backgroundColor; node = node.parentElement; }
+          return `${cs.color} on ${bg}`;
+        } catch (e) { return 'unreadable'; }
+      };
+      // No slice for the gate. Truncating to five before the allowlist ran
+      // meant a rule with six unresolved nodes had its sixth neither printed
+      // nor required to match — and the homepage contrast set has exactly six.
       const shape = (v) => ({
         id: v.id,
         impact: v.impact,
         help: v.help,
-        nodes: v.nodes.slice(0, 5).map((n) => n.target.join(' ')),
+        nodes: v.nodes.map((n) => ({
+          target: n.target.join(' '),
+          colours: colours(n.target[0]),
+        })),
       });
       return { violations: r.violations.map(shape), incomplete: r.incomplete.map(shape) };
     });
@@ -124,7 +158,8 @@ try {
       needsReview.push({ route, incomplete });
       for (const i of incomplete) {
         for (const n of i.nodes) {
-          if (!REVIEWED.has(`${i.id} ${n}`)) unreviewed.push(`${route} — ${i.id} on ${n}`);
+          const key = `${i.id} ${n.colours}`;
+          if (!REVIEWED.has(key)) unreviewed.push(`${route} — ${key}  (at ${n.target})`);
         }
       }
     }
@@ -139,7 +174,7 @@ if (needsReview.length) {
   for (const { route, incomplete } of needsReview) {
     for (const i of incomplete) {
       console.log(`  ? ${route} — ${i.id} (${i.impact ?? 'no impact rating'}): ${i.help}`);
-      for (const n of i.nodes) console.log(`      ${n}`);
+      for (const n of i.nodes) console.log(`      ${n.target}  [${n.colours}]`);
     }
   }
   console.log('Each of these is on the reviewed list in this file, or the run fails below.');
@@ -149,7 +184,7 @@ if (unreviewed.length) {
   console.error(`\n${unreviewed.length} unresolved check(s) that nobody has measured:`);
   for (const u of unreviewed) console.error('  \u2717 ' + u);
   console.error(
-    'Measure each, then add "<rule-id> <selector>" to REVIEWED at the top of this file.\n' +
+    'Measure each, then add "<rule-id> <colours>" to REVIEWED at the top of this file.\n' +
     'Printing them and passing anyway is what hid a serious-impact contrast check on\n' +
     'every page for as long as this gate has existed.'
   );
