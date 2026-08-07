@@ -1,4 +1,6 @@
 ---
+import PostHog from '../components/posthog.astro';
+
 interface Props {
   title: string;
   description: string;
@@ -29,6 +31,7 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
 <link rel="sitemap" href="/sitemap-index.xml">
 <link rel="icon" href="/logo/orbit-favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/GreycliffHebrewCF-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<PostHog />
 <script is:inline>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -689,8 +692,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // value in the shared GA4 tag.
     if (a.href.indexOf('wa.me') !== -1) {
       window.dataLayer.push({ event: 'whatsapp_click', cta_location: loc, method: undefined });
+      window.posthog?.capture('whatsapp_contact_clicked', { cta_location: loc });
     } else if (a.href.indexOf('digitizer.li/schedule') !== -1) {
       window.dataLayer.push({ event: 'schedule_click', cta_location: loc, method: undefined });
+      window.posthog?.capture('consultation_booking_clicked', { cta_location: loc });
     }
   });
 </script>

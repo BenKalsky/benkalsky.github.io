@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^7.1.6"
+    "astro": "^7.1.6",
+    "posthog-js": "^1.413.3",
+    "posthog-node": "^5.48.1"
   },
   "devDependencies": {
     "axe-core": "^4.12.1",

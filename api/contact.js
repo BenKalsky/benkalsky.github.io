@@ -1,3 +1,5 @@
+import { getPostHogServer } from './posthog-server.js';
+
 // The site and this function now ship in the same deployment, so every
 // legitimate request is same-origin and no CORS headers are needed. What
 // remains is the origin *check*, kept deliberately: it costs nothing and it
@@ -179,6 +181,20 @@ export default async function handler(req, res) {
   // traced in the ElasticEmail activity log instead of guessed at.
   const accepted = await r.text().catch(() => '');
   console.log('elasticemail accepted', accepted);
+
+  const posthog = getPostHogServer();
+  if (posthog) {
+    posthog.capture({
+      distinctId: req.headers['x-posthog-distinct-id'],
+      event: 'contact_form_submitted',
+      properties: {
+        $process_person_profile: false,
+        $session_id: req.headers['x-posthog-session-id'],
+        source: 'contact_form',
+      },
+    });
+    await posthog.flush();
+  }
 
   res.status(200).json({ ok: true });
 }
