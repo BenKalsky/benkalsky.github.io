@@ -714,8 +714,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       // loaded and holds a buffer it would still flush. Stopping it ends new
       // capture, and the reload ends the page that holds the buffer — which is
       // what the privacy page's "change your choice at any time" has to mean
-      // to be true. No recorder running means nothing to undo, so no reload.
-      if (window.bkStopRecording()) location.reload();
+      // to be true.
+      var wasRunning = window.bkStopRecording();
+      // bkConsentSignalled, not just a live recorder. bk_consent_granted is
+      // queued in the dataLayer and GTM replays it whenever the container
+      // finishes loading, which here is deferred until first interaction. A
+      // visitor who accepts and then changes their mind a second later leaves
+      // no window.posthog to stop — and the grant still arrives afterwards and
+      // starts recording against a stored 'denied'. Reloading discards the
+      // queue along with the page.
+      //
+      // Nothing to undo means no reload: a first-time visitor choosing
+      // "necessary only" must not have the page reloaded under them.
+      if (wasRunning || window.bkConsentSignalled) location.reload();
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });

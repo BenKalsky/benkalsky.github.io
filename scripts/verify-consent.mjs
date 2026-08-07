@@ -56,6 +56,11 @@ const SILENCE_WINDOW_MS = 5000;
 // Time the recorder is left running before its violations are read, so a
 // resource it loads lazily has happened by then.
 const EXERCISE_MS = 4000;
+// How long the GTM container is held back in the race check, and how long the
+// page is then watched. The watch must outlast the delay, or "never started"
+// would only mean "had not started yet".
+const CONTAINER_DELAY_MS = 5000;
+const RACE_WATCH_MS = 15000;
 
 // The recorder reaches PostHog through a first-party reverse proxy, so it
 // cannot be matched by vendor name — not having the vendor's name in the
@@ -109,7 +114,7 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch();
 const fail = [];
 
-async function open(page, consent) {
+async function open(page, consent, opts = {}) {
   const ctx = await browser.newContext();
   const tab = await ctx.newPage();
 
@@ -125,6 +130,23 @@ async function open(page, consent) {
   await tab.route('**/g/collect*', ok204);
   await tab.route('**://t.benkalsky.co.il/**', (route, request) =>
     (UPLOAD.test(request.url()) ? route.abort() : route.continue()));
+
+  // Holds the GTM container back, not the recorder. The tag's own snippet
+  // defines window.posthog synchronously the moment the tag fires, so once the
+  // container is up there is always something for bkStopRecording() to find.
+  // The window that matters is earlier: the accept lands in the dataLayer
+  // while GTM is still loading — which here it always is, because the loader
+  // is deferred until exactly the interaction that the accept click is. A
+  // withdrawal inside that window has no window.posthog to stop.
+  //
+  // Real but short, a few hundred milliseconds. A test that has to win that
+  // race by luck is not a test, so the container is delayed to widen it.
+  if (opts.delayContainer) {
+    await tab.route('**://www.googletagmanager.com/gtm.js**', async (route) => {
+      await new Promise((r) => setTimeout(r, CONTAINER_DELAY_MS));
+      await route.continue();
+    });
+  }
 
   const seen = [];
   tab.on('request', (r) => {
@@ -238,8 +260,11 @@ for (const page of PAGES) {
   // "stopped" result would be indistinguishable from never having started.
   let revoked = null;
   if (running) {
-    const at = Date.now();
     await g.tab.click('#cookie-settings');
+    // The boundary is the decline, not the settings click. Taken earlier, an
+    // upload triggered by the settings click itself — while consent was still
+    // granted — would be counted as an upload after withdrawal.
+    const at = Date.now();
     await g.tab.click('#consent-decline');
     // decide() reloads when it finds a live recorder, so the assertion has to
     // survive a navigation.
@@ -257,10 +282,36 @@ for (const page of PAGES) {
   }
   await g.ctx.close();
 
+  // ---- withdrawn while the grant is still in flight ----
+  // The accept queues bk_consent_granted in the dataLayer, and GTM replays it
+  // whenever the container finishes loading. A withdrawal made inside that
+  // window used to be overtaken by its own accept: there was no window.posthog
+  // to stop, so nothing reloaded, and the tag then fired against a stored
+  // 'denied'. The check above cannot see this — it waits for recording to
+  // start before revoking, which is precisely the case that does not apply.
+  const r = await open(page, null, { delayContainer: true });
+  await r.tab.goto(base + page, { waitUntil: 'load' });
+  // No nudge and no wait for the container: the accept click is itself the
+  // first interaction, so both decisions are made while GTM is still in
+  // flight. Waiting for the container first would close the very window under
+  // test — which an earlier version of this check did, and passed for it.
+  await r.tab.click('#consent-accept');
+  await r.tab.click('#cookie-settings');
+  await r.tab.click('#consent-decline');
+  await r.tab.waitForLoadState('load');
+  // Must outlast CONTAINER_DELAY_MS, or "never started" would only mean
+  // "had not started yet".
+  await r.tab.waitForTimeout(RACE_WATCH_MS);
+  const raceStarted = await recordingState(r.tab);
+  // Readiness is asserted after the fact: the container has to have arrived
+  // for the run to mean anything, but it must not be waited for beforehand.
+  const rReady = await r.tab.evaluate(() => !!window.google_tag_manager);
+  await r.ctx.close();
+
   // A run where the container never became ready proves nothing in either
   // direction, and must not be reported as a gate failure — that is how a
   // network problem gets mistaken for a reverted trigger.
-  if (!dReady || !gReady) {
+  if (!dReady || !gReady || !rReady) {
     fail.push(`${page}: the GTM container was not ready within ${GTM_TIMEOUT_MS / 1000}s — this run says nothing about the gate`);
     console.log(`✗ ${page} :: GTM container never became ready`);
     continue;
@@ -282,6 +333,10 @@ for (const page of PAGES) {
     }
   }
 
+  if (raceStarted) {
+    fail.push(`${page}: consent withdrawn while the grant was still queued, and recording started anyway`);
+  }
+
   // The advertising identity sync is not permitted in any state.
   const sync = [...denied, ...granted].filter((u) => AD_SYNC.test(u));
   if (sync.length) {
@@ -296,9 +351,12 @@ for (const page of PAGES) {
     fail.push(`${page}: the recorder tripped the CSP — ${csp[0]}`);
   }
 
+  const clean = denied.length === 0 && running && !revoked?.stillRunning &&
+    !revoked?.after.length && !raceStarted && sync.length === 0 && csp.length === 0;
   console.log(
-    `${denied.length === 0 && running && !revoked?.stillRunning && !revoked?.after.length && sync.length === 0 && csp.length === 0 ? '✓' : '✗'} ${page} ` +
-    `:: before ${denied.length} · recording ${running ? 'on' : 'off'} · after revoke ${running ? (revoked.stillRunning ? 'still on' : 'off') : 'n/a'} · ad sync ${sync.length} · csp ${csp.length}`
+    `${clean ? '✓' : '✗'} ${page} ` +
+    `:: before ${denied.length} · recording ${running ? 'on' : 'off'} · after revoke ${running ? (revoked.stillRunning ? 'still on' : 'off') : 'n/a'} ` +
+    `· race ${raceStarted ? 'started' : 'off'} · ad sync ${sync.length} · csp ${csp.length}`
   );
 }
 

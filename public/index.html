@@ -1353,8 +1353,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       banner.classList.remove('show');
       gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
       if (state === 'granted') { window.bkSignalConsent(); return; }
-      // Refusing after having accepted on this same page. See the layout.
-      if (window.bkStopRecording()) location.reload();
+      // Refusing after having accepted on this same page. bkConsentSignalled
+      // covers the grant that is still queued in the dataLayer and has not
+      // started a recorder yet. See the layout.
+      var wasRunning = window.bkStopRecording();
+      if (wasRunning || window.bkConsentSignalled) location.reload();
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });
