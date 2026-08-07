@@ -1,4 +1,6 @@
-// Enforces the article standard from SEO-PLAN.md against the built output.
+// Enforces the article standard against the built output. The standard itself
+// lives in the marketing repo, Digitizers/digitizer-cmo, at
+// method/page-standards.md — SEO-PLAN.md here is only a pointer at it.
 //
 // Every rule here exists because it was missed or nearly missed by hand:
 // title length was wrong twice in one session, and two headings that would
@@ -128,4 +130,4 @@ if (problems.length) {
   for (const pr of problems) console.error('  ✗ ' + pr);
   process.exit(1);
 }
-console.log('all articles meet the standard in SEO-PLAN.md');
+console.log('all articles meet the standard in digitizer-cmo/method/page-standards.md');
