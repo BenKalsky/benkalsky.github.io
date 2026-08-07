@@ -61,7 +61,14 @@ try {
     const page = await ctx.newPage();
     const seen = [];
     // The spec event is the reliable signal; console messages vary by engine.
+    //
+    // Consent is granted before the page runs. Consent-gated tags — Clarity
+    // among them — never load otherwise, and a policy entry that the run
+    // never exercises is a policy entry nobody is checking. The granted
+    // state loads strictly more third-party code than the denied one, so
+    // testing it covers both.
     await page.addInitScript(() => {
+      try { localStorage.setItem('bk-consent', 'granted'); } catch (e) { /* ignore */ }
       window.__csp = [];
       document.addEventListener('securitypolicyviolation', (e) => {
         window.__csp.push(`${e.violatedDirective} blocked ${e.blockedURI || '(inline)'}`);

@@ -68,6 +68,31 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
   try {
     window.bkClarityConsent(localStorage.getItem('bk-consent'));
   } catch (e) { /* storage blocked — stays denied */ }
+
+  // The Clarity tag in GTM fires on this event, not on All Pages, so the
+  // script does not load at all until consent is granted.
+  //
+  // It has to be a trigger and not GTM's Additional Consent Checks: that
+  // setting consumes the tag's once-per-page allowance when it blocks, so
+  // the tag counts as already fired and does NOT fire again when consent
+  // arrives later on the same page.
+  //
+  // Pushed from the head so it also covers the returning visitor whose
+  // choice is already in storage. dataLayer entries pushed before gtm.js
+  // loads are replayed when GTM initialises, and GTM here is deferred until
+  // first interaction, so the push always precedes the container.
+  //
+  // Guarded to once per page: reopening the settings and accepting again
+  // would otherwise fire the tag a second time and initialise Clarity twice.
+  window.bkConsentSignalled = false;
+  window.bkSignalConsent = function () {
+    if (window.bkConsentSignalled) return;
+    window.bkConsentSignalled = true;
+    window.dataLayer.push({ event: 'bk_consent_granted' });
+  };
+  try {
+    if (localStorage.getItem('bk-consent') === 'granted') window.bkSignalConsent();
+  } catch (e) { /* storage blocked — no signal, tag stays unfired */ }
 </script>
 <!-- Google Tag Manager (deferred: off the critical path, see README) -->
 <script is:inline>(function(w,d,s,l,i){
@@ -683,6 +708,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       banner.classList.remove('show');
       gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
       window.bkClarityConsent(state);
+      if (state === 'granted') window.bkSignalConsent();
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });
