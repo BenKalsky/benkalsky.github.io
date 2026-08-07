@@ -44,6 +44,30 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
       gtag('consent', 'update', { analytics_storage: 'granted' });
     }
   } catch (e) { /* storage blocked — stay denied */ }
+
+  // Clarity loads through GTM, which is deferred until first interaction, so
+  // window.clarity does not exist when the banner is clicked. Clarity's own
+  // snippet uses `c[a] = c[a] || function(){...q.push(arguments)}`, so a stub
+  // defined first is kept and its queue drained on load. Without it a consent
+  // decision made before GTM starts is silently dropped.
+  window.clarity = window.clarity || function () {
+    (window.clarity.q = window.clarity.q || []).push(arguments);
+  };
+
+  // ad_Storage stays denied unconditionally and is never wired to the banner.
+  // Granting it lets Clarity sync an identifier into Microsoft's advertising
+  // graph (c.clarity.ms/c.gif redirects to c.bing.com with a CtsSyncId); the
+  // CSP blocks that endpoint, and this keeps the site from asking for it in
+  // the first place. Session recording needs analytics_Storage only.
+  window.bkClarityConsent = function (state) {
+    window.clarity('consentv2', {
+      ad_Storage: 'denied',
+      analytics_Storage: state === 'granted' ? 'granted' : 'denied'
+    });
+  };
+  try {
+    window.bkClarityConsent(localStorage.getItem('bk-consent'));
+  } catch (e) { /* storage blocked — stays denied */ }
 </script>
 <!-- Google Tag Manager (deferred: off the critical path, see README) -->
 <script is:inline>(function(w,d,s,l,i){
@@ -658,6 +682,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       try { localStorage.setItem('bk-consent', state); } catch (e) { /* session-only choice */ }
       banner.classList.remove('show');
       gtag('consent', 'update', { analytics_storage: state === 'granted' ? 'granted' : 'denied' });
+      window.bkClarityConsent(state);
     }
     document.getElementById('consent-accept').addEventListener('click', function () { decide('granted'); });
     document.getElementById('consent-decline').addEventListener('click', function () { decide('denied'); });

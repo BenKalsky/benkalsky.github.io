@@ -54,7 +54,7 @@ Writing this policy is what found a GTM-injected Meta Pixel setting an `_fbp` ad
 ## Conventions
 
 - Every change lands through a pull request and an AI code-review loop; merges happen only on a clean review of the branch head.
-- Blog content follows the standards in [SEO-PLAN.md](SEO-PLAN.md) (keyword research, page standards) and each article ships with Article + FAQPage structured data.
+- Blog content follows the standards in the marketing repo, `Digitizers/digitizer-cmo`: page standards in `method/page-standards.md`, keyword ownership in `keywords/registry.md`, and this site's plan in `sites/benkalsky.co.il/plan.md`. [SEO-PLAN.md](SEO-PLAN.md) here is a pointer at them. Each article ships with Article + FAQPage structured data.
 - Conversion tracking is documented in [TRACKING.md](TRACKING.md) — three events, no personal data in any of them.
 
 ## Privacy
