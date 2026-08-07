@@ -56,11 +56,10 @@ const SILENCE_WINDOW_MS = 5000;
 // Time the recorder is left running before its violations are read, so a
 // resource it loads lazily has happened by then.
 const EXERCISE_MS = 4000;
-// How long the GTM container is held back in the race check, and how long the
-// page is then watched. The watch must outlast the delay, or "never started"
-// would only mean "had not started yet".
+// How long the GTM container is held back in the race check, so the
+// withdrawal lands while the grant is still queued. The watch that follows is
+// anchored to the container arriving rather than to a fixed window.
 const CONTAINER_DELAY_MS = 5000;
-const RACE_WATCH_MS = 15000;
 
 // The recorder reaches PostHog through a first-party reverse proxy, so it
 // cannot be matched by vendor name — not having the vendor's name in the
@@ -309,13 +308,18 @@ for (const page of PAGES) {
   await r.tab.click('#cookie-settings');
   await r.tab.click('#consent-decline');
   await r.tab.waitForLoadState('load');
-  // Must outlast CONTAINER_DELAY_MS, or "never started" would only mean
-  // "had not started yet".
-  await r.tab.waitForTimeout(RACE_WATCH_MS);
-  const raceStarted = await recordingState(r.tab);
-  // Readiness is asserted after the fact: the container has to have arrived
-  // for the run to mean anything, but it must not be waited for beforehand.
-  const rReady = await r.tab.evaluate(() => !!window.google_tag_manager);
+  // The watch is anchored to the container arriving, not to a fixed number of
+  // seconds after the clicks. A container held back by CONTAINER_DELAY_MS and
+  // then a slow runner can become ready near the end of any fixed window, and
+  // the sample would land before the tag had a chance to load — reporting a
+  // gate that holds on exactly the runs where it is most likely not to.
+  //
+  // Waiting here does not reopen the hole the earlier version had: the
+  // decisions are already made. And the bound is the same one the granted
+  // path allows itself, so the two cannot disagree about how long a recorder
+  // is given to start.
+  const rReady = await waitForContainer(r.tab);
+  const raceStarted = rReady ? await waitForRecording(r.tab) : false;
   await r.ctx.close();
 
   // A run where the container never became ready proves nothing in either
