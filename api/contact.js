@@ -12,11 +12,31 @@ const SELF_ORIGIN = 'https://www.benkalsky.co.il';
 //
 // The default is therefore the single address that is always permitted.
 // Adding ben@digitizer.co.il for redundancy is a LEAD_NOTIFY_TO change once
-// the plan allows other recipients, with no deploy needed.
-const TO_ADDRESSES = (process.env.LEAD_NOTIFY_TO || 'benkalsky@gmail.com')
-  .split(',')
-  .map((a) => a.trim())
-  .filter(Boolean);
+// the plan allows other recipients — followed by a REDEPLOY. An earlier
+// version of this comment claimed no deploy was needed, which is wrong twice
+// over: Vercel applies environment changes to new deployments rather than to
+// a running one, and this value is read once at module scope. Changing the
+// variable and believing a second recipient is live is exactly the state that
+// takes an outage a while to notice.
+//
+// The fallback is applied AFTER parsing, not before. A value of " , " is
+// truthy, so testing the raw string first sent every valid submission to
+// ElasticEmail with an empty To list — a 502 on every lead, which is the same
+// total outage this line was written to prevent.
+const DEFAULT_TO = 'benkalsky@gmail.com';
+
+// Exported so the fallback is testable. It is a rule about a value an operator
+// types by hand into a dashboard, which is exactly the kind of rule that is
+// only ever exercised on the day it is wrong.
+export function resolveRecipients(raw) {
+  const configured = String(raw ?? '')
+    .split(',')
+    .map((a) => a.trim())
+    .filter(Boolean);
+  return configured.length ? configured : [DEFAULT_TO];
+}
+
+const TO_ADDRESSES = resolveRecipients(process.env.LEAD_NOTIFY_TO);
 const FROM_ADDRESS = 'hello@benkalsky.co.il';
 const FROM_NAME = 'Ben Kalsky Site';
 
