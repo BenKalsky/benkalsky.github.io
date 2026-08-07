@@ -56,3 +56,13 @@ jobs:
       # existing article's.
       - name: Validate articles against the content standard
         run: npm run validate:articles
+      # Not in CI until now, and that is exactly why two live leaks survived
+      # for weeks: every manual run of this script before 2026-08-07 sent real
+      # GA4 hits from localhost, and clicking the article CTA opened a second
+      # page that the page-level route never covered, so each run also
+      # fabricated a whatsapp_click or schedule_click conversion in the live
+      # property. Both are fixed — collect is answered with an empty 204 and
+      # the routes are installed on the context — and a check nobody runs is a
+      # check that decays, so it runs here now.
+      - name: Verify GA4 is deferred until consent
+        run: npm run verify:tracking

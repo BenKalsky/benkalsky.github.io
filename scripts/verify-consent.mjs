@@ -1,6 +1,8 @@
-// Proves the consent gate on the session-recording tag, in all three
-// directions: silent before consent, actually running after it, and actually
-// stopped when consent is withdrawn.
+// Proves the consent gate on the session-recording tag, in every direction:
+// absent before consent, running after a first-time visitor accepts, running
+// for a returning visitor whose choice is stored, and actually stopped when
+// consent is withdrawn — including a withdrawal made while the grant is still
+// queued.
 //
 // PostHog records the visit, through a first-party reverse proxy at
 // t.benkalsky.co.il. It is held back by one layer that lives in this repo and
@@ -60,6 +62,10 @@ const EXERCISE_MS = 4000;
 // withdrawal lands while the grant is still queued. The watch that follows is
 // anchored to the container arriving rather than to a fixed window.
 const CONTAINER_DELAY_MS = 5000;
+// How long the page is watched for a recorder object AFTER the pre-consent
+// activity. The silence window above ends before that activity runs, so this
+// is the only window that covers an initialisation the activity itself caused.
+const SETTLE_MS = 5000;
 
 // The recorder reaches PostHog through a first-party reverse proxy, so it
 // cannot be matched by vendor name — not having the vendor's name in the
@@ -242,8 +248,52 @@ for (const page of PAGES) {
   await nudge(d.tab);
   const dReady = await waitForContainer(d.tab);
   if (dReady) await d.tab.waitForTimeout(SILENCE_WINDOW_MS);
+  // Activity worth capturing, before any decision: pointer movement, scroll,
+  // and — where the page has one — keystrokes into a form field. A recorder
+  // that buffers this in memory and uploads it once consent arrives is
+  // invisible to a check that watches the network, because there is nothing on
+  // the network yet.
+  await d.tab.mouse.move(420, 260);
+  await d.tab.mouse.wheel(0, 400);
+  const field = d.tab.locator('#contact input[type="text"], #contact input[name="name"]').first();
+  if (await field.count()) await field.fill('בדיקה לפני הסכמה').catch(() => {});
+  // The structural answer to buffering, and the only one this harness can give
+  // (see UPLOAD above — nothing here ever reaches an ingestion path, so a
+  // payload cannot be inspected): before consent the recorder is not held back,
+  // it is ABSENT. No library object, therefore no buffer, therefore nothing to
+  // flush when consent arrives. If a future design loads the library and
+  // configures it not to record, this fails, and it should — that design needs
+  // an assertion about its buffer, which this one cannot make.
+  //
+  // Polled for a window rather than sampled once. The silence window above
+  // expires BEFORE this activity happens, so a single read taken straight
+  // afterwards races an asynchronous initialisation that the activity itself
+  // triggered: a tag fired on the interaction would still be loading, the read
+  // would see undefined, and the accept-side wait a moment later would find the
+  // recorder already starting and credit it to consent. This resolves the
+  // moment the object appears at any point in the window, which is the same
+  // question asked over time instead of at one instant.
+  const recorderPresent = await d.tab
+    .waitForFunction(() => typeof window.posthog !== 'undefined', null, { timeout: SETTLE_MS })
+    .then(() => true, () => false);
   const denied = d.seen.map((s) => s.url);
   const deniedCsp = await cspOf(d.tab);
+
+  // ---- the first-time visitor's accept, in the same context ----
+  // Two things at once, both of which the seeded path below cannot see.
+  //
+  // The seeded path writes 'granted' into localStorage before any application
+  // code runs, so it only ever exercises the returning-visitor branch in the
+  // document head. Breaking the accept handler's bkSignalConsent() call — the
+  // home page's own copy of it, which is where this whole script's first
+  // finding came from — would leave a first-time visitor unrecorded while
+  // every seeded run stayed green.
+  //
+  // And it is the same document that was just exercised, so the transition
+  // from no-consent to consent happens with that activity behind it, rather
+  // than in a fresh context where nothing came before.
+  await d.tab.click('#consent-accept');
+  const firstTimeStarted = await waitForRecording(d.tab);
   await d.ctx.close();
 
   // ---- after consent: the recorder must actually be running ----
@@ -335,6 +385,16 @@ for (const page of PAGES) {
     fail.push(`${page}: ${denied.length} recorder request(s) before consent — ${denied[0]}`);
   }
 
+  if (recorderPresent) {
+    fail.push(`${page}: the recorder library is present in the page before any consent decision — network silence no longer proves nothing was captured, because a buffer can exist`);
+  }
+
+  if (!firstTimeStarted) {
+    fail.push(`${page}: accepting from the banner as a first-time visitor did not start recording — the seeded runs below only exercise the returning-visitor branch`);
+  } else {
+    recorderEverRan = true;
+  }
+
   if (!running) {
     fail.push(`${page}: consent granted and session recording never started — the gate cannot be distinguished from a broken tag`);
   } else {
@@ -365,11 +425,14 @@ for (const page of PAGES) {
     fail.push(`${page}: the recorder tripped the CSP — ${csp[0]}`);
   }
 
-  const clean = denied.length === 0 && running && !revoked?.stillRunning &&
-    !revoked?.after.length && !raceStarted && sync.length === 0 && csp.length === 0;
+  const clean = denied.length === 0 && !recorderPresent && firstTimeStarted && running &&
+    !revoked?.stillRunning && !revoked?.after.length && !raceStarted &&
+    sync.length === 0 && csp.length === 0;
   console.log(
     `${clean ? '✓' : '✗'} ${page} ` +
-    `:: before ${denied.length} · recording ${running ? 'on' : 'off'} · after revoke ${running ? (revoked.stillRunning ? 'still on' : 'off') : 'n/a'} ` +
+    `:: before ${denied.length} req/${recorderPresent ? 'library present' : 'no library'} ` +
+    `· first-time accept ${firstTimeStarted ? 'records' : 'silent'} · recording ${running ? 'on' : 'off'} ` +
+    `· after revoke ${running ? (revoked.stillRunning ? 'still on' : 'off') : 'n/a'} ` +
     `· race ${raceStarted ? 'started' : 'off'} · ad sync ${sync.length} · csp ${csp.length}`
   );
 }
