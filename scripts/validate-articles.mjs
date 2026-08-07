@@ -43,7 +43,13 @@ const FORBIDDEN_HEADINGS = new Set(['סיכום', 'לסיכום', 'סיכום ו
 // they break every comparison and count they touch: two headings that render
 // identically differ by an RLM, and a title is one "character" longer than it
 // looks. Stripped before anything is compared or measured.
-const BIDI = /[‎‏؜‪-‮⁦-⁩﻿]/g;
+//
+// U+206A–U+206F are deprecated and nothing emits them on purpose, which is
+// exactly why they are here: a stray one survives a hand-written class that
+// only covers the marks someone thought of, and Intl.Segmenter counts each as
+// its own grapheme. Verified — U+206A passed the earlier class and added one
+// to every length it touched.
+const BIDI = /[‎‏؜‪-‮⁦-⁩⁪-⁯﻿]/g;
 const norm = (s) => String(s ?? '').normalize('NFC').replace(BIDI, '').replace(/\s+/g, ' ').trim();
 
 // String.length counts UTF-16 code units. An emoji counts as two, and the
@@ -107,9 +113,19 @@ for (const p of articlePaths) {
   if (h1.length !== 1) flag(p, `${h1.length} h1 elements, must be exactly 1`);
   const h2s = main.find('h2').map((_, el) => norm($(el).text())).get();
   if (h2s.length < LIMITS.minH2) flag(p, `${h2s.length} h2 headings, minimum ${LIMITS.minH2}`);
-  // Headings inside the closing CTA block are shared across every article on
-  // purpose, and are exempt from the cannibalisation check below.
-  const ctaHeadings = new Set(main.find('.post-cta h2').map((_, el) => norm($(el).text())).get());
+  // Every article closes by asking the reader to do something. Two shapes are
+  // in use: .post-cta, a block with its own heading, and .cta-line, a single
+  // paragraph. page-standards.md requires a call to action in the meta
+  // description and says nothing about the closing block's form, so neither
+  // shape is mandated here — but an article with neither is an article that
+  // ends without asking, and until now nothing looked.
+  const ctaBlock = main.find('.post-cta, .cta-line');
+  if (!ctaBlock.length) flag(p, 'no closing call to action (.post-cta or .cta-line)');
+  // Headings inside that block are shared across articles on purpose, and are
+  // exempt from the cannibalisation check below. .cta-line carries no heading,
+  // so the set is empty for those articles — which only makes the check
+  // stricter, never looser.
+  const ctaHeadings = new Set(ctaBlock.find('h2').map((_, el) => norm($(el).text())).get());
   const forbidden = h2s.filter((h) => FORBIDDEN_HEADINGS.has(h));
   if (forbidden.length) flag(p, `heading "${forbidden[0]}" is not permitted as a section`);
 
