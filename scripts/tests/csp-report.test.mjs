@@ -135,7 +135,36 @@ test('an unbounded origin never reaches the log', () => {
 
 test('an unbounded scheme never reaches the log either', () => {
   const { reports } = call({ 'csp-report': { 'blocked-uri': 'x'.repeat(50000) + '://y' } });
-  assert.equal(reports[0].blocked, '(oversized)');
+  assert.equal(reports[0].blocked, '(other)');
+});
+
+test('a long path does not cost the origin it is attached to', () => {
+  // Bounding the whole URI threw away a short, useful origin because of a
+  // suffix the function was never going to keep.
+  const { reports } = call({
+    'csp-report': { 'document-uri': 'https://www.benkalsky.co.il/?q=' + 'x'.repeat(20000) },
+  });
+  assert.equal(reports[0].onPage, 'https://www.benkalsky.co.il');
+});
+
+test('a long but valid host survives', () => {
+  // 253 characters is the DNS limit and punycode makes long IDNs ordinary.
+  const host = ('a'.repeat(59) + '.').repeat(4) + 'example.com';
+  assert.ok(host.length > 240 && host.length <= 253, `fixture host is ${host.length}`);
+  const { reports } = call({ 'csp-report': { 'blocked-uri': `https://${host}/x` } });
+  assert.equal(reports[0].blocked, `https://${host}`);
+});
+
+test('a scheme outside the vocabulary cannot label itself', () => {
+  // A shape check passed both of these, and both then read as a real finding.
+  assert.equal(
+    call({ 'csp-report': { 'blocked-uri': 'password-leaked://x' } }).reports[0].blocked,
+    '(other)'
+  );
+  assert.equal(
+    call({ 'csp-report': { 'blocked-uri': 'credential-stolen' } }).reports[0].blocked,
+    '(other)'
+  );
 });
 
 test('a non-POST is rejected without logging anything', () => {
