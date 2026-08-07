@@ -52,6 +52,49 @@ const FORBIDDEN_HEADINGS = new Set(['סיכום', 'לסיכום', 'סיכום ו
 const BIDI = /[‎‏؜‪-‮⁦-⁩⁪-⁯﻿]/g;
 const norm = (s) => String(s ?? '').normalize('NFC').replace(BIDI, '').replace(/\s+/g, ' ').trim();
 
+// The four destinations an article actually closes on. Matched by parsed URL,
+// not by substring: `digitizer.li` alone would accept /cw-spotlight, which
+// this repo already links to and which is a resource rather than a way to
+// reach anyone, and an unanchored /#contact/ would accept another site's
+// fragment. See closing-cta in digitizer-cmo/method/page-standards.md.
+const CONTACT_HOSTS = new Set(['wa.me', 'www.wa.me']);
+const BOOKING = { host: 'digitizer.li', path: '/schedule' };
+const SITE_HOSTS = new Set(['www.benkalsky.co.il', 'benkalsky.co.il']);
+function isContactHref(href) {
+  if (typeof href !== 'string' || !href) return false;
+  if (href.startsWith('mailto:') || href.startsWith('tel:')) return true;
+  let u;
+  try { u = new URL(href, SITE + '/'); } catch { return false; }
+  if (u.hash === '#contact' && SITE_HOSTS.has(u.hostname)) return true;
+  if (CONTACT_HOSTS.has(u.hostname)) return true;
+  return u.hostname.replace(/^www\./, '') === BOOKING.host && u.pathname.replace(/\/$/, '') === BOOKING.path;
+}
+
+// Text that follows an element in document order, walking up the ancestor
+// chain so a link nested in a closing block still sees what comes after that
+// block.
+//
+// contents() rather than nextAll(): nextAll returns element siblings only, so
+// a bare text node after the link is invisible to it — and the closing line in
+// .cta-line articles is exactly that, "…חינם" inside the link and
+// "ונראה מאיפה מתחילים." as a text node after it. Measured with nextAll,
+// every article reported zero trailing characters, which was the function
+// failing to see rather than the articles closing cleanly.
+function textAfter($, el, root) {
+  let out = '';
+  let node = el;
+  while (node.length && !node.is(root)) {
+    const siblings = node.parent().contents().toArray();
+    for (const s of siblings.slice(siblings.indexOf(node[0]) + 1)) out += ' ' + $(s).text();
+    node = node.parent();
+  }
+  return out;
+}
+// Set from the corpus rather than guessed: the largest trailing run in the
+// nine live articles is the closing half-sentence in .cta-line. A guessed 120
+// let a whole added paragraph through in testing.
+const MAX_TRAILING_AFTER_CTA = 40;
+
 // String.length counts UTF-16 code units. An emoji counts as two, and the
 // limits here are stated in characters someone can see.
 const segmenter = new Intl.Segmenter('he', { granularity: 'grapheme' });
@@ -82,10 +125,15 @@ for (const p of articlePaths) {
   const $ = load(pages.get(p));
   headingsByArticle.set(p, $('article.prose h2').map((_, el) => norm($(el).text())).get());
 }
-// "שאלות ותשובות" is shared by design. The CTA heading is shared too, but it
-// is identified by the block it lives in rather than by its shape — exempting
-// every heading that ends in "?" let two articles ship the same content
-// heading as long as it was phrased as a question.
+// "שאלות ותשובות" is shared by design and is the only heading that is.
+//
+// There was an exemption for the closing CTA heading too — first every
+// heading ending in "?", then every heading inside .post-cta. Measured
+// 2026-08-07: all seven CTA headings in the corpus are DIFFERENT from each
+// other. The exemption never protected anything, and each version of it was a
+// hole: the first let two articles ship the same question-form content
+// heading, the second would have exempted every heading in an article wrapped
+// in one container. Removed rather than narrowed.
 const SHARED_HEADINGS = new Set(['שאלות ותשובות']);
 
 for (const p of articlePaths) {
@@ -122,28 +170,21 @@ for (const p of articlePaths) {
   // collision check. Both are the same mistake: describing the markup instead
   // of the requirement.
   //
-  // What is asserted is the requirement: the last substantive block of the
-  // article offers a way to act. Tested by DESTINATION rather than by
-  // phrasing — the closing blocks are worded differently from each other and
-  // from the description's call to action, and what makes a close a close is
-  // that the reader can do something from it, not which verb it used.
-  const blocks = main.children().filter((_, el) => $(el).text().trim().length > 0);
-  const closing = blocks.last();
-  const closesWithAsk = closing.length > 0 && closing.find('a').toArray().some((el) => {
-    const href = $(el).attr('href') ?? '';
-    return /#contact\b/.test(href) || /(^|\/\/)(www\.)?(digitizer\.li|wa\.me)\b/.test(href) ||
-      href.startsWith('mailto:') || href.startsWith('tel:');
-  });
-  if (!closesWithAsk) {
-    const where = closing.length
-      ? `${closing.prop('tagName')}${closing.attr('class') ? '.' + closing.attr('class') : ''}`
-      : 'the article has no content';
-    flag(p, `the article does not end with a way to get in touch (last block: ${where})`);
+  // What is asserted is the requirement: the reader can act at the point they
+  // stop reading. Tested as "the last actionable link has almost nothing after
+  // it" rather than "the last child element contains one", because an article
+  // wrapped in a single container has exactly one child and any link anywhere
+  // inside it would satisfy that. Position is the whole requirement, so
+  // position is what is measured.
+  const actionable = main.find('a[href]').toArray().filter((el) => isContactHref($(el).attr('href')));
+  if (!actionable.length) {
+    flag(p, 'the article has no way to get in touch');
+  } else {
+    const trailing = norm(textAfter($, $(actionable[actionable.length - 1]), main));
+    if (trailing.length > MAX_TRAILING_AFTER_CTA) {
+      flag(p, `${trailing.length} characters of content follow the last way to get in touch — it does not close the article`);
+    }
   }
-  // Headings inside that closing block are shared across articles on purpose,
-  // and are exempt from the cannibalisation check below. A closing block with
-  // no heading leaves the set empty — which only makes the check stricter.
-  const ctaHeadings = new Set(closing.find('h2').map((_, el) => norm($(el).text())).get());
   const forbidden = h2s.filter((h) => FORBIDDEN_HEADINGS.has(h));
   if (forbidden.length) flag(p, `heading "${forbidden[0]}" is not permitted as a section`);
 
@@ -213,7 +254,7 @@ for (const p of articlePaths) {
   // Both sides are normalised, so an invisible RLM or a doubled space cannot
   // make two headings that render identically compare as different.
   for (const h of h2s) {
-    if (SHARED_HEADINGS.has(h) || ctaHeadings.has(h)) continue;
+    if (SHARED_HEADINGS.has(h)) continue;
     for (const [other, otherHeadings] of headingsByArticle) {
       if (other === p) continue;
       if (otherHeadings.includes(h)) flag(p, `h2 "${h}" also appears on ${other}`);

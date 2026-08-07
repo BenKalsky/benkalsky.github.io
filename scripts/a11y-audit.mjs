@@ -47,9 +47,35 @@ const server = createServer(async (req, res) => {
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const origin = `http://127.0.0.1:${server.address().port}`;
 
+// Checks axe could not decide, that a human has decided instead. Each was
+// measured on 2026-08-07, when reporting `incomplete` was added and turned out
+// to have been discarding a serious-impact check on every page since the gate
+// was written. All are colour contrast, and all pass:
+//
+//   #consent-desc   #F7F6F2 on #12130F  = 17.25:1
+//   .h1-mark        #12130F on #E8FF52  = 16.75:1
+//   .stars          #12130F on #E8FF52  = 16.75:1
+//
+// AA asks 4.5:1. Axe cannot decide them because the elements sit over a
+// backdrop it will not resolve, not because the contrast is marginal.
+//
+// This is an allowlist, not a filter: anything NOT on it fails. Printing the
+// list and passing regardless was the previous version, and it would have let
+// a new unresolved check hide inside a green build — nobody reads a passing
+// log. Adding an entry here is a deliberate act that says someone measured it.
+const REVIEWED = new Set([
+  'color-contrast #consent-desc',
+  'color-contrast .h1-mark',
+  'color-contrast li:nth-child(1) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
+  'color-contrast li:nth-child(2) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
+  'color-contrast li:nth-child(3) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
+  'color-contrast li:nth-child(4) > figure > .stars[role="img"][aria-label="חמישה כוכבים"]',
+]);
+
 const browser = await chromium.launch();
 let failed = false;
 const needsReview = [];
+const unreviewed = [];
 
 try {
   const page = await browser.newPage();
@@ -96,6 +122,11 @@ try {
     // gate that hides the question is worse than one that asks it.
     if (incomplete.length) {
       needsReview.push({ route, incomplete });
+      for (const i of incomplete) {
+        for (const n of i.nodes) {
+          if (!REVIEWED.has(`${i.id} ${n}`)) unreviewed.push(`${route} — ${i.id} on ${n}`);
+        }
+      }
     }
   }
 } finally {
@@ -111,21 +142,17 @@ if (needsReview.length) {
       for (const n of i.nodes) console.log(`      ${n}`);
     }
   }
-  console.log('These are not failures. They are the checks a human still has to make.');
-  // Made once, 2026-08-07, when this reporting was added and turned out to
-  // have been discarding a serious-impact check on every page since the gate
-  // was written. All of them are color-contrast, and all of them measure fine:
-  //
-  //   #consent-desc   #F7F6F2 on #12130F  = 17.25:1
-  //   .h1-mark        #12130F on #E8FF52  = 16.75:1
-  //   .stars          #12130F on #E8FF52  = 16.75:1
-  //
-  // AA asks 4.5:1 for body text. Axe cannot decide these because the elements
-  // sit over a backdrop it will not resolve, not because the contrast is
-  // marginal. Recorded here so the next person does not measure them again —
-  // and left in the output rather than filtered, because a filter is how the
-  // next undecidable check would disappear too.
-  console.log('Every current entry was measured on 2026-08-07 and passes; see the note in this file.');
+  console.log('Each of these is on the reviewed list in this file, or the run fails below.');
+}
+if (unreviewed.length) {
+  failed = true;
+  console.error(`\n${unreviewed.length} unresolved check(s) that nobody has measured:`);
+  for (const u of unreviewed) console.error('  \u2717 ' + u);
+  console.error(
+    'Measure each, then add "<rule-id> <selector>" to REVIEWED at the top of this file.\n' +
+    'Printing them and passing anyway is what hid a serious-impact contrast check on\n' +
+    'every page for as long as this gate has existed.'
+  );
 }
 if (failed) process.exit(1);
 console.log(`\naxe clean: ${pages.length} pages, no violations${needsReview.length ? `, ${needsReview.length} page(s) with checks needing review` : ''}`);

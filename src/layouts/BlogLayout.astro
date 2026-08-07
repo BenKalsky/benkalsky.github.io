@@ -757,12 +757,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       //
       // Appended as visually hidden text rather than set as an aria-label: a
       // label would replace the link's own accessible name, and several of
-      // these links are the CTA copy itself. Guarded so a second pass, or a
-      // link that already says it, cannot repeat the announcement.
-      if (!a.querySelector('.sr-only-newtab')) {
+      // these links are the CTA copy itself.
+      //
+      // Unless the link already HAS an aria-label — the floating WhatsApp
+      // button does. There the label IS the accessible name and a hidden
+      // descendant is not read at all, so the announcement has to go into the
+      // label or it does not happen. Both paths are guarded so a second pass
+      // cannot repeat it.
+      var NOTE = ' (נפתח בלשונית חדשה)';
+      var label = a.getAttribute('aria-label');
+      if (label) {
+        if (label.indexOf(NOTE) === -1) a.setAttribute('aria-label', label + NOTE);
+      } else if (!a.querySelector('.sr-only-newtab')) {
         var note = document.createElement('span');
         note.className = 'sr-only sr-only-newtab';
-        note.textContent = ' (נפתח בלשונית חדשה)';
+        note.textContent = NOTE;
         a.appendChild(note);
       }
     }

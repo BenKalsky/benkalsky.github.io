@@ -1388,11 +1388,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       // noopener and not noreferrer — see the layout for why.
       a.relList.add('noopener');
       // WCAG 3.2.5. Kept in step with src/layouts/BlogLayout.astro, where the
-      // reasoning for hidden text over an aria-label is written out.
-      if (!a.querySelector('.sr-only-newtab')) {
+      // reasoning for hidden text over an aria-label — and for the one case
+      // that has to go the other way — is written out.
+      var NOTE = ' (נפתח בלשונית חדשה)';
+      var label = a.getAttribute('aria-label');
+      if (label) {
+        if (label.indexOf(NOTE) === -1) a.setAttribute('aria-label', label + NOTE);
+      } else if (!a.querySelector('.sr-only-newtab')) {
         var note = document.createElement('span');
         note.className = 'sr-only sr-only-newtab';
-        note.textContent = ' (נפתח בלשונית חדשה)';
+        note.textContent = NOTE;
         a.appendChild(note);
       }
     }
