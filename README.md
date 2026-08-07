@@ -37,7 +37,9 @@ cmp dist/index.html public/index.html   # must be silent
 
 **It applies to `/api` as well, and there is no per-path override.** A request to `/api/contact` is 308-redirected to `/api/contact/`. That matters more than it looks: browsers do not follow redirects on a CORS preflight, so a cross-origin form posting to the unslashed path fails outright rather than degrading.
 
-**Always call the API at `/api/contact/`, with the slash.** Verified against a real deployment: the slashed path returns 204 on preflight, 200 on the honeypot path, 400 on validation failure and 403 on a disallowed origin, while every one of those returns 308 without the slash.
+**Always call the API at `/api/contact/`, with the slash.** Verified against a real deployment: the slashed path returns 200 on the honeypot path, 400 on validation failure and 403 on a disallowed origin, while every one of those returns 308 without the slash.
+
+**`OPTIONS` returns 405, not 204.** The explicit preflight branch was removed with the CORS layer when the site and the function moved into one deployment: the form is same-origin, so it never sends a preflight, and a cross-origin caller gets no `Access-Control-Allow-Origin` back and fails in the browser whatever the status. This line existed as `204` for a while after that stopped being true — the endpoint had changed and its written contract had not.
 
 The function accepts one origin, `https://www.benkalsky.co.il`. Browsers do send `Origin` on a same-origin POST — verified on both Chromium and WebKit, so Safari is covered — which is what makes a one-constant check sufficient after the CORS layer was removed.
 

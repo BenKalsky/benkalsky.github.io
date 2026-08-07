@@ -589,13 +589,17 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
     width: 58px;
     height: 58px;
     border-radius: 50%;
-    background: #25D366;
+    /* WhatsApp's own dark teal, not its light green. White on #25D366 is
+       1.98:1 and WCAG 1.4.11 asks 3:1 of the graphics that identify a
+       control; on #128C7E it is 4.14:1, and the button still reads as
+       WhatsApp because this is one of their brand colours too. */
+    background: #128C7E;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 6px 20px rgba(18, 19, 15, .28);
   }
-  .wa-float:hover { background: #1EBE5A; }
+  .wa-float:hover { background: #0E6F64; }
   .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 
   /* ---------- consent banner ---------- */
@@ -740,9 +744,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   (function () {
     var links = document.querySelectorAll('a[href^="http"]');
     for (var i = 0; i < links.length; i++) {
-      if (links[i].hostname !== location.hostname) {
-        links[i].target = '_blank';
-        links[i].relList.add('noopener');
+      var a = links[i];
+      if (a.hostname === location.hostname) continue;
+      a.target = '_blank';
+      // noopener and not noreferrer. noopener is what closes the security
+      // hole — it stops the destination reaching back through window.opener.
+      // noreferrer additionally strips the Referer header, which would make
+      // every click that leaves this site arrive at digitizer.co.il, LinkedIn
+      // or GitHub as direct traffic. That is measurement thrown away for no
+      // security gain.
+      a.relList.add('noopener');
+      // WCAG 3.2.5: opening a new browsing context is a change of context, and
+      // screen readers do not announce target="_blank" consistently — so
+      // without this a keyboard or screen-reader user lands somewhere new with
+      // no warning and no back button.
+      //
+      // Appended as visually hidden text rather than set as an aria-label: a
+      // label would replace the link's own accessible name, and several of
+      // these links are the CTA copy itself.
+      //
+      // Unless the link already HAS an aria-label — the floating WhatsApp
+      // button does. There the label IS the accessible name and a hidden
+      // descendant is not read at all, so the announcement has to go into the
+      // label or it does not happen. Both paths are guarded so a second pass
+      // cannot repeat it.
+      var NOTE = ' (נפתח בלשונית חדשה)';
+      var label = a.getAttribute('aria-label');
+      if (label) {
+        if (label.indexOf(NOTE) === -1) a.setAttribute('aria-label', label + NOTE);
+      } else if (!a.querySelector('.sr-only-newtab')) {
+        var note = document.createElement('span');
+        note.className = 'sr-only sr-only-newtab';
+        note.textContent = NOTE;
+        a.appendChild(note);
       }
     }
   })();

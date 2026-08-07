@@ -33,14 +33,29 @@
     margin: 0;
     text-align: center;
   }
-  b { font-size: 4rem; display: block; color: #6C4BC8; }
+  /* An h1 rather than a bare <b>: the page had no heading and no landmark at
+     all, so axe could not decide whether repeated blocks could be bypassed
+     and the check was reported as unresolved. Styled to look exactly as it
+     did. */
+  h1 { font-size: 4rem; display: block; color: #6C4BC8; margin: 0 0 .25rem; font-weight: 700; }
   a { color: #6C4BC8; }
+  /* Same skip-link contract as every other page. This was the one deployed
+     document without it, so a missing route was the only place the advertised
+     keyboard shortcut did not exist. */
+  .skip-link {
+    position: absolute; top: -100px; inset-inline-start: 12px;
+    background: #201743; color: #F6F4FA; padding: 10px 16px;
+    border-radius: 8px; z-index: 100; transition: top .15s;
+  }
+  .skip-link:focus, .skip-link:focus-visible { top: 12px; }
+  main:focus { outline: none; }
 </style>
 </head>
 <body>
-  <div>
-    <b>404</b>
+  <a class="skip-link" href="#main-content">דילוג לתוכן הראשי</a>
+  <main id="main-content" tabindex="-1">
+    <h1>404</h1>
     <p>הדף הזה לא כאן. <a href="/">חזרה לעמוד הראשי</a></p>
-  </div>
+  </main>
 </body>
 </html>

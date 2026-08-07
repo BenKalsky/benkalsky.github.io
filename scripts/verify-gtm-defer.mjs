@@ -28,16 +28,24 @@ const fail = [];
 // polluting the live GA4 property with localhost traffic every time it runs.
 // googletagmanager.com is deliberately left reachable: the container has to
 // actually load for the dataLayer assertions to mean anything.
-async function blockCollect(page) {
-  await page.route('**://*.google-analytics.com/**', (r) => r.abort());
-  await page.route('**://analytics.google.com/**', (r) => r.abort());
-  await page.route('**/g/collect*', (r) => r.abort());
+//
+// Installed on the CONTEXT, not on the page. Page routes cover only the page
+// they were installed on, and the CTA this script clicks is a target="_blank"
+// link to digitizer.li — the click opens a second page in the same context,
+// and that page was sending analytics for the three seconds the script then
+// waited. Same defect as the interaction context having no blocking at all,
+// one level further out: a route that covers the page you thought of and not
+// the one the click creates.
+async function blockCollect(ctx) {
+  await ctx.route('**://*.google-analytics.com/**', (r) => r.abort());
+  await ctx.route('**://analytics.google.com/**', (r) => r.abort());
+  await ctx.route('**/g/collect*', (r) => r.abort());
 }
 try {
   for (const target of ['/', '/blog/mcp/']) {
     const ctx = await browser.newContext();
+    await blockCollect(ctx);
     const page = await ctx.newPage();
-    await blockCollect(page);
     const gtm = [];
     const collect = [];
     page.on('request', (r) => {
@@ -71,7 +79,13 @@ try {
 
   // Interaction path: a click must load GTM immediately, well before idle.
   const ctx = await browser.newContext();
+  await blockCollect(ctx);
   const page = await ctx.newPage();
+  // This block ran without blockCollect until 2026-08-07. Every run of
+  // verify:tracking therefore sent a real pageview AND a real CTA conversion
+  // from localhost into the live GA4 property, while the script's own PASS
+  // line said outbound hits were blocked. The two idle-path contexts above
+  // always had it; this one was simply missed.
   let gtmAt = null;
   const collect = [];
   page.on('request', (r) => {
@@ -103,11 +117,21 @@ try {
     if (target !== '_blank') {
       fail.push(`interaction: CTA is target="${target}" — an early click would unload the page before the queued event is processed`);
     }
+    // Snapshot before the click. GTM's automatic pageview has already put a
+    // hit in `collect` by now, so asserting on the total afterwards passes
+    // even when the CTA handler or the conversion tag is broken — and the
+    // `events` filter was computed and then never checked at all.
+    const before = collect.length;
     await cta.click();
     await page.waitForTimeout(3000);
-    const events = collect.filter((u) => /en=|ep\.|whatsapp|schedule|cta/.test(u));
-    console.log(`CTA hits captured: ${collect.length} (event-bearing: ${events.length})`);
-    if (!collect.length) fail.push('interaction: CTA click produced no GA4 hit');
+    const after = collect.slice(before);
+    const events = after.filter((u) => /whatsapp_click|schedule_click/.test(u));
+    console.log(`CTA hits after the click: ${after.length} (naming the CTA event: ${events.length})`);
+    if (!after.length) {
+      fail.push('interaction: CTA click produced no GA4 hit');
+    } else if (!events.length) {
+      fail.push(`interaction: ${after.length} hit(s) after the CTA click but none carried whatsapp_click or schedule_click`);
+    }
   } else {
     fail.push('interaction: no [data-cta-loc] element found');
   }
