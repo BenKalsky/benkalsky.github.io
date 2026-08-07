@@ -1382,9 +1382,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   (function () {
     var links = document.querySelectorAll('a[href^="http"]');
     for (var i = 0; i < links.length; i++) {
-      if (links[i].hostname !== location.hostname) {
-        links[i].target = '_blank';
-        links[i].relList.add('noopener');
+      var a = links[i];
+      if (a.hostname === location.hostname) continue;
+      a.target = '_blank';
+      a.relList.add('noopener');
+      // WCAG 3.2.5. Kept in step with src/layouts/BlogLayout.astro, where the
+      // reasoning for hidden text over an aria-label is written out.
+      if (!a.querySelector('.sr-only-newtab')) {
+        var note = document.createElement('span');
+        note.className = 'sr-only sr-only-newtab';
+        note.textContent = ' (נפתח בלשונית חדשה)';
+        a.appendChild(note);
       }
     }
   })();
