@@ -168,6 +168,41 @@ try {
       });
       return { violations: r.violations.map(shape), incomplete: r.incomplete.map(shape) };
     });
+    // WCAG 2.2.2, and the sentence the accessibility statement makes about it:
+    // continuous motion exists on the homepage only, and one control stops all
+    // of it. axe cannot check that — it does not know which button pauses what
+    // — and the statement was wrong once already, promising a pause for all
+    // moving content while the only control paused the logo strip and left the
+    // hero blob drifting. A claim only a measurement can keep true belongs in
+    // the gate that runs on every build, not in a comment.
+    //
+    // Runs after axe, because it clicks.
+    const motion = await page.evaluate(async () => {
+      const infinite = () => document.getAnimations()
+        .filter((a) => a.effect?.getTiming?.().iterations === Infinity);
+      const running = infinite();
+      if (!running.length) return { count: 0 };
+      const control = document.querySelector('[data-motion-pause]');
+      if (!control) return { count: running.length, control: false };
+      control.click();
+      // A class toggle repaints before the animation's playState settles.
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      const stillRunning = infinite().filter((a) => a.playState !== 'paused').length;
+      return { count: running.length, control: true, stillRunning };
+    });
+    if (motion.count && !motion.control) {
+      failed = true;
+      console.error(
+        `✗ ${route} — ${motion.count} animation(s) never end and the page has no ` +
+        `[data-motion-pause] control; the accessibility statement promises one`
+      );
+    } else if (motion.stillRunning) {
+      failed = true;
+      console.error(
+        `✗ ${route} — the pause control left ${motion.stillRunning} of ${motion.count} ` +
+        `endless animation(s) running; the control paused some of the motion, not all of it`
+      );
+    }
     if (violations.length) {
       failed = true;
       console.error(`✗ ${route}`);
