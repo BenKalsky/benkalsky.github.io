@@ -79,14 +79,24 @@ const AD_SYNC = /bing\.com/;
 // never actually ran; /flags/ is read-only and part of init. A CI run must
 // never write a fabricated session into the live project.
 //
-// KNOWN LIMIT, measured 2026-08-07: this abort has never fired. Thirty seconds
-// of scripted mouse movement, scrolling and clicking with recording confirmed
-// running produced zero requests to any of these paths. So the "nothing after
-// the revoke" assertion below proves no NEW upload was attempted — it does not
-// prove an already-buffered one was discarded, because nothing in this
-// environment ever gets far enough to flush. The privacy page is worded to
-// claim only the former. If a future run ever trips this abort, that assertion
-// becomes the stronger one it currently is not.
+// KNOWN LIMIT, measured 2026-08-07: this abort has never fired. Seventy
+// seconds of scripted activity with sessionRecordingStarted() true throughout
+// produced zero requests to any ingestion path, and so did an explicit
+// posthog.capture() with every POST to the proxy recorded before being
+// dropped. The library reports __loaded, the recorder reports started, the
+// config is ordinary (localStorage+cookie, batching on, not opted out) — and
+// nothing is ever sent.
+//
+// It is the harness, not the site: a real consented visit the same day
+// produced a 48-second replay and four event types in the live project. The
+// cause of the difference is not identified.
+//
+// What follows from that: the "nothing after the revoke" assertion below
+// proves no NEW upload was attempted. It does NOT prove an already-buffered
+// one was discarded, because nothing here ever gets far enough to flush. The
+// privacy page is worded to claim only the former. If a future run ever trips
+// this abort, that assertion becomes the stronger one it currently is not —
+// and this comment should be deleted rather than trusted.
 const UPLOAD = /\/\/t\.benkalsky\.co\.il\/(i|e|s)\//;
 
 const TYPES = {
