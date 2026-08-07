@@ -289,6 +289,22 @@ for (const p of articlePaths) {
     } else if (authorId !== personNode['@id']) {
       flag(p, `Article author ${authorId} does not resolve to the Person node ${personNode['@id']}`);
     }
+
+    // The publisher is the same kind of edge and was pointing somewhere else.
+    // Every article named Digitizer as publisher while /terms/ says the content
+    // belongs to the site owner and /privacy/ says the site is operated by Ben
+    // — structured data contradicting the site's own legal pages, on nine
+    // pages, for as long as the blog has existed. Ben's decision, 2026-08-08:
+    // he is the publisher. Enforced here so the next article cannot quietly
+    // reintroduce the other answer. Digitizer stays in the graph where it is
+    // true, as the Person's worksFor.
+    const pubRef = articleNode.publisher;
+    const publisherId = typeof pubRef === 'string' ? pubRef : pubRef?.['@id'];
+    if (!pubRef) {
+      flag(p, 'Article has no publisher');
+    } else if (publisherId !== personNode['@id']) {
+      flag(p, `Article publisher ${publisherId} is not the Person node ${personNode['@id']} — /terms/ gives the content to the site owner`);
+    }
   }
 
   // --- dates must agree, and both must be there ---
