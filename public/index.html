@@ -390,6 +390,12 @@
   }
   .marquee-group .star { color: var(--acid); }
   .marquee.paused .marquee-track { animation-play-state: paused; }
+  /* The control used to pause the marquee alone, while .hero-blob kept
+     drifting on a 10s infinite loop — and the accessibility statement claimed
+     a pause button for all moving content. Scoped to the document so the
+     claim is true. */
+  html.motion-paused .hero-blob,
+  html.motion-paused .marquee-track { animation-play-state: paused; }
   .marquee-toggle {
     position: absolute;
     inset-inline-end: 10px;
@@ -866,13 +872,17 @@
     width: 58px;
     height: 58px;
     border-radius: 50%;
-    background: #25D366;
+    /* WhatsApp's own dark teal, not its light green. White on #25D366 is
+       1.98:1 and WCAG 1.4.11 asks 3:1 of the graphics that identify a
+       control; on #128C7E it is 4.14:1, and the button still reads as
+       WhatsApp because this is one of their brand colours too. */
+    background: #128C7E;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 6px 20px rgba(18, 19, 15, .28);
   }
-  .wa-float:hover { background: #1EBE5A; }
+  .wa-float:hover { background: #0E6F64; }
   .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 
   /* ---------- consent banner ---------- */
@@ -969,7 +979,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </ul>
 
   <div class="marquee" id="marquee" dir="ltr">
-    <button type="button" class="marquee-toggle" id="marquee-toggle" aria-pressed="false" aria-label="השהיית התנועה בפס הלוגואים" lang="he">⏸</button>
+    <button type="button" class="marquee-toggle" id="marquee-toggle" aria-pressed="false" aria-label="השהיית התנועה בעמוד" lang="he">⏸</button>
     <p class="sr-only" lang="he" dir="rtl">בין החברות שבנינו עבורן: Reposify (נרכשה ע"י CrowdStrike), Deci (נרכשה ע"י NVIDIA), Balance, PractiTest</p>
     <div class="marquee-track" aria-hidden="true">
       <div class="marquee-group"><span>REPOSIFY → CROWDSTRIKE</span><span class="star">✳</span><span>DECI → NVIDIA</span><span class="star">✳</span><span>BALANCE</span><span class="star">✳</span><span>PRACTITEST</span><span class="star">✳</span></div>
@@ -1373,9 +1383,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     var toggle = document.getElementById('marquee-toggle');
     toggle.addEventListener('click', function () {
       var paused = mq.classList.toggle('paused');
+      // Also on the document, so the hero blob stops with it. The control was
+      // labelled and scoped for the logo strip alone while the accessibility
+      // statement promised a pause for all moving content.
+      document.documentElement.classList.toggle('motion-paused', paused);
       toggle.setAttribute('aria-pressed', String(paused));
       toggle.textContent = paused ? '▶' : '⏸';
-      toggle.setAttribute('aria-label', paused ? 'הפעלת התנועה בפס הלוגואים' : 'השהיית התנועה בפס הלוגואים');
+      toggle.setAttribute('aria-label', paused ? 'הפעלת התנועה בעמוד' : 'השהיית התנועה בעמוד');
     });
   })();
 

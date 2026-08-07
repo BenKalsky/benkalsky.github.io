@@ -88,6 +88,16 @@ function isContactHref(href) {
 // threshold worth setting. What "closes the article" means is that nothing
 // substantive comes after, and an element is substantive whether or not it
 // says anything.
+// Phrasing content, which the closing sentence is allowed to use. The rule is
+// about what comes after the article ends, and "<a>קבעו פגישה</a><strong>
+// ונראה מאיפה מתחילים</strong>" is the same closing line as the bare text node
+// the corpus happens to use today — the difference is a tag, not a section.
+// Everything outside this set counts, whether or not it says anything.
+const INLINE = new Set([
+  'a', 'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'dfn', 'em',
+  'i', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 'sub',
+  'sup', 'time', 'u', 'var', 'wbr',
+]);
 function contentAfter($, el, root) {
   let text = '';
   const els = [];
@@ -96,7 +106,7 @@ function contentAfter($, el, root) {
     const siblings = node.parent().contents().toArray();
     for (const s of siblings.slice(siblings.indexOf(node[0]) + 1)) {
       text += ' ' + $(s).text();
-      if (s.type === 'tag') els.push(s.name);
+      if (s.type === 'tag' && !INLINE.has(s.name)) els.push(s.name);
     }
     node = node.parent();
   }

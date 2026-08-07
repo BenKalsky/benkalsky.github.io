@@ -589,13 +589,17 @@ const canonicalURL = new URL(canonicalPath, 'https://www.benkalsky.co.il').href;
     width: 58px;
     height: 58px;
     border-radius: 50%;
-    background: #25D366;
+    /* WhatsApp's own dark teal, not its light green. White on #25D366 is
+       1.98:1 and WCAG 1.4.11 asks 3:1 of the graphics that identify a
+       control; on #128C7E it is 4.14:1, and the button still reads as
+       WhatsApp because this is one of their brand colours too. */
+    background: #128C7E;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 6px 20px rgba(18, 19, 15, .28);
   }
-  .wa-float:hover { background: #1EBE5A; }
+  .wa-float:hover { background: #0E6F64; }
   .wa-float svg { width: 30px; height: 30px; fill: #fff; }
 
   /* ---------- consent banner ---------- */

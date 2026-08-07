@@ -106,6 +106,18 @@ try {
     }
     await page.evaluate(axeSource);
     const { violations, incomplete } = await page.evaluate(async () => {
+      // Finish every finite animation first. The entrance animations are
+      // opacity fades, and networkidle does not wait for them — the first run
+      // of the compositing fingerprint caught one mid-flight at
+      // opacity: 0.988073, which would have made the key different on every
+      // run and the allowlist useless. Infinite animations (the logo marquee,
+      // the hero blob) are left alone: they never finish, and they do not
+      // change any measured colour.
+      for (const a of document.getAnimations()) {
+        try {
+          if (a.effect?.getTiming?.().iterations !== Infinity) a.finish();
+        } catch (e) { /* an animation that cannot be finished is left running */ }
+      }
       const r = await axe.run(document, {
         runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
       });
@@ -117,14 +129,29 @@ try {
       // carry a live element reference that does not survive being returned
       // out of the page, so reading it here produced "unknown" for every node
       // and the fingerprint would have been a constant.
+      // Compositing is part of the fingerprint, not just the two colours.
+      // Adding opacity to the element or any ancestor, or a background-image
+      // that keeps the same fallback colour, changes the pixels a browser
+      // actually paints while leaving color and backgroundColor identical —
+      // so an approval keyed on the pair alone would survive it.
       const colours = (selector) => {
         try {
           const el = document.querySelector(selector);
           if (!el) return 'not found';
           const cs = getComputedStyle(el);
           let node = el, bg = 'rgba(0, 0, 0, 0)';
-          while (node && bg === 'rgba(0, 0, 0, 0)') { bg = getComputedStyle(node).backgroundColor; node = node.parentElement; }
-          return `${cs.color} on ${bg}`;
+          const layers = [];
+          while (node) {
+            const ns = getComputedStyle(node);
+            if (ns.opacity !== '1') layers.push(`opacity:${ns.opacity}`);
+            if (ns.backgroundImage !== 'none') layers.push('bg-image');
+            if (ns.mixBlendMode !== 'normal') layers.push(`blend:${ns.mixBlendMode}`);
+            if (ns.filter !== 'none') layers.push('filter');
+            if (bg === 'rgba(0, 0, 0, 0)') bg = ns.backgroundColor;
+            node = node.parentElement;
+          }
+          const composite = layers.length ? ` +${[...new Set(layers)].sort().join('+')}` : '';
+          return `${cs.color} on ${bg}${composite}`;
         } catch (e) { return 'unreadable'; }
       };
       // No slice for the gate. Truncating to five before the allowlist ran
