@@ -1,6 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": true,
+  "env": {
+    "PUBLIC_POSTHOG_PROJECT_TOKEN": "phc_kF63LdcfrxwxybEhZkVs8ucrha4H6q8hnimZMB9UinfN",
+    "PUBLIC_POSTHOG_HOST": "https://eu.i.posthog.com"
+  },
   "headers": [
     {
       "source": "/(.*)",
