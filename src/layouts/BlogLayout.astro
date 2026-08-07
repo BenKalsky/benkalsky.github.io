@@ -743,6 +743,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       var a = links[i];
       if (a.hostname === location.hostname) continue;
       a.target = '_blank';
+      // noopener and not noreferrer. noopener is what closes the security
+      // hole — it stops the destination reaching back through window.opener.
+      // noreferrer additionally strips the Referer header, which would make
+      // every click that leaves this site arrive at digitizer.co.il, LinkedIn
+      // or GitHub as direct traffic. That is measurement thrown away for no
+      // security gain.
       a.relList.add('noopener');
       // WCAG 3.2.5: opening a new browsing context is a change of context, and
       // screen readers do not announce target="_blank" consistently — so

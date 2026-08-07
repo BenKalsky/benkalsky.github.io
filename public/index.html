@@ -1385,6 +1385,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       var a = links[i];
       if (a.hostname === location.hostname) continue;
       a.target = '_blank';
+      // noopener and not noreferrer — see the layout for why.
       a.relList.add('noopener');
       // WCAG 3.2.5. Kept in step with src/layouts/BlogLayout.astro, where the
       // reasoning for hidden text over an aria-label is written out.
