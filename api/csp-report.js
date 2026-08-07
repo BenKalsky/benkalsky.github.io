@@ -35,24 +35,41 @@ const isRecord = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
 // A directive plus the blocked URI's origin is enough to identify a
 // violation. The full URI can carry a path and query, which on a page with a
 // query string can carry whatever was in it — none of which is needed here.
+// Nothing this function returns may be unbounded. Node's URL parser accepts a
+// hostname of any length and .origin preserves all of it, so a single report
+// carrying "https://" plus a megabyte of host would put a megabyte through
+// JSON.stringify and into the log. The caps count lines, not bytes.
+//
+// A real origin is well under this. Anything longer is not a site, so the
+// value is dropped rather than truncated — a truncated one is still a
+// hundred characters an attacker chose.
+const MAX_ORIGIN_LEN = 100;
+const MAX_SCHEME_LEN = 20;
+
 function safeOrigin(uri) {
   if (typeof uri !== 'string' || !uri) return '(none)';
+  // Bound the input before the parser sees it, not just the output.
+  if (uri.length > 4096) return '(oversized)';
   // Scheme matching is case-insensitive per RFC 3986 §3.1. An earlier version
   // tested startsWith('http'), so "HTTPS://host/path?token=..." missed the URL
   // branch and fell through to a raw 40-character slice with its path and
   // query intact — the one thing this function exists to prevent.
   if (/^https?:/i.test(uri)) {
+    let origin;
     try {
-      return new URL(uri).origin;
+      origin = new URL(uri).origin;
     } catch {
       return '(unparseable)';
     }
+    return origin.length > MAX_ORIGIN_LEN ? '(oversized)' : origin;
   }
   // Anything else is either a CSP keyword ('inline', 'eval', 'data') or a
   // scheme this site does not speak, most often a browser extension. The
   // scheme alone carries the signal; the rest is an attacker-chosen string.
   const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(uri);
-  if (scheme) return scheme[1].toLowerCase() + ':';
+  if (scheme) {
+    return scheme[1].length > MAX_SCHEME_LEN ? '(oversized)' : scheme[1].toLowerCase() + ':';
+  }
   return /^[a-z-]{1,20}$/.test(uri) ? uri : '(other)';
 }
 
@@ -61,11 +78,20 @@ function safeOrigin(uri) {
 // calling it a directive is safe from injection but still puts a value they
 // chose in the directive field of a log a human reads.
 //
-// The trade-off is deliberate: a directive added to the spec after this list
-// logs as (unknown) until someone adds it. The -src family is matched by shape
-// so the common case of a new fetch directive still carries its name, and a
-// mislabelled line beats an attacker-labelled one either way.
+// An earlier version accepted anything ending in -src so that a directive
+// added to the spec later would still carry its name. That is a hole by
+// construction: "password-leaked-src" matches the shape and reads as a
+// genuine browser finding. The list is exhaustive instead, and the cost is
+// stated rather than avoided — a directive added to the spec logs as
+// (unknown) until someone adds it here, which is a line that says less
+// rather than a line that lies.
 const DIRECTIVES = new Set([
+  // fetch directives
+  'child-src', 'connect-src', 'default-src', 'fenced-frame-src', 'font-src',
+  'frame-src', 'img-src', 'manifest-src', 'media-src', 'object-src',
+  'prefetch-src', 'script-src', 'script-src-attr', 'script-src-elem',
+  'style-src', 'style-src-attr', 'style-src-elem', 'worker-src',
+  // document, navigation and reporting directives
   'base-uri', 'block-all-mixed-content', 'form-action', 'frame-ancestors',
   'navigate-to', 'report-to', 'report-uri', 'require-trusted-types-for',
   'sandbox', 'trusted-types', 'upgrade-insecure-requests',
@@ -77,8 +103,7 @@ const DIRECTIVES = new Set([
 function safeDirective(v) {
   if (typeof v !== 'string') return '(unknown)';
   const name = v.trim().split(/\s+/)[0];
-  if (DIRECTIVES.has(name)) return name;
-  return /^[a-z][a-z0-9-]{0,30}-src(-elem|-attr)?$/.test(name) ? name : '(unknown)';
+  return DIRECTIVES.has(name) ? name : '(unknown)';
 }
 
 // Two values, fixed by the spec. Anything else is not a disposition.

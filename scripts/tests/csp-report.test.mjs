@@ -72,12 +72,6 @@ test('the directive is drawn from a closed vocabulary, not copied through', () =
     call({ 'csp-report': { 'violated-directive': "script-src 'self' 'unsafe-inline'" } }).reports[0].directive,
     'script-src'
   );
-  // A directive the spec adds later still carries its name if it is a fetch
-  // directive, which is the shape almost every new one takes.
-  assert.equal(
-    call({ 'csp-report': { 'effective-directive': 'fenced-frame-src' } }).reports[0].directive,
-    'fenced-frame-src'
-  );
   // A log-injection attempt, a plausible-looking token that is not a
   // directive, and a nested object.
   assert.equal(
@@ -86,6 +80,12 @@ test('the directive is drawn from a closed vocabulary, not copied through', () =
   );
   assert.equal(
     call({ 'csp-report': { 'effective-directive': 'benkalsky' } }).reports[0].directive,
+    '(unknown)'
+  );
+  // Matching the -src shape rather than the vocabulary let an attacker write
+  // a line that reads as a genuine browser finding.
+  assert.equal(
+    call({ 'csp-report': { 'effective-directive': 'password-leaked-src' } }).reports[0].directive,
     '(unknown)'
   );
   assert.equal(
@@ -118,6 +118,24 @@ test('a batch cannot outrun the log cap by carrying its reports in one request',
   const { status, reports } = call(huge);
   assert.equal(status, 204);
   assert.ok(reports.length <= 10, `emitted ${reports.length} reports from one request`);
+});
+
+test('an unbounded origin never reaches the log', () => {
+  // Node's URL parser accepts a hostname of any length and .origin keeps all
+  // of it, so the line caps bound how many lines are written and nothing at
+  // all about how large one can be.
+  const host = 'a'.repeat(200000);
+  const { lines, reports } = call({
+    'csp-report': { 'blocked-uri': `https://${host}/`, 'document-uri': `https://${host}.example/` },
+  });
+  assert.equal(reports[0].blocked, '(oversized)');
+  assert.equal(reports[0].onPage, '(oversized)');
+  for (const l of lines) assert.ok(l.length < 500, `log line was ${l.length} bytes`);
+});
+
+test('an unbounded scheme never reaches the log either', () => {
+  const { reports } = call({ 'csp-report': { 'blocked-uri': 'x'.repeat(50000) + '://y' } });
+  assert.equal(reports[0].blocked, '(oversized)');
 });
 
 test('a non-POST is rejected without logging anything', () => {
