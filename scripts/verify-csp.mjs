@@ -46,13 +46,16 @@ if (enforced[0].value !== CSP) {
   console.error('csp.json and vercel.json disagree. Production serves:\n  ' + enforced[0].value);
   process.exit(1);
 }
+// Report-Only alongside an enforced policy is the standard way to trial a
+// stricter one, and it changes nothing about what this script exercises.
+// Rejecting it outright would have failed a normal CSP rollout. What is worth
+// saying is that it is not proven here.
 if (reportOnly.length) {
-  console.error(
-    `vercel.json also serves ${reportOnly.length} Content-Security-Policy-Report-Only header(s), on: ` +
+  console.log(
+    `Note: ${reportOnly.length} Content-Security-Policy-Report-Only header(s) on ` +
     reportOnly.map((h) => h.source).join(', ') +
-    '\nNothing here proves that policy, and a policy left in report-only mode is usually one someone meant to enforce.'
+    ' — not exercised by this script, which proves the enforced policy only.'
   );
-  process.exit(1);
 }
 
 const TYPES = {
@@ -206,20 +209,41 @@ if (violations.length) {
   process.exit(1);
 }
 // A page where the container never ran exercised no third-party code at all,
-// so "no violations" there is a statement about nothing. Reported rather than
-// swallowed, but not failed: the usual cause is a runner with no network, and
-// turning that into a red build teaches people to ignore the red.
-if (unreachable.length) {
-  console.error(
-    `\n${unreachable.length} page(s) where the GTM container never became ready within ${GTM_TIMEOUT_MS / 1000}s: ` +
-    unreachable.join(', ') +
-    '\nNo third-party code ran on them, so their clean result covers first-party requests only.'
+// so "no violations" there is a statement about nothing.
+//
+// An earlier version of this only logged it, on the reasoning that a runner
+// with no network is the usual cause and a red build teaches people to ignore
+// the red. That has it backwards: no network is exactly when this gate tests
+// none of the third-party policy, and reporting clean then is the failure mode
+// worth preventing. It fails.
+//
+// /404.html is exempt because it genuinely carries no container — it is a
+// hand-written file in public/ with no GTM and no consent banner. Naming it
+// here rather than tolerating a class of silence means the day it gains
+// tracking, or another page loses it, the list stops matching and someone
+// looks.
+const NO_CONTAINER_EXPECTED = new Set(['/404.html']);
+const silent = unreachable.filter((p) => !NO_CONTAINER_EXPECTED.has(p));
+const expectedSilent = unreachable.filter((p) => NO_CONTAINER_EXPECTED.has(p));
+
+if (expectedSilent.length) {
+  console.log(
+    `\nNo container by design, not exercised: ${expectedSilent.join(', ')}`
   );
+}
+if (silent.length) {
+  console.error(
+    `\n${silent.length} page(s) where the GTM container never became ready within ${GTM_TIMEOUT_MS / 1000}s: ` +
+    silent.join(', ') +
+    '\nNo third-party code ran on them, so this run tested none of the policy that exists for third parties.' +
+    '\nA network-less runner is the usual cause, and it is precisely the case where a clean result means nothing.'
+  );
+  process.exit(1);
 }
 if (EXPECTED.length) {
   console.log('\nIntentionally blocked, documented in csp.json:');
   for (const e of EXPECTED) console.log(`  - ${e.pattern}`);
 }
 console.log(
-  `\nCSP clean: ${pages.length - unreachable.length} of ${pages.length} pages fully exercised, no unexpected violations.`
+  `\nCSP clean: ${pages.length - expectedSilent.length} of ${pages.length} pages fully exercised, no unexpected violations.`
 );
