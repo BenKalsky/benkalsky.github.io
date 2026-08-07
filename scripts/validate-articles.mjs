@@ -13,6 +13,10 @@ import { load } from 'cheerio';
 
 const DIST = path.resolve(process.cwd(), 'dist');
 const SITE = 'https://www.benkalsky.co.il';
+// The site owner's node, by ID. Ben decided on 2026-08-08 that he is the
+// publisher, which is what /terms/ and /privacy/ have always said, and this
+// is the identity both the author and the publisher edge must resolve to.
+const BEN_ID = `${SITE}/#ben`;
 
 const LIMITS = {
   titleMin: 50, titleMax: 60,
@@ -298,12 +302,22 @@ for (const p of articlePaths) {
     // he is the publisher. Enforced here so the next article cannot quietly
     // reintroduce the other answer. Digitizer stays in the graph where it is
     // true, as the Person's worksFor.
+    //
+    // Compared against the stable ID and not against whichever Person node the
+    // graph happens to contain. An article that defines a different Person and
+    // points both author and publisher at it satisfies "publisher matches the
+    // Person node" completely — the invariant is that the publisher is Ben,
+    // not that the graph is internally tidy. The Person node is checked against
+    // the same ID for the same reason.
     const pubRef = articleNode.publisher;
     const publisherId = typeof pubRef === 'string' ? pubRef : pubRef?.['@id'];
     if (!pubRef) {
       flag(p, 'Article has no publisher');
-    } else if (publisherId !== personNode['@id']) {
-      flag(p, `Article publisher ${publisherId} is not the Person node ${personNode['@id']} — /terms/ gives the content to the site owner`);
+    } else if (publisherId !== BEN_ID) {
+      flag(p, `Article publisher ${publisherId} is not ${BEN_ID} — /terms/ gives the content to the site owner`);
+    }
+    if (personNode['@id'] !== BEN_ID) {
+      flag(p, `the Person node is ${personNode['@id']}, not ${BEN_ID}`);
     }
   }
 
@@ -315,6 +329,17 @@ for (const p of articlePaths) {
   if (!visible) flag(p, 'no visible <time datetime> in the article');
   if (articleNode?.datePublished && visible && articleNode.datePublished !== visible) {
     flag(p, `visible date ${visible} disagrees with schema datePublished ${articleNode.datePublished}`);
+  }
+  // dateModified was mapped to datePublished, so every article told crawlers it
+  // had never been touched — including the nine revised on 2026-08-08 to
+  // correct claims that were not true. A modification date that cannot move is
+  // not a modification date. It may equal datePublished, and it may not precede
+  // it.
+  const modified = articleNode?.dateModified;
+  if (!modified) {
+    flag(p, 'Article has no dateModified');
+  } else if (articleNode.datePublished && modified < articleNode.datePublished) {
+    flag(p, `dateModified ${modified} precedes datePublished ${articleNode.datePublished}`);
   }
 
   // --- internal links must resolve ---
