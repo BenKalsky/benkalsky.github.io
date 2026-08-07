@@ -62,6 +62,10 @@ const EXERCISE_MS = 4000;
 // withdrawal lands while the grant is still queued. The watch that follows is
 // anchored to the container arriving rather than to a fixed window.
 const CONTAINER_DELAY_MS = 5000;
+// How long the page is watched for a recorder object AFTER the pre-consent
+// activity. The silence window above ends before that activity runs, so this
+// is the only window that covers an initialisation the activity itself caused.
+const SETTLE_MS = 5000;
 
 // The recorder reaches PostHog through a first-party reverse proxy, so it
 // cannot be matched by vendor name — not having the vendor's name in the
@@ -260,7 +264,18 @@ for (const page of PAGES) {
   // flush when consent arrives. If a future design loads the library and
   // configures it not to record, this fails, and it should — that design needs
   // an assertion about its buffer, which this one cannot make.
-  const recorderPresent = await d.tab.evaluate(() => typeof window.posthog !== 'undefined');
+  //
+  // Polled for a window rather than sampled once. The silence window above
+  // expires BEFORE this activity happens, so a single read taken straight
+  // afterwards races an asynchronous initialisation that the activity itself
+  // triggered: a tag fired on the interaction would still be loading, the read
+  // would see undefined, and the accept-side wait a moment later would find the
+  // recorder already starting and credit it to consent. This resolves the
+  // moment the object appears at any point in the window, which is the same
+  // question asked over time instead of at one instant.
+  const recorderPresent = await d.tab
+    .waitForFunction(() => typeof window.posthog !== 'undefined', null, { timeout: SETTLE_MS })
+    .then(() => true, () => false);
   const denied = d.seen.map((s) => s.url);
   const deniedCsp = await cspOf(d.tab);
 
