@@ -170,6 +170,25 @@ for (const p of articlePaths) {
 // in one container. Removed rather than narrowed.
 const SHARED_HEADINGS = new Set(['שאלות ותשובות']);
 
+// The head phrase of a <title>: everything before the first punctuation that
+// separates the claim from its elaboration. That leading phrase is what a
+// search result leads with and what the page is asking to own.
+//
+// Two live articles led with the same one — /blog/ai-agents/ and
+// /blog/build-ai-agent/ both opened "סוכן AI לעסק:" — while only the second
+// has that string assigned to it in the registry. The h2 collision check
+// could not see it, because it never looked at titles, and the pair shipped
+// on 2026-08-02 and 06.08 without anything complaining.
+//
+// The corpus splits on a mix of ":", "?" and "," today, which is why all four
+// are separators here rather than a single one: keying on ":" alone would
+// compare whole titles for four of the nine articles and never collide.
+const headPhrase = (title) => norm(title.split('|')[0].split(/[:?,]/)[0]);
+const titlesByArticle = new Map();
+for (const p of articlePaths) {
+  titlesByArticle.set(p, headPhrase(load(pages.get(p))('head > title').text()));
+}
+
 for (const p of articlePaths) {
   const html = pages.get(p);
   const $ = load(html);
@@ -296,6 +315,15 @@ for (const p of articlePaths) {
     for (const [other, otherHeadings] of headingsByArticle) {
       if (other === p) continue;
       if (otherHeadings.includes(h)) flag(p, `h2 "${h}" also appears on ${other}`);
+    }
+  }
+
+  // --- cannibalisation: two titles may not lead with the same phrase ---
+  const head = titlesByArticle.get(p);
+  for (const [other, otherHead] of titlesByArticle) {
+    if (other === p) continue;
+    if (otherHead === head) {
+      flag(p, `title leads with "${head}", and so does ${other} — both pages ask to own it`);
     }
   }
 }
