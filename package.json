@@ -10,6 +10,7 @@
     "audit:a11y": "node scripts/a11y-audit.mjs",
     "verify:tracking": "node scripts/verify-gtm-defer.mjs",
     "verify:csp": "node scripts/verify-csp.mjs",
+    "verify:consent": "node scripts/verify-consent.mjs",
     "validate:articles": "node scripts/validate-articles.mjs"
   },
   "dependencies": {
