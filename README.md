@@ -1,6 +1,6 @@
 # benkalsky.co.il
 
-[![Page checks](https://github.com/BenKalsky/benkalsky.co.il/actions/workflows/a11y.yml/badge.svg)](https://github.com/BenKalsky/benkalsky.co.il/actions/workflows/a11y.yml)
+[![Page checks](https://github.com/BenKalsky/benkalsky.co.il/actions/workflows/a11y.yml/badge.svg?event=pull_request)](https://github.com/BenKalsky/benkalsky.co.il/actions/workflows/a11y.yml?query=event%3Apull_request)
 
 **[www.benkalsky.co.il](https://www.benkalsky.co.il)** — personal site of Ben Kalsky, co-founder & CTO at [Digitizer](https://www.digitizer.co.il). A Hebrew (RTL) landing page and blog about putting AI to work in real businesses: agents, MCP, automations and agentic development.
 
