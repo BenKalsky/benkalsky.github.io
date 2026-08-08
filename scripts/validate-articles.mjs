@@ -53,8 +53,14 @@ const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
 // introduced the manifest, CI printed the fallback note and passed. That was
 // correct — master had no such file yet — but a missing ref would have printed
 // the same line, so the message could not tell a first run from a broken clone.
-const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null;
-const BASE_REF = process.env.FINGERPRINT_BASE ?? 'origin/master';
+// The all-zero SHA is what GitHub sends as github.event.before when a branch
+// has no previous commit — the first push, when the repository is created. It
+// is not a baseline that failed to resolve; it is the absence of a predecessor,
+// and there are no earlier articles to have modified.
+const NO_PREVIOUS_COMMIT = /^0{40}$/;
+const noPredecessor = NO_PREVIOUS_COMMIT.test(process.env.FINGERPRINT_BASE ?? '');
+const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null && !noPredecessor;
+const BASE_REF = EXPLICIT_BASE ? process.env.FINGERPRINT_BASE : 'origin/master';
 const refExists = (() => {
   try {
     execFileSync('git', ['rev-parse', '--verify', '--quiet', `${BASE_REF}^{commit}`], {
@@ -66,19 +72,29 @@ const refExists = (() => {
   }
 })();
 let BASELINE = null;
-if (!refExists && EXPLICIT_BASE) {
-  console.error(
-    `error: ${BASE_REF} does not resolve in this clone, so the modification dates ` +
-    `have nothing to be compared against. Fetch it — CI needs fetch-depth: 0 — or ` +
-    `set FINGERPRINT_BASE to a commit that is present`
+if (noPredecessor) {
+  // Not substituted with origin/master: on that push origin/master IS the
+  // commit being checked, so the comparison would be the tip against itself —
+  // a check that always passes and looks like one that ran.
+  console.warn(
+    `note: the base is the all-zero SHA, which is GitHub's way of saying this ` +
+    `push has no predecessor. There is no earlier state to compare dates ` +
+    `against, so that comparison is skipped. Every other rule still runs`
   );
-  process.exit(1);
-}
-// Only the baseline comparison needs the ref. Exiting here took the title
-// lengths, the CTA rule, the schema checks, the link destinations and the
-// cross-article heading collisions down with it, in a fork or a tarball where
-// origin/master simply does not exist — nine rules switched off to protect one.
-if (!refExists) {
+} else if (!refExists) {
+  // Only the baseline comparison needs the ref. Exiting here took the title
+  // lengths, the CTA rule, the schema checks, the link destinations and the
+  // cross-article heading collisions down with it, in a fork or a tarball
+  // where origin/master does not exist — nine rules off to protect one. The
+  // hard failure stays where it earns its keep: a base somebody named.
+  if (EXPLICIT_BASE) {
+    console.error(
+      `error: ${BASE_REF} does not resolve in this clone, so the modification dates ` +
+      `have nothing to be compared against. Fetch it — CI needs fetch-depth: 0 — or ` +
+      `set FINGERPRINT_BASE to a commit that is present`
+    );
+    process.exit(1);
+  }
   console.warn(
     `note: ${BASE_REF} does not resolve in this clone, so the modification-date ` +
     `comparison is skipped. Every other rule still runs`
