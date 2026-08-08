@@ -6,7 +6,8 @@
 // title length was wrong twice in one session, and two headings that would
 // have cannibalised existing articles were caught by a manual grep that
 // nobody is obliged to remember to run. This turns that memory into a gate.
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { glob } from 'node:fs/promises';
 import path from 'node:path';
 import { load } from 'cheerio';
@@ -17,6 +18,14 @@ const SITE = 'https://www.benkalsky.co.il';
 // publisher, which is what /terms/ and /privacy/ have always said, and this
 // is the identity both the author and the publisher edge must resolve to.
 const BEN_ID = `${SITE}/#ben`;
+
+// What each article looked like when its dateModified was last set. Committed,
+// so a copy change that leaves the date behind is a failing build rather than
+// a silent lie to crawlers.
+const FINGERPRINT_FILE = 'ARTICLE-FINGERPRINTS.json';
+const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
+  ? JSON.parse(readFileSync(FINGERPRINT_FILE, 'utf8'))
+  : {};
 
 const LIMITS = {
   titleMin: 50, titleMax: 60,
@@ -340,6 +349,33 @@ for (const p of articlePaths) {
     flag(p, 'Article has no dateModified');
   } else if (articleNode.datePublished && modified < articleNode.datePublished) {
     flag(p, `dateModified ${modified} precedes datePublished ${articleNode.datePublished}`);
+  }
+  // Presence and ordering are not the assertion. A hand-written constant that
+  // passes both can sit at 2026-08-08 through every future correction, which
+  // is the same stale date the mapping to datePublished produced — one step
+  // further along. So the date is tied to the thing it describes: what the
+  // reader sees.
+  //
+  // The fingerprint is the rendered text plus the title and description, all
+  // normalised. Not the HTML: a class rename or a wrapper element is not a
+  // modification of the article, and a gate that fires on those gets switched
+  // off. Not the source file's git date either, which is the other obvious
+  // shape — squash-merging rewrites commit dates, so an unchanged article
+  // would start failing the day after its neighbour merged.
+  //
+  // ARTICLE-FINGERPRINTS.json is committed, so changing the copy without
+  // moving the date fails and updating both is one deliberate act.
+  const fingerprint = createHash('sha256')
+    .update(norm(`${title} ${desc} ${main.text()}`))
+    .digest('hex')
+    .slice(0, 16);
+  const known = FINGERPRINTS[p];
+  if (!known) {
+    flag(p, `no fingerprint recorded — add {"${p}": {"content": "${fingerprint}", "dateModified": "${modified}"}} to ${FINGERPRINT_FILE}`);
+  } else if (known.content !== fingerprint && known.dateModified === modified) {
+    flag(p, `the content changed and dateModified is still ${modified} — set it to the day this ships and update ${FINGERPRINT_FILE} to ${fingerprint}`);
+  } else if (known.content !== fingerprint || known.dateModified !== modified) {
+    flag(p, `${FINGERPRINT_FILE} is stale for this article — update its entry to {"content": "${fingerprint}", "dateModified": "${modified}"}`);
   }
 
   // --- internal links must resolve ---
