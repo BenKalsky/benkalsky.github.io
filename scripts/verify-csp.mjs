@@ -267,7 +267,12 @@ if (violations.length) {
 // here rather than tolerating a class of silence means the day it gains
 // tracking, or another page loses it, the list stops matching and someone
 // looks.
-const NO_CONTAINER_EXPECTED = new Set(['/404.html']);
+// Empty on purpose. /404.html was the one entry, from when it was a
+// hand-written static file with no container in it. It is a page now and
+// carries the same container as every other route — leaving it exempt would
+// have let this check report broken-route tracking as absent "by design" and
+// pass, which is the one thing the migration exists to make visible.
+const NO_CONTAINER_EXPECTED = new Set([]);
 const silent = unreachable.filter((p) => !NO_CONTAINER_EXPECTED.has(p));
 const expectedSilent = unreachable.filter((p) => NO_CONTAINER_EXPECTED.has(p));
 
