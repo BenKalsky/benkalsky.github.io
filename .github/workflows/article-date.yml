@@ -41,9 +41,10 @@ jobs:
         run: npm run build
       # github.event.before is master's tip before this push, which is the right
       # baseline for both a squash merge and a direct commit. On a first push or
-      # after a force push it can name a commit that is not in the clone; the
-      # gate then says out loud that it fell back to the self-reported manifest
-      # instead of failing on an unreadable ref.
+      # after a force push it can name a commit that is not in the clone, and
+      # the gate fails there rather than warning: this is the run whose clock is
+      # the shipping day, so a pass with no baseline would be a green tick on
+      # the one check that had nothing to compare.
       - name: Validate articles against the pre-merge master
         env:
           FINGERPRINT_BASE: ${{ github.event.before }}

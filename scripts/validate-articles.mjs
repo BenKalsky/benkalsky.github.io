@@ -33,9 +33,16 @@ const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
 // satisfies every comparison against it while dateModified sits untouched.
 // A baseline the branch cannot edit is what makes the record mean anything.
 //
-// Absent — a shallow clone, a fresh checkout, a first run — the check degrades
-// to the self-reported form and SAYS SO. A gate that silently weakens is worse
-// than one that announces it.
+// Absent under the default ref — a shallow clone, a fresh checkout, a first
+// run — the check degrades to the self-reported form and SAYS SO.
+//
+// Absent under a ref somebody passed deliberately, it fails. FINGERPRINT_BASE
+// is set by the post-merge job, which is the one run whose clock is the
+// shipping day; a warning there would let the gate pass at exactly the moment
+// its central assertion could not run. The two cases differ in what an
+// unreadable ref means: an accident of how the repository was cloned, or the
+// baseline a caller named and expected to be compared against.
+const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null;
 const BASE_REF = process.env.FINGERPRINT_BASE ?? 'origin/master';
 let BASELINE = null;
 try {
@@ -46,6 +53,14 @@ try {
     })
   );
 } catch {
+  if (EXPLICIT_BASE) {
+    console.error(
+      `error: ${FINGERPRINT_FILE} is not readable at ${BASE_REF}, which was named ` +
+      `in FINGERPRINT_BASE — without it the modification dates are checked only ` +
+      `against the manifest in this same commit, and that is not a check`
+    );
+    process.exit(1);
+  }
   console.warn(
     `note: ${FINGERPRINT_FILE} not readable at ${BASE_REF} — the modification-date ` +
     `check falls back to the working-tree copy, which the same commit can edit`
@@ -429,13 +444,24 @@ for (const p of articlePaths) {
   // modification date that never happened. Equality also absorbs the
   // second-revision-on-the-same-day case that used to need its own branch: a
   // date already set to today passes because it is already correct.
+  //
+  // Moving the date is itself a change that has to land on today, even when
+  // the article's content did not move. Otherwise the repair for a date this
+  // gate rejected — which touches the date and the manifest and nothing else —
+  // has an unchanged fingerprint, skips this branch, and can write another
+  // false date, including a future one, to turn the build green.
   const base = BASELINE?.[p];
-  if (base && base.content !== fingerprint && modified !== TODAY) {
-    flag(
-      p,
-      `the content changed since ${BASE_REF} and dateModified is ${modified} — ` +
-      `set it to ${TODAY}, the day this run is happening`
-    );
+  if (base && (base.content !== fingerprint || base.dateModified !== modified)) {
+    if (modified !== TODAY) {
+      flag(
+        p,
+        (base.content !== fingerprint
+          ? `the content changed since ${BASE_REF} and dateModified is ${modified}`
+          : `the content is unchanged since ${BASE_REF} but dateModified moved from ` +
+            `${base.dateModified} to ${modified}`) +
+        ` — set it to ${TODAY}, the day this run is happening`
+      );
+    }
   }
 
   const known = FINGERPRINTS[p];
