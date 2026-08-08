@@ -42,9 +42,38 @@ const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
 // its central assertion could not run. The two cases differ in what an
 // unreadable ref means: an accident of how the repository was cloned, or the
 // baseline a caller named and expected to be compared against.
+// "Not readable" is two different situations and only one of them is benign.
+// The ref not resolving means the clone cannot answer the question at all — a
+// shallow checkout, a bad FINGERPRINT_BASE — and that fails, because a gate
+// that quietly stops comparing is worse than one that stops the build. The ref
+// resolving with no file at it is the first run after this manifest was
+// introduced, which has no baseline to have and warns.
+//
+// Measured, and the reason this distinction exists: on the pull request that
+// introduced the manifest, CI printed the fallback note and passed. That was
+// correct — master had no such file yet — but a missing ref would have printed
+// the same line, so the message could not tell a first run from a broken clone.
 const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null;
 const BASE_REF = process.env.FINGERPRINT_BASE ?? 'origin/master';
+const refExists = (() => {
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', `${BASE_REF}^{commit}`], {
+      stdio: ['ignore', 'ignore', 'ignore'],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+})();
 let BASELINE = null;
+if (!refExists) {
+  console.error(
+    `error: ${BASE_REF} does not resolve in this clone, so the modification dates ` +
+    `have nothing to be compared against. Fetch it — CI needs fetch-depth: 0 — or ` +
+    `set FINGERPRINT_BASE to a commit that is present`
+  );
+  process.exit(1);
+}
 try {
   BASELINE = JSON.parse(
     execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
@@ -55,15 +84,17 @@ try {
 } catch {
   if (EXPLICIT_BASE) {
     console.error(
-      `error: ${FINGERPRINT_FILE} is not readable at ${BASE_REF}, which was named ` +
-      `in FINGERPRINT_BASE — without it the modification dates are checked only ` +
-      `against the manifest in this same commit, and that is not a check`
+      `error: ${BASE_REF} resolves but carries no ${FINGERPRINT_FILE}, and it was ` +
+      `named in FINGERPRINT_BASE — the post-merge run is the only check that sees ` +
+      `the shipping day, so it does not pass without a baseline`
     );
     process.exit(1);
   }
   console.warn(
-    `note: ${FINGERPRINT_FILE} not readable at ${BASE_REF} — the modification-date ` +
-    `check falls back to the working-tree copy, which the same commit can edit`
+    `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} yet — the modification-date ` +
+    `check falls back to the working-tree copy, which the same commit can edit. ` +
+    `This is the first run after the manifest was added and stops being true once ` +
+    `it is on ${BASE_REF}`
   );
 }
 
