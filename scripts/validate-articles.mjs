@@ -365,17 +365,39 @@ for (const p of articlePaths) {
   //
   // ARTICLE-FINGERPRINTS.json is committed, so changing the copy without
   // moving the date fails and updating both is one deliberate act.
+  // Link destinations are part of it, in document order. Text alone missed a
+  // real correction made in this same branch: the booking CTA moved from
+  // /#contact to the scheduler while its anchor text stayed the same, so the
+  // rendered text was byte-identical and the article read as unchanged. Only
+  // the href, not the markup around it — the point is where the reader is
+  // sent, not how the link is dressed.
+  //
+  // The parts are joined with a delimiter that cannot occur in any of them,
+  // so a title ending where a description begins cannot collide with a
+  // different split of the same characters.
+  const hrefs = main.find('a[href]').map((_, el) => $(el).attr('href')).get().join(' ');
   const fingerprint = createHash('sha256')
-    .update(norm(`${title} ${desc} ${main.text()}`))
+    .update([title, desc, main.text(), hrefs].map(norm).join('\u0000'))
     .digest('hex')
     .slice(0, 16);
   const known = FINGERPRINTS[p];
   if (!known) {
     flag(p, `no fingerprint recorded — add {"${p}": {"content": "${fingerprint}", "dateModified": "${modified}"}} to ${FINGERPRINT_FILE}`);
-  } else if (known.content !== fingerprint && known.dateModified === modified) {
-    flag(p, `the content changed and dateModified is still ${modified} — set it to the day this ships and update ${FINGERPRINT_FILE} to ${fingerprint}`);
+  } else if (modified < known.dateModified) {
+    flag(p, `dateModified ${modified} is earlier than the recorded ${known.dateModified} — a modification date does not go backwards`);
   } else if (known.content !== fingerprint || known.dateModified !== modified) {
-    flag(p, `${FINGERPRINT_FILE} is stale for this article — update its entry to {"content": "${fingerprint}", "dateModified": "${modified}"}`);
+    // One message for both cases, because the required action is one action:
+    // bring the record up to date. Splitting it produced a branch nobody could
+    // satisfy — an article revised twice in one day already has the correct
+    // date, and the old wording told its author to invent a future one.
+    flag(
+      p,
+      `${FINGERPRINT_FILE} does not match this article — set its entry to ` +
+      `{"content": "${fingerprint}", "dateModified": "${modified}"}` +
+      (known.content !== fingerprint && known.dateModified === modified
+        ? `, and check that ${modified} is still the day this ships`
+        : '')
+    );
   }
 
   // --- internal links must resolve ---
