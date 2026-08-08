@@ -8,6 +8,7 @@
 // nobody is obliged to remember to run. This turns that memory into a gate.
 import { readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { glob } from 'node:fs/promises';
 import path from 'node:path';
 import { load } from 'cheerio';
@@ -26,6 +27,37 @@ const FINGERPRINT_FILE = 'ARTICLE-FINGERPRINTS.json';
 const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
   ? JSON.parse(readFileSync(FINGERPRINT_FILE, 'utf8'))
   : {};
+
+// The same file as it stands on the base branch. The working-tree copy alone
+// is a self-report: an author who changes the copy and pastes the new hash in
+// satisfies every comparison against it while dateModified sits untouched.
+// A baseline the branch cannot edit is what makes the record mean anything.
+//
+// Absent — a shallow clone, a fresh checkout, a first run — the check degrades
+// to the self-reported form and SAYS SO. A gate that silently weakens is worse
+// than one that announces it.
+const BASE_REF = process.env.FINGERPRINT_BASE ?? 'origin/master';
+let BASELINE = null;
+try {
+  BASELINE = JSON.parse(
+    execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+  );
+} catch {
+  console.warn(
+    `note: ${FINGERPRINT_FILE} not readable at ${BASE_REF} — the modification-date ` +
+    `check falls back to the working-tree copy, which the same commit can edit`
+  );
+}
+
+// The runner's UTC date, used for exactly one thing: telling a second revision
+// shipping TODAY (dateModified legitimately unchanged) from a change shipping
+// later against a date somebody forgot to move. Nothing else here reads a
+// clock, and this comparison only runs for an article whose content differs
+// from the base branch.
+const TODAY = new Date().toISOString().slice(0, 10);
 
 const LIMITS = {
   titleMin: 50, titleMax: 60,
@@ -380,6 +412,23 @@ for (const p of articlePaths) {
     .update([title, desc, main.text(), hrefs].map(norm).join('\u0000'))
     .digest('hex')
     .slice(0, 16);
+  // Against the base branch first: did the article itself change, and did its
+  // date move with it? This is the question the working-tree manifest cannot
+  // answer about itself.
+  const base = BASELINE?.[p];
+  if (base && base.content !== fingerprint) {
+    if (modified < base.dateModified) {
+      flag(p, `the content changed since ${BASE_REF} and dateModified ${modified} is earlier than the ${base.dateModified} recorded there`);
+    } else if (modified === base.dateModified && modified !== TODAY) {
+      flag(
+        p,
+        `the content changed since ${BASE_REF} and dateModified is still ${modified} — ` +
+        `set it to the day this ships (${TODAY}), or refresh the manifest only if this ` +
+        `is a second revision on ${modified}`
+      );
+    }
+  }
+
   const known = FINGERPRINTS[p];
   if (!known) {
     flag(p, `no fingerprint recorded — add {"${p}": {"content": "${fingerprint}", "dateModified": "${modified}"}} to ${FINGERPRINT_FILE}`);
