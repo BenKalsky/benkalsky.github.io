@@ -127,30 +127,41 @@ if (noPredecessor) {
     }
   })()
 ) {
+  // The file is there and cannot be used: a broken repository state, never a
+  // first run, and it must not read as one.
+  const unusableBaseline = (detail) => {
+    if (EXPLICIT_BASE) {
+      console.error(
+        `error: ${FINGERPRINT_FILE} exists at ${BASE_REF} but is not usable ` +
+        `(${detail}) — the post-merge run does not fall back to the manifest in ` +
+        `this same commit`
+      );
+      process.exit(1);
+    }
+    console.warn(
+      `WARNING: ${FINGERPRINT_FILE} exists at ${BASE_REF} and is not usable ` +
+      `(${detail}). The modification-date comparison is skipped. This is not a ` +
+      `first run — the baseline is broken and someone has to fix it`
+    );
+  };
   try {
-    BASELINE = JSON.parse(
+    const parsed = JSON.parse(
       execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'ignore'],
       })
     );
-  } catch (err) {
-    // The file is there and cannot be used. That is a broken repository state,
-    // never a first run, and it must not read as one.
-    const detail = err instanceof Error ? err.message.split('\n')[0] : String(err);
-    if (EXPLICIT_BASE) {
-      console.error(
-        `error: ${FINGERPRINT_FILE} exists at ${BASE_REF} but could not be read as ` +
-        `JSON (${detail}) — the post-merge run does not fall back to the manifest ` +
-        `in this same commit`
-      );
-      process.exit(1);
+    // Parsing is not the test. `null`, `0`, `false` and `""` are all valid JSON
+    // and all leave BASELINE falsy, which reads downstream as "no baseline" —
+    // so a manifest reduced to the four characters `null` would skip both the
+    // comparison and the first-run rule, on the run that trusts neither.
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      unusableBaseline(`it parsed as ${Array.isArray(parsed) ? 'an array' : typeof parsed === 'object' ? 'null' : typeof parsed}, not an object of paths`);
+    } else {
+      BASELINE = parsed;
     }
-    console.warn(
-      `WARNING: ${FINGERPRINT_FILE} exists at ${BASE_REF} and could not be read as ` +
-      `JSON (${detail}). The modification-date comparison is skipped. This is not ` +
-      `a first run — the baseline is corrupt and someone has to fix it`
-    );
+  } catch (err) {
+    unusableBaseline(err instanceof Error ? err.message.split('\n')[0] : String(err));
   }
 } else {
   {
@@ -190,7 +201,19 @@ if (noPredecessor) {
           .filter((f) => f.endsWith('.astro') && !f.endsWith('/index.astro'))
           .map((f) => `/blog/${path.basename(f, '.astro')}/`)
       );
-    } catch {
+    } catch (err) {
+      // In the explicit run this diff is the ONLY comparison available, so
+      // losing it loses the check entirely — the same reason an unusable
+      // manifest fails there.
+      if (EXPLICIT_BASE) {
+        console.error(
+          `error: ${BASE_REF} carries no ${FINGERPRINT_FILE} and the source diff ` +
+          `against it could not be read either ` +
+          `(${err instanceof Error ? err.message.split('\n')[0] : String(err)}) — ` +
+          `the post-merge run has nothing left to check the shipping date with`
+        );
+        process.exit(1);
+      }
       INTRODUCTION_CHANGED = null;
     }
     console.warn(
