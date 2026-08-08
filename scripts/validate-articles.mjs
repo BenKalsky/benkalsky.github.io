@@ -33,30 +33,33 @@ const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
 // satisfies every comparison against it while dateModified sits untouched.
 // A baseline the branch cannot edit is what makes the record mean anything.
 //
-// Absent under the default ref — a shallow clone, a fresh checkout, a first
-// run — the check degrades to the self-reported form and SAYS SO.
+// "No baseline" is FOUR states, not one, and this rule moved three times
+// before they were all named. They are enumerated here so the next reader sees
+// the whole table instead of meeting them one at a time, as I did:
 //
-// Absent under a ref somebody passed deliberately, it fails. FINGERPRINT_BASE
-// is set by the post-merge job, which is the one run whose clock is the
-// shipping day; a warning there would let the gate pass at exactly the moment
-// its central assertion could not run. The two cases differ in what an
-// unreadable ref means: an accident of how the repository was cloned, or the
-// baseline a caller named and expected to be compared against.
-// "Not readable" is two different situations and only one of them is benign.
-// The ref not resolving means the clone cannot answer the question at all — a
-// shallow checkout, a bad FINGERPRINT_BASE — and that fails, because a gate
-// that quietly stops comparing is worse than one that stops the build. The ref
-// resolving with no file at it is the first run after this manifest was
-// introduced, which has no baseline to have and warns.
+//   1. No ref. The name does not resolve — a shallow clone, a fork with no
+//      origin/master, a typo in FINGERPRINT_BASE. Explicit base: FAIL, the
+//      caller named a baseline and expected a comparison. Implicit default:
+//      skip that one comparison, because a fork should not lose the nine
+//      rules that need no baseline to protect the one that does.
+//   2. No predecessor. FINGERPRINT_BASE is the all-zero SHA, GitHub's way of
+//      saying this push has no previous commit. Nothing earlier exists to
+//      compare against. Skip, and do NOT substitute origin/master — on that
+//      push origin/master IS the commit being checked, so the comparison
+//      would be the tip against itself.
+//   3. No file. The ref resolves and carries no manifest: the merge that
+//      introduces this file, once per repository. Skip. Failing here would
+//      have turned master red on the merge that installed the gate. A later
+//      deletion is caught elsewhere — with no working-tree copy every article
+//      fails the "no fingerprint recorded" rule.
+//   4. No entry. The manifest exists at the base and does not list this path:
+//      the article is new here, or moved. NOT a skip — this is the case the
+//      gate meets most often, and it requires today's date like any other
+//      change. Handled per article, further down.
 //
-// Measured, and the reason this distinction exists: on the pull request that
-// introduced the manifest, CI printed the fallback note and passed. That was
-// correct — master had no such file yet — but a missing ref would have printed
-// the same line, so the message could not tell a first run from a broken clone.
-// The all-zero SHA is what GitHub sends as github.event.before when a branch
-// has no previous commit — the first push, when the repository is created. It
-// is not a baseline that failed to resolve; it is the absence of a predecessor,
-// and there are no earlier articles to have modified.
+// States 1 to 3 print a note on a passing build, which is the weakness this
+// design has not solved: three of the four ways to have no baseline are
+// announced to a log nobody reads.
 const NO_PREVIOUS_COMMIT = /^0{40}$/;
 const noPredecessor = NO_PREVIOUS_COMMIT.test(process.env.FINGERPRINT_BASE ?? '');
 const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null && !noPredecessor;
