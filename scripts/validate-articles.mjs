@@ -48,18 +48,24 @@ const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
 //      push origin/master IS the commit being checked, so the comparison
 //      would be the tip against itself.
 //   3. No file. The ref resolves and carries no manifest: the merge that
-//      introduces this file, once per repository. Skip. Failing here would
-//      have turned master red on the merge that installed the gate. A later
-//      deletion is caught elsewhere — with no working-tree copy every article
-//      fails the "no fingerprint recorded" rule.
+//      introduces this file, once per repository. Failing outright would have
+//      turned master red on the merge that installed the gate; skipping
+//      outright disarmed the rule on the one push where the dates were all
+//      written by hand. Neither — the SOURCE diff stands in for the missing
+//      fingerprints, and an article whose source changed since the base
+//      carries today's date. A later deletion is caught elsewhere: with no
+//      working-tree copy every article fails "no fingerprint recorded".
+//   3b. File present, unreadable. Malformed JSON, a failed read. Never a first
+//      run — a broken state — and it must not read as one. Explicit base:
+//      FAIL. Implicit: a WARNING that says the baseline is corrupt.
 //   4. No entry. The manifest exists at the base and does not list this path:
 //      the article is new here, or moved. NOT a skip — this is the case the
 //      gate meets most often, and it requires today's date like any other
 //      change. Handled per article, further down.
 //
-// States 1 to 3 print a note on a passing build, which is the weakness this
-// design has not solved: three of the four ways to have no baseline are
-// announced to a log nobody reads.
+// States 1 and 2 print a note on a passing build, which is the weakness this
+// design has not solved: two of the ways to have no baseline are announced to
+// a log nobody reads. States 3, 3b and 4 all assert something instead.
 const NO_PREVIOUS_COMMIT = /^0{40}$/;
 const noPredecessor = NO_PREVIOUS_COMMIT.test(process.env.FINGERPRINT_BASE ?? '');
 const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null && !noPredecessor;
@@ -75,6 +81,9 @@ const refExists = (() => {
   }
 })();
 let BASELINE = null;
+// Set only in the manifest's first run: the article paths whose source changed
+// since the base. Null when that diff was not readable.
+let INTRODUCTION_CHANGED = null;
 if (noPredecessor) {
   // Not substituted with origin/master: on that push origin/master IS the
   // commit being checked, so the comparison would be the tip against itself —
@@ -102,7 +111,22 @@ if (noPredecessor) {
     `note: ${BASE_REF} does not resolve in this clone, so the modification-date ` +
     `comparison is skipped. Every other rule still runs`
   );
-} else {
+} else if (
+  // Does the path exist at that commit at all? Asked separately, because
+  // "absent" and "present but unreadable" were landing in the same catch: a
+  // malformed or truncated manifest read as a first run, and the explicit-base
+  // job carried on against the working-tree copy it is meant not to trust.
+  (() => {
+    try {
+      execFileSync('git', ['cat-file', '-e', `${BASE_REF}:${FINGERPRINT_FILE}`], {
+        stdio: ['ignore', 'ignore', 'ignore'],
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  })()
+) {
   try {
     BASELINE = JSON.parse(
       execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
@@ -110,7 +134,26 @@ if (noPredecessor) {
         stdio: ['ignore', 'pipe', 'ignore'],
       })
     );
-  } catch {
+  } catch (err) {
+    // The file is there and cannot be used. That is a broken repository state,
+    // never a first run, and it must not read as one.
+    const detail = err instanceof Error ? err.message.split('\n')[0] : String(err);
+    if (EXPLICIT_BASE) {
+      console.error(
+        `error: ${FINGERPRINT_FILE} exists at ${BASE_REF} but could not be read as ` +
+        `JSON (${detail}) — the post-merge run does not fall back to the manifest ` +
+        `in this same commit`
+      );
+      process.exit(1);
+    }
+    console.warn(
+      `WARNING: ${FINGERPRINT_FILE} exists at ${BASE_REF} and could not be read as ` +
+      `JSON (${detail}). The modification-date comparison is skipped. This is not ` +
+      `a first run — the baseline is corrupt and someone has to fix it`
+    );
+  }
+} else {
+  {
     // A ref that resolves and carries no manifest is the same category as the
     // all-zero SHA: not a baseline that failed to load, but a state that never
     // had one. It happens exactly once per repository — the merge that
@@ -124,11 +167,40 @@ if (noPredecessor) {
     // Deleting the manifest later does not slip through here. With no
     // working-tree copy every article fails the "no fingerprint recorded"
     // rule, so the build stops for that reason instead.
+    // Skipping the date rule outright was wrong on the one push where it
+    // matters most. This is the merge that ships the manifest, and the dates
+    // baked into it were written on the day the branch was worked on. Merge a
+    // day later and every one of them is stale, on the run whose whole purpose
+    // is to see the shipping day.
+    //
+    // With no recorded state there is still one signal: which article SOURCES
+    // changed between the base and here. It is a blunter instrument than the
+    // fingerprint — a formatting change counts — and for this one push that is
+    // the right direction to err in.
+    try {
+      const changed = execFileSync(
+        'git',
+        ['diff', '--name-only', BASE_REF, 'HEAD', '--', 'src/pages/blog/'],
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+      );
+      INTRODUCTION_CHANGED = new Set(
+        changed
+          .split('\n')
+          .map((f) => f.trim())
+          .filter((f) => f.endsWith('.astro') && !f.endsWith('/index.astro'))
+          .map((f) => `/blog/${path.basename(f, '.astro')}/`)
+      );
+    } catch {
+      INTRODUCTION_CHANGED = null;
+    }
     console.warn(
-      `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} — there is no recorded ` +
-      `earlier state, so the modification-date comparison is skipped. Every other ` +
-      `rule still runs. This is the manifest's first run and stops being true ` +
-      `once it is on ${BASE_REF}`
+      `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} — this is the manifest's ` +
+      `first run. There is no recorded earlier state to compare against, so ` +
+      (INTRODUCTION_CHANGED
+        ? `the ${INTRODUCTION_CHANGED.size} article source(s) changed since ` +
+          `${BASE_REF} are required to carry today's date instead`
+        : `the modification-date rule is skipped and the source diff was not ` +
+          `readable either`)
     );
   }
 }
@@ -523,7 +595,17 @@ for (const p of articlePaths) {
   // future, because the only remaining check compares it against that same
   // self-reported entry.
   const base = BASELINE?.[p];
-  if (BASELINE && !base && modified !== TODAY) {
+  // The manifest's first run: no recorded state, but the source diff still
+  // says which articles this push touched, and those carry today's date.
+  if (!BASELINE && INTRODUCTION_CHANGED?.has(p) && modified !== TODAY) {
+    flag(
+      p,
+      `this article's source changed since ${BASE_REF} and dateModified is ` +
+      `${modified} — set it to ${TODAY}. There is no manifest at ${BASE_REF} to ` +
+      `compare fingerprints against, so the source diff is what says the article ` +
+      `moved`
+    );
+  } else if (BASELINE && !base && modified !== TODAY) {
     flag(
       p,
       `this article is not in the manifest at ${BASE_REF}, so it is new on this ` +
