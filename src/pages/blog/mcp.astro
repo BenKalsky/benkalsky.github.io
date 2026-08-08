@@ -5,6 +5,7 @@ export const meta = {
   title: 'מה זה MCP? המדריך המעשי לחיבור AI למערכות העסק | בן קלסקי',
   description:
     'מה זה MCP, למה OpenAI וגוגל אימצו את הפרוטוקול של Anthropic, ומה זה נותן לעסק בפועל. הסבר מעשי מ-CTO שבונה שרתי MCP בקוד פתוח. קבעו פגישת אבחון חינם.',
+  dateModified: '2026-08-08',
   datePublished: '2026-08-02',
 };
 
@@ -43,10 +44,10 @@ const jsonLd = {
       description: meta.description,
       inLanguage: 'he',
       datePublished: meta.datePublished,
-      dateModified: meta.datePublished,
+      dateModified: meta.dateModified,
       mainEntityOfPage: 'https://www.benkalsky.co.il/blog/mcp/',
       author: { '@id': 'https://www.benkalsky.co.il/#ben' },
-      publisher: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
+      publisher: { '@id': 'https://www.benkalsky.co.il/#ben' },
     },
     {
       '@type': 'Person',
@@ -55,6 +56,7 @@ const jsonLd = {
       alternateName: 'בן קלסקי',
       jobTitle: 'Co-founder & CTO',
       url: 'https://www.benkalsky.co.il/',
+      worksFor: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
     },
     {
       '@type': 'Organization',
@@ -124,7 +126,7 @@ const jsonLd = {
 
     <h2>איך מתחילים</h2>
     <p>לא מתחילים מלחבר הכול. בוחרים מערכת אחת שהצוות מבזבז עליה הכי הרבה זמן, בודקים אם קיים לה שרת מוכן, ומריצים פיילוט מבוקר על תהליך אחד. אחרי שבועיים יש לכם תשובה אמיתית על הערך, בהשקעה מינימלית.</p>
-    <p>ואם צריך שרת שלא קיים? זה בדיוק סוג הפיתוח שנעשה מהיר מאוד בעבודה נכונה עם סוכני קוד. כתבתי על התהליך הזה <a href="/blog/vibe-coding/">במדריך ה-vibe coding</a>: שרת MCP למערכת פנימית הוא פרויקט של ימים, לא של רבעון.</p>
+    <p>ואם צריך שרת שלא קיים? זה בדיוק סוג הפיתוח שנעשה מהיר מאוד בעבודה נכונה עם סוכני קוד. כתבתי על התהליך הזה <a href="/blog/vibe-coding/">במדריך הוייב קודינג</a>: שרת MCP למערכת פנימית הוא פרויקט של ימים, לא של רבעון.</p>
 
     <h2>שאלות ותשובות</h2>
     <div class="qa">

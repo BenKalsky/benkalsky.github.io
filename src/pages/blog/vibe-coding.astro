@@ -5,6 +5,7 @@ export const meta = {
   title: 'וייב קודינג: המדריך המעשי בעברית לבניית מוצר אמיתי',
   description:
     'מה זה וייב קודינג (vibe coding), מה זה לא, ואיך בונים ככה מוצר שמחזיק בפרודקשן. התהליך, הכלים והמגבלות. קבעו פגישת אבחון חינם.',
+  dateModified: '2026-08-08',
   datePublished: '2026-08-01',
 };
 
@@ -43,10 +44,10 @@ const jsonLd = {
       description: meta.description,
       inLanguage: 'he',
       datePublished: meta.datePublished,
-      dateModified: meta.datePublished,
+      dateModified: meta.dateModified,
       mainEntityOfPage: 'https://www.benkalsky.co.il/blog/vibe-coding/',
       author: { '@id': 'https://www.benkalsky.co.il/#ben' },
-      publisher: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
+      publisher: { '@id': 'https://www.benkalsky.co.il/#ben' },
     },
     {
       '@type': 'Person',
@@ -55,6 +56,7 @@ const jsonLd = {
       alternateName: 'בן קלסקי',
       jobTitle: 'Co-founder & CTO',
       url: 'https://www.benkalsky.co.il/',
+      worksFor: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
     },
     {
       '@type': 'Organization',

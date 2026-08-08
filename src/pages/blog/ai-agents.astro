@@ -2,9 +2,10 @@
 import BlogLayout from '../../layouts/BlogLayout.astro';
 
 export const meta = {
-  title: 'סוכן AI לעסק: מה עובד דיגיטלי עושה ואיך מתחילים | בן קלסקי',
+  title: 'מה זה סוכן AI: מה עובד דיגיטלי באמת עושה בעסק | בן קלסקי',
   description:
     'מה זה סוכן AI, במה הוא שונה מצ\'אטבוט, ואיך סוכני AI עובדים בעסקים אמיתיים: הרשאות, בקרה אנושית ומקרי שימוש מהשטח. קבעו פגישת אבחון חינם.',
+  dateModified: '2026-08-08',
   datePublished: '2026-08-02',
 };
 
@@ -43,10 +44,10 @@ const jsonLd = {
       description: meta.description,
       inLanguage: 'he',
       datePublished: meta.datePublished,
-      dateModified: meta.datePublished,
+      dateModified: meta.dateModified,
       mainEntityOfPage: 'https://www.benkalsky.co.il/blog/ai-agents/',
       author: { '@id': 'https://www.benkalsky.co.il/#ben' },
-      publisher: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
+      publisher: { '@id': 'https://www.benkalsky.co.il/#ben' },
     },
     {
       '@type': 'Person',
@@ -55,6 +56,7 @@ const jsonLd = {
       alternateName: 'בן קלסקי',
       jobTitle: 'Co-founder & CTO',
       url: 'https://www.benkalsky.co.il/',
+      worksFor: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
     },
     {
       '@type': 'Organization',
@@ -119,7 +121,7 @@ const jsonLd = {
     <p>בפגישות אבחון אני מוצא בדרך כלל שילוב: עמוד שדרה של אוטומציות פשוטות, וסוכן בנקודות שבהן צריך מוח. מי שמוכר לכם סוכן לכל דבר מוכר פטיש, לא פתרון.</p>
 
     <h2>מהניסיון שלי, לא מהתיאוריה</h2>
-    <p>אני לא רק בונה סוכנים ללקוחות, אני עובד ככה בעצמי. את <a href="https://deep-claw.com">DeepClaw</a>, דשבורד תפעול לסוכני AI, בניתי כי הייתי צריך לנהל את הסוכנים של עצמי: לראות מה הם עושים, לתפוס תקלות ולשלוט בהרשאות. וגם האתר שאתם קוראים עכשיו נבנה בתהליך אג'נטי מלא, שתיארתי <a href="/blog/vibe-coding/">במדריך ה-vibe coding</a>.</p>
+    <p>אני לא רק בונה סוכנים ללקוחות, אני עובד ככה בעצמי. את <a href="https://deep-claw.com">DeepClaw</a>, דשבורד תפעול לסוכני AI, בניתי כי הייתי צריך לנהל את הסוכנים של עצמי: לראות מה הם עושים, לתפוס תקלות ולשלוט בהרשאות. וגם האתר שאתם קוראים עכשיו נבנה בתהליך אג'נטי מלא, שתיארתי <a href="/blog/vibe-coding/">במדריך הוייב קודינג</a>.</p>
     <p>הניסיון הזה חשוב מסיבה אחת: מי שמפעיל סוכנים על העסק של עצמו כבר שילם את שכר הלימוד על הטעויות. אתם לא צריכים לשלם אותו שוב.</p>
 
     <h2>איך מתחילים נכון</h2>

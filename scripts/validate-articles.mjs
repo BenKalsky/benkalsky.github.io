@@ -6,13 +6,243 @@
 // title length was wrong twice in one session, and two headings that would
 // have cannibalised existing articles were caught by a manual grep that
 // nobody is obliged to remember to run. This turns that memory into a gate.
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { glob } from 'node:fs/promises';
 import path from 'node:path';
 import { load } from 'cheerio';
 
 const DIST = path.resolve(process.cwd(), 'dist');
 const SITE = 'https://www.benkalsky.co.il';
+// The site owner's node, by ID. Ben decided on 2026-08-08 that he is the
+// publisher, which is what /terms/ and /privacy/ have always said, and this
+// is the identity both the author and the publisher edge must resolve to.
+const BEN_ID = `${SITE}/#ben`;
+
+// What each article looked like when its dateModified was last set. Committed,
+// so a copy change that leaves the date behind is a failing build rather than
+// a silent lie to crawlers.
+const FINGERPRINT_FILE = 'ARTICLE-FINGERPRINTS.json';
+const FINGERPRINTS = existsSync(FINGERPRINT_FILE)
+  ? JSON.parse(readFileSync(FINGERPRINT_FILE, 'utf8'))
+  : {};
+
+// The same file as it stands on the base branch. The working-tree copy alone
+// is a self-report: an author who changes the copy and pastes the new hash in
+// satisfies every comparison against it while dateModified sits untouched.
+// A baseline the branch cannot edit is what makes the record mean anything.
+//
+// "No baseline" is FOUR states, not one, and this rule moved three times
+// before they were all named. They are enumerated here so the next reader sees
+// the whole table instead of meeting them one at a time, as I did:
+//
+//   1. No ref. The name does not resolve — a shallow clone, a fork with no
+//      origin/master, a typo in FINGERPRINT_BASE. Explicit base: FAIL, the
+//      caller named a baseline and expected a comparison. Implicit default:
+//      skip that one comparison, because a fork should not lose the nine
+//      rules that need no baseline to protect the one that does.
+//   2. No predecessor. FINGERPRINT_BASE is the all-zero SHA, GitHub's way of
+//      saying this push has no previous commit. Nothing earlier exists to
+//      compare against. Skip, and do NOT substitute origin/master — on that
+//      push origin/master IS the commit being checked, so the comparison
+//      would be the tip against itself.
+//   3. No file. The ref resolves and carries no manifest: the merge that
+//      introduces this file, once per repository. Failing outright would have
+//      turned master red on the merge that installed the gate; skipping
+//      outright disarmed the rule on the one push where the dates were all
+//      written by hand. Neither — the SOURCE diff stands in for the missing
+//      fingerprints, and an article whose source changed since the base
+//      carries today's date. A later deletion is caught elsewhere: with no
+//      working-tree copy every article fails "no fingerprint recorded".
+//   3b. File present, unreadable. Malformed JSON, a failed read. Never a first
+//      run — a broken state — and it must not read as one. Explicit base:
+//      FAIL. Implicit: a WARNING that says the baseline is corrupt.
+//   4. No entry. The manifest exists at the base and does not list this path:
+//      the article is new here, or moved. NOT a skip — this is the case the
+//      gate meets most often, and it requires today's date like any other
+//      change. Handled per article, further down.
+//
+// States 1 and 2 print a note on a passing build, which is the weakness this
+// design has not solved: two of the ways to have no baseline are announced to
+// a log nobody reads. States 3, 3b and 4 all assert something instead.
+const NO_PREVIOUS_COMMIT = /^0{40}$/;
+const noPredecessor = NO_PREVIOUS_COMMIT.test(process.env.FINGERPRINT_BASE ?? '');
+const EXPLICIT_BASE = process.env.FINGERPRINT_BASE != null && !noPredecessor;
+const BASE_REF = EXPLICIT_BASE ? process.env.FINGERPRINT_BASE : 'origin/master';
+const refExists = (() => {
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', `${BASE_REF}^{commit}`], {
+      stdio: ['ignore', 'ignore', 'ignore'],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+let BASELINE = null;
+// Set only in the manifest's first run: the article paths whose source changed
+// since the base. Null when that diff was not readable.
+let INTRODUCTION_CHANGED = null;
+// path -> the name of the rule that checked its dateModified.
+const dateCheckedBy = new Map();
+if (noPredecessor) {
+  // Not substituted with origin/master: on that push origin/master IS the
+  // commit being checked, so the comparison would be the tip against itself —
+  // a check that always passes and looks like one that ran.
+  console.warn(
+    `note: the base is the all-zero SHA, which is GitHub's way of saying this ` +
+    `push has no predecessor. There is no earlier state to compare dates ` +
+    `against, so that comparison is skipped. Every other rule still runs`
+  );
+} else if (!refExists) {
+  // Only the baseline comparison needs the ref. Exiting here took the title
+  // lengths, the CTA rule, the schema checks, the link destinations and the
+  // cross-article heading collisions down with it, in a fork or a tarball
+  // where origin/master does not exist — nine rules off to protect one. The
+  // hard failure stays where it earns its keep: a base somebody named.
+  if (EXPLICIT_BASE) {
+    console.error(
+      `error: ${BASE_REF} does not resolve in this clone, so the modification dates ` +
+      `have nothing to be compared against. Fetch it — CI needs fetch-depth: 0 — or ` +
+      `set FINGERPRINT_BASE to a commit that is present`
+    );
+    process.exit(1);
+  }
+  console.warn(
+    `note: ${BASE_REF} does not resolve in this clone, so the modification-date ` +
+    `comparison is skipped. Every other rule still runs`
+  );
+} else if (
+  // Does the path exist at that commit at all? Asked separately, because
+  // "absent" and "present but unreadable" were landing in the same catch: a
+  // malformed or truncated manifest read as a first run, and the explicit-base
+  // job carried on against the working-tree copy it is meant not to trust.
+  (() => {
+    try {
+      execFileSync('git', ['cat-file', '-e', `${BASE_REF}:${FINGERPRINT_FILE}`], {
+        stdio: ['ignore', 'ignore', 'ignore'],
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  })()
+) {
+  // The file is there and cannot be used: a broken repository state, never a
+  // first run, and it must not read as one.
+  const unusableBaseline = (detail) => {
+    if (EXPLICIT_BASE) {
+      console.error(
+        `error: ${FINGERPRINT_FILE} exists at ${BASE_REF} but is not usable ` +
+        `(${detail}) — the post-merge run does not fall back to the manifest in ` +
+        `this same commit`
+      );
+      process.exit(1);
+    }
+    console.warn(
+      `WARNING: ${FINGERPRINT_FILE} exists at ${BASE_REF} and is not usable ` +
+      `(${detail}). The modification-date comparison is skipped. This is not a ` +
+      `first run — the baseline is broken and someone has to fix it`
+    );
+  };
+  try {
+    const parsed = JSON.parse(
+      execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+    );
+    // Parsing is not the test. `null`, `0`, `false` and `""` are all valid JSON
+    // and all leave BASELINE falsy, which reads downstream as "no baseline" —
+    // so a manifest reduced to the four characters `null` would skip both the
+    // comparison and the first-run rule, on the run that trusts neither.
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      unusableBaseline(`it parsed as ${Array.isArray(parsed) ? 'an array' : typeof parsed === 'object' ? 'null' : typeof parsed}, not an object of paths`);
+    } else {
+      BASELINE = parsed;
+    }
+  } catch (err) {
+    unusableBaseline(err instanceof Error ? err.message.split('\n')[0] : String(err));
+  }
+} else {
+  {
+    // A ref that resolves and carries no manifest is the same category as the
+    // all-zero SHA: not a baseline that failed to load, but a state that never
+    // had one. It happens exactly once per repository — the merge that
+    // introduces this file — and on that push the post-merge job reads the
+    // pre-merge master, where the manifest does not exist yet.
+    //
+    // This used to exit 1 whenever the base was explicit, which would have
+    // turned master red on the merge that added the gate. That is not a
+    // hypothetical: it is what would have happened to this branch.
+    //
+    // Deleting the manifest later does not slip through here. With no
+    // working-tree copy every article fails the "no fingerprint recorded"
+    // rule, so the build stops for that reason instead.
+    // Skipping the date rule outright was wrong on the one push where it
+    // matters most. This is the merge that ships the manifest, and the dates
+    // baked into it were written on the day the branch was worked on. Merge a
+    // day later and every one of them is stale, on the run whose whole purpose
+    // is to see the shipping day.
+    //
+    // With no recorded state there is still one signal: which article SOURCES
+    // changed between the base and here. It is a blunter instrument than the
+    // fingerprint — a formatting change counts — and for this one push that is
+    // the right direction to err in.
+    try {
+      const changed = execFileSync(
+        'git',
+        ['diff', '--name-only', BASE_REF, 'HEAD', '--', 'src/pages/blog/'],
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+      );
+      INTRODUCTION_CHANGED = new Set(
+        changed
+          .split('\n')
+          .map((f) => f.trim())
+          .filter((f) => f.endsWith('.astro') && !f.endsWith('/index.astro'))
+          .map((f) => `/blog/${path.basename(f, '.astro')}/`)
+      );
+    } catch (err) {
+      // In the explicit run this diff is the ONLY comparison available, so
+      // losing it loses the check entirely — the same reason an unusable
+      // manifest fails there.
+      if (EXPLICIT_BASE) {
+        console.error(
+          `error: ${BASE_REF} carries no ${FINGERPRINT_FILE} and the source diff ` +
+          `against it could not be read either ` +
+          `(${err instanceof Error ? err.message.split('\n')[0] : String(err)}) — ` +
+          `the post-merge run has nothing left to check the shipping date with`
+        );
+        process.exit(1);
+      }
+      INTRODUCTION_CHANGED = null;
+    }
+    console.warn(
+      `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} — this is the manifest's ` +
+      `first run. There is no recorded earlier state to compare against, so ` +
+      (INTRODUCTION_CHANGED
+        ? `the ${INTRODUCTION_CHANGED.size} article source(s) changed since ` +
+          `${BASE_REF} are required to carry today's date instead`
+        : `the modification-date rule is skipped and the source diff was not ` +
+          `readable either`)
+    );
+  }
+}
+
+// The runner's UTC date, used for exactly one thing: an article whose content
+// differs from the base branch must carry today's dateModified. Nothing else
+// here reads a clock.
+//
+// On a pull request "today" is the day the check ran, which is not necessarily
+// the day the change ships: a run that went green on the 8th stays green after
+// midnight, and merging on the 9th publishes the 8th. The check cannot see the
+// merge from inside the pull request. What closes it is the same gate running
+// again on master immediately after the merge, where the runner's date IS the
+// ship date — .github/workflows/article-date.yml. That detects the miss rather
+// than preventing it: master goes red and the date is corrected in one commit,
+// after the article is already live for as long as that takes.
+const TODAY = new Date().toISOString().slice(0, 10);
 
 const LIMITS = {
   titleMin: 50, titleMax: 60,
@@ -170,6 +400,25 @@ for (const p of articlePaths) {
 // in one container. Removed rather than narrowed.
 const SHARED_HEADINGS = new Set(['שאלות ותשובות']);
 
+// The head phrase of a <title>: everything before the first punctuation that
+// separates the claim from its elaboration. That leading phrase is what a
+// search result leads with and what the page is asking to own.
+//
+// Two live articles led with the same one — /blog/ai-agents/ and
+// /blog/build-ai-agent/ both opened "סוכן AI לעסק:" — while only the second
+// has that string assigned to it in the registry. The h2 collision check
+// could not see it, because it never looked at titles, and the pair shipped
+// on 2026-08-02 and 06.08 without anything complaining.
+//
+// The corpus splits on a mix of ":", "?" and "," today, which is why all four
+// are separators here rather than a single one: keying on ":" alone would
+// compare whole titles for four of the nine articles and never collide.
+const headPhrase = (title) => norm(title.split('|')[0].split(/[:?,]/)[0]);
+const titlesByArticle = new Map();
+for (const p of articlePaths) {
+  titlesByArticle.set(p, headPhrase(load(pages.get(p))('head > title').text()));
+}
+
 for (const p of articlePaths) {
   const html = pages.get(p);
   const $ = load(html);
@@ -270,6 +519,32 @@ for (const p of articlePaths) {
     } else if (authorId !== personNode['@id']) {
       flag(p, `Article author ${authorId} does not resolve to the Person node ${personNode['@id']}`);
     }
+
+    // The publisher is the same kind of edge and was pointing somewhere else.
+    // Every article named Digitizer as publisher while /terms/ says the content
+    // belongs to the site owner and /privacy/ says the site is operated by Ben
+    // — structured data contradicting the site's own legal pages, on nine
+    // pages, for as long as the blog has existed. Ben's decision, 2026-08-08:
+    // he is the publisher. Enforced here so the next article cannot quietly
+    // reintroduce the other answer. Digitizer stays in the graph where it is
+    // true, as the Person's worksFor.
+    //
+    // Compared against the stable ID and not against whichever Person node the
+    // graph happens to contain. An article that defines a different Person and
+    // points both author and publisher at it satisfies "publisher matches the
+    // Person node" completely — the invariant is that the publisher is Ben,
+    // not that the graph is internally tidy. The Person node is checked against
+    // the same ID for the same reason.
+    const pubRef = articleNode.publisher;
+    const publisherId = typeof pubRef === 'string' ? pubRef : pubRef?.['@id'];
+    if (!pubRef) {
+      flag(p, 'Article has no publisher');
+    } else if (publisherId !== BEN_ID) {
+      flag(p, `Article publisher ${publisherId} is not ${BEN_ID} — /terms/ gives the content to the site owner`);
+    }
+    if (personNode['@id'] !== BEN_ID) {
+      flag(p, `the Person node is ${personNode['@id']}, not ${BEN_ID}`);
+    }
   }
 
   // --- dates must agree, and both must be there ---
@@ -280,6 +555,129 @@ for (const p of articlePaths) {
   if (!visible) flag(p, 'no visible <time datetime> in the article');
   if (articleNode?.datePublished && visible && articleNode.datePublished !== visible) {
     flag(p, `visible date ${visible} disagrees with schema datePublished ${articleNode.datePublished}`);
+  }
+  // dateModified was mapped to datePublished, so every article told crawlers it
+  // had never been touched — including the nine revised on 2026-08-08 to
+  // correct claims that were not true. A modification date that cannot move is
+  // not a modification date. It may equal datePublished, and it may not precede
+  // it.
+  const modified = articleNode?.dateModified;
+  if (!modified) {
+    flag(p, 'Article has no dateModified');
+  } else if (articleNode.datePublished && modified < articleNode.datePublished) {
+    flag(p, `dateModified ${modified} precedes datePublished ${articleNode.datePublished}`);
+  }
+  // Presence and ordering are not the assertion. A hand-written constant that
+  // passes both can sit at 2026-08-08 through every future correction, which
+  // is the same stale date the mapping to datePublished produced — one step
+  // further along. So the date is tied to the thing it describes: what the
+  // reader sees.
+  //
+  // The fingerprint is the rendered text plus the title and description, all
+  // normalised. Not the HTML: a class rename or a wrapper element is not a
+  // modification of the article, and a gate that fires on those gets switched
+  // off. Not the source file's git date either, which is the other obvious
+  // shape — squash-merging rewrites commit dates, so an unchanged article
+  // would start failing the day after its neighbour merged.
+  //
+  // ARTICLE-FINGERPRINTS.json is committed, so changing the copy without
+  // moving the date fails and updating both is one deliberate act.
+  // Link destinations are part of it, in document order. Text alone missed a
+  // real correction made in this same branch: the booking CTA moved from
+  // /#contact to the scheduler while its anchor text stayed the same, so the
+  // rendered text was byte-identical and the article read as unchanged. Only
+  // the href, not the markup around it — the point is where the reader is
+  // sent, not how the link is dressed.
+  //
+  // The parts are joined with a delimiter that cannot occur in any of them,
+  // so a title ending where a description begins cannot collide with a
+  // different split of the same characters.
+  const hrefs = main.find('a[href]').map((_, el) => $(el).attr('href')).get().join(' ');
+  const fingerprint = createHash('sha256')
+    .update([title, desc, main.text(), hrefs].map(norm).join('\u0000'))
+    .digest('hex')
+    .slice(0, 16);
+  // Against the base branch first: did the article itself change, and did its
+  // date move with it? This is the question the working-tree manifest cannot
+  // answer about itself.
+  //
+  // The required date is today's, not merely a date later than the baseline's.
+  // "Later" accepted 2026-08-02 for a change shipping on 2026-08-08, and
+  // accepted a future date outright — both of which leave crawlers a
+  // modification date that never happened. Equality also absorbs the
+  // second-revision-on-the-same-day case that used to need its own branch: a
+  // date already set to today passes because it is already correct.
+  //
+  // Moving the date is itself a change that has to land on today, even when
+  // the article's content did not move. Otherwise the repair for a date this
+  // gate rejected — which touches the date and the manifest and nothing else —
+  // has an unchanged fingerprint, skips this branch, and can write another
+  // false date, including a future one, to turn the build green.
+  // An article the baseline has never heard of is new here — freshly written,
+  // or moved to a new path. That was the widest gap left: with no base entry
+  // the shipping-date assertion was skipped altogether, and an author could
+  // pair a new article with a manifest entry carrying any date at all, past or
+  // future, because the only remaining check compares it against that same
+  // self-reported entry.
+  const base = BASELINE?.[p];
+  // Which rule took responsibility for this article's date. Recorded rather
+  // than assumed, because the last five findings on this file were all the
+  // same shape: a path where no rule applied and the build stayed green.
+  // Enumerating the ways a baseline can go missing found them one at a time;
+  // asserting that a comparison HAPPENED closes the class.
+  if (base) dateCheckedBy.set(p, 'baseline');
+  else if (BASELINE) dateCheckedBy.set(p, 'new-entry');
+  else if (INTRODUCTION_CHANGED) {
+    dateCheckedBy.set(p, INTRODUCTION_CHANGED.has(p) ? 'source-diff' : 'source-diff (unchanged)');
+  }
+  // The manifest's first run: no recorded state, but the source diff still
+  // says which articles this push touched, and those carry today's date.
+  if (!BASELINE && INTRODUCTION_CHANGED?.has(p) && modified !== TODAY) {
+    flag(
+      p,
+      `this article's source changed since ${BASE_REF} and dateModified is ` +
+      `${modified} — set it to ${TODAY}. There is no manifest at ${BASE_REF} to ` +
+      `compare fingerprints against, so the source diff is what says the article ` +
+      `moved`
+    );
+  } else if (BASELINE && !base && modified !== TODAY) {
+    flag(
+      p,
+      `this article is not in the manifest at ${BASE_REF}, so it is new on this ` +
+      `branch and dateModified ${modified} is not ${TODAY}, the day this run is ` +
+      `happening`
+    );
+  } else if (base && (base.content !== fingerprint || base.dateModified !== modified)) {
+    if (modified !== TODAY) {
+      flag(
+        p,
+        (base.content !== fingerprint
+          ? `the content changed since ${BASE_REF} and dateModified is ${modified}`
+          : `the content is unchanged since ${BASE_REF} but dateModified moved from ` +
+            `${base.dateModified} to ${modified}`) +
+        ` — set it to ${TODAY}, the day this run is happening`
+      );
+    }
+  }
+
+  const known = FINGERPRINTS[p];
+  if (!known) {
+    flag(p, `no fingerprint recorded — add {"${p}": {"content": "${fingerprint}", "dateModified": "${modified}"}} to ${FINGERPRINT_FILE}`);
+  } else if (modified < known.dateModified) {
+    flag(p, `dateModified ${modified} is earlier than the recorded ${known.dateModified} — a modification date does not go backwards`);
+  } else if (known.content !== fingerprint || known.dateModified !== modified) {
+    // One message for both cases, because the required action is one action:
+    // bring the record up to date. Splitting it produced a branch nobody could
+    // satisfy — an article revised twice in one day already has the correct
+    // date, and the old wording told its author to invent a future one.
+    flag(
+      p,
+      `${FINGERPRINT_FILE} does not match this article — set its entry to ` +
+      `{"content": "${fingerprint}", "dateModified": "${modified}"}` +
+      (known.content !== fingerprint && known.dateModified === modified
+        ? `, and check that ${modified} is still the day this ships`
+        : '')
+    );
   }
 
   // --- internal links must resolve ---
@@ -298,9 +696,36 @@ for (const p of articlePaths) {
       if (otherHeadings.includes(h)) flag(p, `h2 "${h}" also appears on ${other}`);
     }
   }
+
+  // --- cannibalisation: two titles may not lead with the same phrase ---
+  const head = titlesByArticle.get(p);
+  for (const [other, otherHead] of titlesByArticle) {
+    if (other === p) continue;
+    if (otherHead === head) {
+      flag(p, `title leads with "${head}", and so does ${other} — both pages ask to own it`);
+    }
+  }
 }
 
 console.log(`checked ${articlePaths.length} articles`);
+// Coverage, asserted rather than hoped for. In the post-merge run — the only
+// one whose clock is the shipping day — an article no date rule touched is the
+// failure this whole mechanism exists to prevent, however it came about.
+const unchecked = articlePaths.filter((p) => !dateCheckedBy.has(p));
+if (unchecked.length) {
+  const message =
+    `${unchecked.length} of ${articlePaths.length} article(s) had no ` +
+    `modification-date rule applied at all: ${unchecked.join(', ')}`;
+  if (EXPLICIT_BASE) {
+    console.error(`error: ${message} — this run cannot vouch for their dates`);
+    process.exit(1);
+  }
+  console.warn(`note: ${message}`);
+} else {
+  const modes = [...new Set(dateCheckedBy.values())].sort().join(', ');
+  console.log(`dates checked for ${articlePaths.length} article(s) by: ${modes}`);
+}
+
 if (problems.length) {
   console.error('\nARTICLE STANDARD VIOLATIONS:');
   for (const pr of problems) console.error('  ✗ ' + pr);

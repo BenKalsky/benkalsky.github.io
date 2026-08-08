@@ -1,0 +1,51 @@
+# The article gate again, on master, against the commit master was at before
+# this push.
+#
+# Why it exists: the modification-date check requires an article whose content
+# changed to carry the date of the run. Inside a pull request that is the day
+# the check ran, and a green check outlives its day — a run that passed on the
+# 8th still shows green when the branch merges on the 9th, and the article
+# ships claiming the 8th. Nothing inside the pull request can see the merge.
+#
+# Here the runner's date is the ship date, because this runs on the merge. It
+# detects rather than prevents: the article is already live while master is
+# red. The alternative — a gate at merge time that blocks — needs a merge queue
+# this repository does not have.
+name: Article modification dates
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  dates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The baseline is read with `git show <ref>:<file>`, so the ref has to
+          # be in the clone.
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      # github.event.before is master's tip before this push, which is the right
+      # baseline for both a squash merge and a direct commit. On a first push or
+      # after a force push it can name a commit that is not in the clone, and
+      # the gate fails there rather than warning: this is the run whose clock is
+      # the shipping day, so a pass with no baseline would be a green tick on
+      # the one check that had nothing to compare.
+      - name: Validate articles against the pre-merge master
+        env:
+          FINGERPRINT_BASE: ${{ github.event.before }}
+        run: npm run validate:articles

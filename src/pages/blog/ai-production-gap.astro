@@ -5,6 +5,7 @@ export const meta = {
   title: 'בינה מלאכותית לעסקים: למה הדמו נתקע בדרך לפרודקשן | בן קלסקי',
   description:
     'רוב פרויקטי הבינה המלאכותית לעסקים נעצרים אחרי הדמו. מה באמת חסר בדרך לפרודקשן: נתונים, גבולות, בדיקות ובעלים לתוצאה. קבעו פגישת אבחון חינם.',
+  dateModified: '2026-08-08',
   datePublished: '2026-08-02',
 };
 
@@ -43,10 +44,10 @@ const jsonLd = {
       description: meta.description,
       inLanguage: 'he',
       datePublished: meta.datePublished,
-      dateModified: meta.datePublished,
+      dateModified: meta.dateModified,
       mainEntityOfPage: 'https://www.benkalsky.co.il/blog/ai-production-gap/',
       author: { '@id': 'https://www.benkalsky.co.il/#ben' },
-      publisher: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
+      publisher: { '@id': 'https://www.benkalsky.co.il/#ben' },
     },
     {
       '@type': 'Person',
@@ -55,6 +56,7 @@ const jsonLd = {
       alternateName: 'בן קלסקי',
       jobTitle: 'Co-founder & CTO',
       url: 'https://www.benkalsky.co.il/',
+      worksFor: { '@id': 'https://www.benkalsky.co.il/#digitizer' },
     },
     {
       '@type': 'Organization',
@@ -113,7 +115,7 @@ const jsonLd = {
     <p>ואז, כשמוסיפים שכבת שיקול דעת, <a href="/blog/ai-agents/">סוכן AI</a> שמטפל בפניות או מנהל תהליך, הוא נוחת על צנרת שכבר עובדת במקום על ביצה.</p>
 
     <h2>איך נראה תהליך שכן מגיע לפרודקשן</h2>
-    <p>התהליך שאני עובד בו בנוי מחמישה שלבים קבועים: הגדרה חדה של מה בונים ואיך מודדים הצלחה, בנייה בלולאות קצרות, ביקורת על כל שינוי, בדיקות אוטומטיות, ורק אז עלייה לאוויר עם ניטור ודרך חזרה. פירטתי אותו שלב-שלב <a href="/blog/vibe-coding/">במדריך ה-vibe coding</a>, ואת המסלול מהצד שלכם כלקוח, מפגישת אבחון ועד ליווי שוטף, תמצאו <a href="https://www.benkalsky.co.il/#process">בדף הבית</a>.</p>
+    <p>התהליך שאני עובד בו בנוי מחמישה שלבים קבועים: הגדרה חדה של מה בונים ואיך מודדים הצלחה, בנייה בלולאות קצרות, ביקורת על כל שינוי, בדיקות אוטומטיות, ורק אז עלייה לאוויר עם ניטור ודרך חזרה. פירטתי אותו שלב-שלב <a href="/blog/vibe-coding/">במדריך הוייב קודינג</a>, ואת המסלול מהצד שלכם כלקוח, מפגישת אבחון ועד ליווי שוטף, תמצאו <a href="https://www.benkalsky.co.il/#process">בדף הבית</a>.</p>
     <p>הנקודה המרכזית: פרודקשן הוא לא שלב אחרון שמגיעים אליו, הוא הנחת עבודה מהיום הראשון. כל החלטה בדרך נמדדת מולו.</p>
 
     <h2>הטמעת בינה מלאכותית בלי לשרוף שנה</h2>

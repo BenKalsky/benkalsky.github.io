@@ -12,6 +12,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The article gate reads ARTICLE-FINGERPRINTS.json as it stands on the
+          # base branch, so a branch cannot satisfy the modification-date check
+          # by editing its own record. A shallow clone has no base ref to read,
+          # and the gate then says out loud that it fell back to the
+          # self-reported copy.
+          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
