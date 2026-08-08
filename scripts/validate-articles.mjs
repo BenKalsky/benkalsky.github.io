@@ -52,11 +52,18 @@ try {
   );
 }
 
-// The runner's UTC date, used for exactly one thing: telling a second revision
-// shipping TODAY (dateModified legitimately unchanged) from a change shipping
-// later against a date somebody forgot to move. Nothing else here reads a
-// clock, and this comparison only runs for an article whose content differs
-// from the base branch.
+// The runner's UTC date, used for exactly one thing: an article whose content
+// differs from the base branch must carry today's dateModified. Nothing else
+// here reads a clock.
+//
+// On a pull request "today" is the day the check ran, which is not necessarily
+// the day the change ships: a run that went green on the 8th stays green after
+// midnight, and merging on the 9th publishes the 8th. The check cannot see the
+// merge from inside the pull request. What closes it is the same gate running
+// again on master immediately after the merge, where the runner's date IS the
+// ship date — .github/workflows/article-date.yml. That detects the miss rather
+// than preventing it: master goes red and the date is corrected in one commit,
+// after the article is already live for as long as that takes.
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const LIMITS = {
@@ -415,18 +422,20 @@ for (const p of articlePaths) {
   // Against the base branch first: did the article itself change, and did its
   // date move with it? This is the question the working-tree manifest cannot
   // answer about itself.
+  //
+  // The required date is today's, not merely a date later than the baseline's.
+  // "Later" accepted 2026-08-02 for a change shipping on 2026-08-08, and
+  // accepted a future date outright — both of which leave crawlers a
+  // modification date that never happened. Equality also absorbs the
+  // second-revision-on-the-same-day case that used to need its own branch: a
+  // date already set to today passes because it is already correct.
   const base = BASELINE?.[p];
-  if (base && base.content !== fingerprint) {
-    if (modified < base.dateModified) {
-      flag(p, `the content changed since ${BASE_REF} and dateModified ${modified} is earlier than the ${base.dateModified} recorded there`);
-    } else if (modified === base.dateModified && modified !== TODAY) {
-      flag(
-        p,
-        `the content changed since ${BASE_REF} and dateModified is still ${modified} — ` +
-        `set it to the day this ships (${TODAY}), or refresh the manifest only if this ` +
-        `is a second revision on ${modified}`
-      );
-    }
+  if (base && base.content !== fingerprint && modified !== TODAY) {
+    flag(
+      p,
+      `the content changed since ${BASE_REF} and dateModified is ${modified} — ` +
+      `set it to ${TODAY}, the day this run is happening`
+    );
   }
 
   const known = FINGERPRINTS[p];
