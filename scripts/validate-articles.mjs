@@ -84,6 +84,8 @@ let BASELINE = null;
 // Set only in the manifest's first run: the article paths whose source changed
 // since the base. Null when that diff was not readable.
 let INTRODUCTION_CHANGED = null;
+// path -> the name of the rule that checked its dateModified.
+const dateCheckedBy = new Map();
 if (noPredecessor) {
   // Not substituted with origin/master: on that push origin/master IS the
   // commit being checked, so the comparison would be the tip against itself —
@@ -618,6 +620,16 @@ for (const p of articlePaths) {
   // future, because the only remaining check compares it against that same
   // self-reported entry.
   const base = BASELINE?.[p];
+  // Which rule took responsibility for this article's date. Recorded rather
+  // than assumed, because the last five findings on this file were all the
+  // same shape: a path where no rule applied and the build stayed green.
+  // Enumerating the ways a baseline can go missing found them one at a time;
+  // asserting that a comparison HAPPENED closes the class.
+  if (base) dateCheckedBy.set(p, 'baseline');
+  else if (BASELINE) dateCheckedBy.set(p, 'new-entry');
+  else if (INTRODUCTION_CHANGED) {
+    dateCheckedBy.set(p, INTRODUCTION_CHANGED.has(p) ? 'source-diff' : 'source-diff (unchanged)');
+  }
   // The manifest's first run: no recorded state, but the source diff still
   // says which articles this push touched, and those carry today's date.
   if (!BASELINE && INTRODUCTION_CHANGED?.has(p) && modified !== TODAY) {
@@ -696,6 +708,24 @@ for (const p of articlePaths) {
 }
 
 console.log(`checked ${articlePaths.length} articles`);
+// Coverage, asserted rather than hoped for. In the post-merge run — the only
+// one whose clock is the shipping day — an article no date rule touched is the
+// failure this whole mechanism exists to prevent, however it came about.
+const unchecked = articlePaths.filter((p) => !dateCheckedBy.has(p));
+if (unchecked.length) {
+  const message =
+    `${unchecked.length} of ${articlePaths.length} article(s) had no ` +
+    `modification-date rule applied at all: ${unchecked.join(', ')}`;
+  if (EXPLICIT_BASE) {
+    console.error(`error: ${message} — this run cannot vouch for their dates`);
+    process.exit(1);
+  }
+  console.warn(`note: ${message}`);
+} else {
+  const modes = [...new Set(dateCheckedBy.values())].sort().join(', ');
+  console.log(`dates checked for ${articlePaths.length} article(s) by: ${modes}`);
+}
+
 if (problems.length) {
   console.error('\nARTICLE STANDARD VIOLATIONS:');
   for (const pr of problems) console.error('  ✗ ' + pr);
