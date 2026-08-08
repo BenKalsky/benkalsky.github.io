@@ -108,19 +108,24 @@ if (noPredecessor) {
       })
     );
   } catch {
-    if (EXPLICIT_BASE) {
-      console.error(
-        `error: ${BASE_REF} resolves but carries no ${FINGERPRINT_FILE}, and it was ` +
-        `named in FINGERPRINT_BASE — the post-merge run is the only check that sees ` +
-        `the shipping day, so it does not pass without a baseline`
-      );
-      process.exit(1);
-    }
+    // A ref that resolves and carries no manifest is the same category as the
+    // all-zero SHA: not a baseline that failed to load, but a state that never
+    // had one. It happens exactly once per repository — the merge that
+    // introduces this file — and on that push the post-merge job reads the
+    // pre-merge master, where the manifest does not exist yet.
+    //
+    // This used to exit 1 whenever the base was explicit, which would have
+    // turned master red on the merge that added the gate. That is not a
+    // hypothetical: it is what would have happened to this branch.
+    //
+    // Deleting the manifest later does not slip through here. With no
+    // working-tree copy every article fails the "no fingerprint recorded"
+    // rule, so the build stops for that reason instead.
     console.warn(
-      `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} yet — the modification-date ` +
-      `check falls back to the working-tree copy, which the same commit can edit. ` +
-      `This is the first run after the manifest was added and stops being true once ` +
-      `it is on ${BASE_REF}`
+      `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} — there is no recorded ` +
+      `earlier state, so the modification-date comparison is skipped. Every other ` +
+      `rule still runs. This is the manifest's first run and stops being true ` +
+      `once it is on ${BASE_REF}`
     );
   }
 }
