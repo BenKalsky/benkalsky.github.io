@@ -508,8 +508,21 @@ for (const p of articlePaths) {
   // gate rejected — which touches the date and the manifest and nothing else —
   // has an unchanged fingerprint, skips this branch, and can write another
   // false date, including a future one, to turn the build green.
+  // An article the baseline has never heard of is new here — freshly written,
+  // or moved to a new path. That was the widest gap left: with no base entry
+  // the shipping-date assertion was skipped altogether, and an author could
+  // pair a new article with a manifest entry carrying any date at all, past or
+  // future, because the only remaining check compares it against that same
+  // self-reported entry.
   const base = BASELINE?.[p];
-  if (base && (base.content !== fingerprint || base.dateModified !== modified)) {
+  if (BASELINE && !base && modified !== TODAY) {
+    flag(
+      p,
+      `this article is not in the manifest at ${BASE_REF}, so it is new on this ` +
+      `branch and dateModified ${modified} is not ${TODAY}, the day this run is ` +
+      `happening`
+    );
+  } else if (base && (base.content !== fingerprint || base.dateModified !== modified)) {
     if (modified !== TODAY) {
       flag(
         p,
