@@ -66,7 +66,7 @@ const refExists = (() => {
   }
 })();
 let BASELINE = null;
-if (!refExists) {
+if (!refExists && EXPLICIT_BASE) {
   console.error(
     `error: ${BASE_REF} does not resolve in this clone, so the modification dates ` +
     `have nothing to be compared against. Fetch it — CI needs fetch-depth: 0 — or ` +
@@ -74,28 +74,39 @@ if (!refExists) {
   );
   process.exit(1);
 }
-try {
-  BASELINE = JSON.parse(
-    execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-  );
-} catch {
-  if (EXPLICIT_BASE) {
-    console.error(
-      `error: ${BASE_REF} resolves but carries no ${FINGERPRINT_FILE}, and it was ` +
-      `named in FINGERPRINT_BASE — the post-merge run is the only check that sees ` +
-      `the shipping day, so it does not pass without a baseline`
-    );
-    process.exit(1);
-  }
+// Only the baseline comparison needs the ref. Exiting here took the title
+// lengths, the CTA rule, the schema checks, the link destinations and the
+// cross-article heading collisions down with it, in a fork or a tarball where
+// origin/master simply does not exist — nine rules switched off to protect one.
+if (!refExists) {
   console.warn(
-    `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} yet — the modification-date ` +
-    `check falls back to the working-tree copy, which the same commit can edit. ` +
-    `This is the first run after the manifest was added and stops being true once ` +
-    `it is on ${BASE_REF}`
+    `note: ${BASE_REF} does not resolve in this clone, so the modification-date ` +
+    `comparison is skipped. Every other rule still runs`
   );
+} else {
+  try {
+    BASELINE = JSON.parse(
+      execFileSync('git', ['show', `${BASE_REF}:${FINGERPRINT_FILE}`], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+    );
+  } catch {
+    if (EXPLICIT_BASE) {
+      console.error(
+        `error: ${BASE_REF} resolves but carries no ${FINGERPRINT_FILE}, and it was ` +
+        `named in FINGERPRINT_BASE — the post-merge run is the only check that sees ` +
+        `the shipping day, so it does not pass without a baseline`
+      );
+      process.exit(1);
+    }
+    console.warn(
+      `note: ${BASE_REF} carries no ${FINGERPRINT_FILE} yet — the modification-date ` +
+      `check falls back to the working-tree copy, which the same commit can edit. ` +
+      `This is the first run after the manifest was added and stops being true once ` +
+      `it is on ${BASE_REF}`
+    );
+  }
 }
 
 // The runner's UTC date, used for exactly one thing: an article whose content
