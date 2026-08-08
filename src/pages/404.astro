@@ -1,0 +1,42 @@
+---
+// Was public/404.html: a hand-written static file that bypassed the layout, and
+// with it GTM and the consent banner. That made every broken route invisible in
+// analytics — the one page where knowing the URL is the entire point — and left
+// the one deployed document where "change your choice at any time" had no
+// control to change it with.
+//
+// It inherits both by being a page rather than an asset. The consent logic is
+// subtle enough that a second copy of it would be the risk, not the fix.
+import BlogLayout from '../layouts/BlogLayout.astro';
+---
+<BlogLayout
+  title="404 — הדף לא נמצא"
+  description="הדף שחיפשתם לא קיים. חזרה לעמוד הראשי או לבלוג."
+  canonicalPath="/404.html"
+  noindex={true}
+>
+  <div class="notfound">
+    <p class="code" aria-hidden="true">404</p>
+    <h1>הדף הזה לא כאן</h1>
+    <p>יכול להיות שהכתובת השתנתה, או שהודלף לינק ישן.</p>
+    <p class="links">
+      <a href="/">חזרה לעמוד הראשי</a> · <a href="/blog/">לבלוג</a>
+    </p>
+  </div>
+</BlogLayout>
+
+<style>
+  .notfound { text-align: center; padding: 48px 0 72px; }
+  /* The number carried the heading role on the old page, which left the page
+     announcing "404" as its only heading. It is decorative now and the
+     sentence underneath is the h1. */
+  .code {
+    font-size: clamp(3.5rem, 12vw, 6rem);
+    font-weight: 700;
+    color: var(--violet, #6C4BC8);
+    line-height: 1;
+    margin: 0 0 .5rem;
+  }
+  .notfound h1 { margin: 0 0 .75rem; }
+  .links { margin-top: 1.5rem; }
+</style>
